@@ -25,12 +25,12 @@ public interface UserMapper {
     @Select("select * from user where token = #{token}")
     User findByToken(String token);
 
-    @Insert("insert into user(account_id, name, token, gmt_create, gmt_modified)" +
-            " values (#{account_id}, #{name}, #{token}, #{gmt_create}, #{gmt_modified})")
+    @Insert("insert into user(account_id, name, token, gmt_create, gmt_modified, bio, avatar_url)" +
+            " values (#{accountId}, #{name}, #{token}, #{gmtCreate}, #{gmtModified}, #{bio}, #{avatarUrl})")
     void saveUser(User user);
 
     @Update("update user set account_id=#{account_id}, name=#{name}, token=#{token}," +
-            " gmt_create=#{gmt_create}, gmt_modified=#{gmt_modified} where id=#{id}")
+            " gmt_create=#{gmtCreate}, gmtModified=#{gmtModified} where id=#{id}")
     void updateUser(User user);
 
     @Delete("delete from user where id=#{id}")

@@ -49,11 +49,13 @@ public class AuthorizeController {
         GithubUserDTO githubUser = githubProvider.getGithubUser(accessToken);
         if (githubUser != null) {
             User user = new User();
-            user.setAccount_id(String.valueOf(githubUser.getId()));
+            user.setAccountId(String.valueOf(githubUser.getId()));
             user.setToken(UUID.randomUUID().toString());
             user.setName(githubUser.getName());
-            user.setGmt_create(System.currentTimeMillis());
-            user.setGmt_modified(System.currentTimeMillis());
+            user.setGmtCreate(System.currentTimeMillis());
+            user.setGmtModified(user.getGmtCreate());
+            user.setBio(githubUser.getBio());
+            user.setAvatarUrl(githubUser.getAvatarUrl());
             userMapper.saveUser(user);
             response.addCookie(new Cookie("token", user.getToken()));
             return "redirect:/";
