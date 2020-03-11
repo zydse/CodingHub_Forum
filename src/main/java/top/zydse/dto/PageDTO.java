@@ -25,7 +25,7 @@ public class PageDTO implements Serializable {
     private boolean showNext;
     private boolean showEndPage;
 
-    public void setPagination(int pageCount, Integer page, Integer size) {
+    public void setPagination(int pageCount, Integer page) {
         this.pageCount = pageCount;
         currentPage = page;
         showPrevious = page != 1;
@@ -41,6 +41,5 @@ public class PageDTO implements Serializable {
         }
         showFirstPage = !pages.contains(1);
         showEndPage = !pages.contains(pageCount);
-        System.out.println(pages);
     }
 }

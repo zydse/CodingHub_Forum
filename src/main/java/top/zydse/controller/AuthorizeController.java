@@ -9,6 +9,7 @@ import top.zydse.dto.GithubUserDTO;
 import top.zydse.mapper.UserMapper;
 import top.zydse.model.User;
 import top.zydse.provider.GithubProvider;
+import top.zydse.service.UserService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +28,7 @@ public class AuthorizeController {
     @Autowired
     private GithubProvider githubProvider;
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Value("${github.client.id}")
     private String clientId;
@@ -52,11 +53,9 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setToken(UUID.randomUUID().toString());
             user.setName(githubUser.getName());
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
             user.setBio(githubUser.getBio());
             user.setAvatarUrl(githubUser.getAvatarUrl());
-            userMapper.saveUser(user);
+            userService.saveOrUpdate(user);
             response.addCookie(new Cookie("token", user.getToken()));
             return "redirect:/";
         } else {

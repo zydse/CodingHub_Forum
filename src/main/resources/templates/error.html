@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CodingHub</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
+</head>
+<body>
+<script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
+<script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
+
+<div th:insert="navigation :: nav"></div>
+<div class="jumbotron">
+    <h1>哎呀！页面出错了</h1>
+    <p th:text="${message}"></p>
+    <p><a class="btn btn-primary btn-lg" th:href="@{/}" role="button">返回首页</a></p>
+</div>
+</body>
+</html>
