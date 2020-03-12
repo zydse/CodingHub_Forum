@@ -7,7 +7,7 @@ body{
     margin: 30px;
 }
 
-.btn-publish{
+.btn-float-right{
     float: right;
     margin-bottom: 15px;
 }
@@ -29,4 +29,8 @@ body{
 
 .jumbotron{
     margin: 50px;
+}
+
+.comment{
+    margin: 10px 0;
 }

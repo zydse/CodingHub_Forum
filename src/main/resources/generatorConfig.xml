@@ -32,13 +32,11 @@
         </javaClientGenerator>
 
         <table tableName="user" domainObjectName="User">
-            <!--为false时可以转换为驼峰命名-->
+            <!--为false时可以转换为驼峰命名，默认为false-->
             <property name="useActualColumnNames" value="false"/>
         </table>
-        <table tableName="question" domainObjectName="Question">
-            <!--为false时可以转换为驼峰命名-->
-            <property name="useActualColumnNames" value="false"/>
-        </table>
+        <table tableName="question" domainObjectName="Question"/>
+        <table tableName="comment" domainObjectName="Comment"/>
 
     </context>
 </generatorConfiguration>

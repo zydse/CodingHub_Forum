@@ -37,3 +37,11 @@ mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
 ## 2020.03.11
 
 1. 增加自定义异常类CustomizeException，和全局异常处理@ControllerAdvice，error.html模板
+2. 增加异常处理Controller
+3. 增加评论表，后台增加一个接收json格式post请求的controller
+
+## 2020.03.12
+
+1. 增强异常处理，可以根据请求头分别饭返回json或html响应
+2. 实现评论的后台处理逻辑
+3. 增加前台评论的输入框，完成ajax请求，评论后关闭编辑区

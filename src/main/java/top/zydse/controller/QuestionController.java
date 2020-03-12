@@ -20,9 +20,10 @@ public class QuestionController {
     @Autowired
     QuestionService questionService;
     @GetMapping("/question/{id}")
-    public String list(@PathVariable(name = "id")Integer questionId,
+    public String list(@PathVariable(name = "id")Long questionId,
                        Model model){
         QuestionDTO questionDTO = questionService.findById(questionId);
+        questionService.increaseViewCount(questionDTO.getId());
         model.addAttribute("question",questionDTO);
         return "question";
     }

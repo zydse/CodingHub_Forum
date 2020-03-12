@@ -1,4 +1,4 @@
-package top.zydse.exception;
+package top.zydse.enums;
 
 /**
  * CreateBy: zydse
@@ -9,4 +9,5 @@ package top.zydse.exception;
  */
 public interface ICustomizeErrorCode {
     String getMessage();
+    Integer getCode();
 }

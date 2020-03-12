@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.zydse.dto.PageDTO;
 import top.zydse.dto.QuestionDTO;
-import top.zydse.exception.CustomizeErrorCode;
+import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.QuestionMapper;
 import top.zydse.mapper.UserMapper;
@@ -55,7 +55,7 @@ public class QuestionService {
         return pageDTO;
     }
 
-    public PageDTO findAll(int page, int size, Integer id) {
+    public PageDTO findAll(int page, int size, Long id) {
         PageDTO pageDTO = new PageDTO();
         QuestionExample example = new QuestionExample();
         example.createCriteria().andCreatorEqualTo(id);
@@ -79,10 +79,10 @@ public class QuestionService {
         return pageDTO;
     }
 
-    public QuestionDTO findById(Integer questionId) {
+    public QuestionDTO findById(Long questionId) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
         if(question == null)
-            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOND);
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
         QuestionDTO dto = new QuestionDTO();
         BeanUtils.copyProperties(question, dto);
@@ -95,7 +95,7 @@ public class QuestionService {
             //创建一个问题
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
-            questionMapper.insert(question);
+            questionMapper.insertSelective(question);
         } else {
             //更新问题信息
             question.setGmtModified(System.currentTimeMillis());
@@ -103,5 +103,11 @@ public class QuestionService {
             if(count != 1)
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_ALREADY_DELETED);
         }
+    }
+
+    public void increaseViewCount(Long id) {
+        Question question = questionMapper.selectByPrimaryKey(id);
+        question.setViewCount(question.getViewCount() + 1);
+        questionMapper.updateByPrimaryKey(question);
     }
 }
