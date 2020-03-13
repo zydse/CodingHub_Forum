@@ -29,7 +29,7 @@
                     <h4 class="media-heading" th:text="${question.title}">问题标题，2014-08-30</h4>
                     <span th:text="${question.description}">详情。。。</span>
                     <br/>
-                    <span class="text-desc"><span th:text="${question.commentCount}">00</span> 个回复 • <span
+                    <span class="text_desc"><span th:text="${question.commentCount}">00</span> 个回复 • <span
                             th:text="${question.viewCount}">00</span> 次浏览 •
                         <span th:text="${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}">刚刚</span>
                     </span>

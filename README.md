@@ -45,3 +45,10 @@ mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
 1. 增强异常处理，可以根据请求头分别饭返回json或html响应
 2. 实现评论的后台处理逻辑
 3. 增加前台评论的输入框，完成ajax请求，评论后关闭编辑区
+
+## 2020.03.13
+
+1. 展示问题的所有评论
+2. 学习了Lambda与streamAPI
+3. 展示评论的子评论
+4. 完成子评论列表的后台，前台动态展示未完成

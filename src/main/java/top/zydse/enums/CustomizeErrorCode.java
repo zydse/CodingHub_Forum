@@ -15,7 +15,8 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     QUESTION_NOT_FOUND(9001, "没有找到你想看的问题，或者问题已经不存在了"),
     QUESTION_ALREADY_DELETED(9002, "问题已经被删除了，请重新发布"),
     COMMENT_TYPE_NOT_FOUND(3002, "请告诉我，你要回复问题还是评论"),
-    COMMENT_NOT_FOUND(3003, "对不起，你要回复的评论不存在了");
+    COMMENT_NOT_FOUND(3003, "对不起，你要回复的评论不存在了"),
+    CONTENT_IS_EMPTY_OR_TO_SHORT(3004, "你的评论内容可能迷路了，或者你回复的内容太短了");
 
     private String message;
     private Integer code;

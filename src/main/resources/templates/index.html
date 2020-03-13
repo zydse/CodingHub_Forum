@@ -6,11 +6,19 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}">
     <link rel="stylesheet" th:href="@{/css/forum.css}">
+    <script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
+    <script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
+    <script type="application/javascript">
+        $(function () {
+            var closable = window.localStorage.getItem("closable");
+            if(closable == "true"){
+                window.localStorage.removeItem("closable");
+                window.close();
+            }
+        });
+    </script>
 </head>
 <body>
-<script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
-<script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
-
 <div th:insert="navigation :: nav"></div>
 
 <div class="container-fluid main">
@@ -32,7 +40,7 @@
                     </h4>
                     <span th:text="${question.description}">问题详情</span>
                     <br/>
-                    <span class="text-desc"><span th:text="${question.commentCount}">00</span> 个回复 • <span
+                    <span class="text_desc"><span th:text="${question.commentCount}">00</span> 个回复 • <span
                             th:text="${question.viewCount}">00</span> 次浏览 •
                         <span th:text="${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}">刚刚</span>
                     </span>

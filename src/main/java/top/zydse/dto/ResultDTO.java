@@ -2,8 +2,9 @@ package top.zydse.dto;
 
 import lombok.Data;
 import top.zydse.enums.CustomizeErrorCode;
-import top.zydse.enums.ICustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
+
+import java.util.List;
 
 /**
  * CreateBy: zydse
@@ -13,9 +14,10 @@ import top.zydse.exception.CustomizeException;
  * @Date: 2020/3/11
  */
 @Data
-public class ResultDTO {
+public class ResultDTO<T> {
     private Integer code;
     private String message;
+    private T data;
 
     public static ResultDTO valueOf(Integer code, String message) {
         ResultDTO resultDTO = new ResultDTO();
@@ -28,11 +30,17 @@ public class ResultDTO {
         return valueOf(noLogin.getCode(), noLogin.getMessage());
     }
 
-    public static ResultDTO successOf(int code, String message) {
-        return valueOf(code, message);
+    public static ResultDTO successOf() {
+        return valueOf(200, "请求成功");
     }
 
     public static ResultDTO errorOf(CustomizeException ex) {
         return valueOf(ex.getCode(), ex.getMessage());
+    }
+
+    public static <T> ResultDTO successOf(T data) {
+        ResultDTO resultDTO = ResultDTO.successOf();
+        resultDTO.setData(data);
+        return resultDTO;
     }
 }

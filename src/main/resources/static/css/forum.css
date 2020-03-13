@@ -7,9 +7,9 @@ body{
     margin: 30px;
 }
 
-.btn-float-right{
+.btn_float_right{
     float: right;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .media-object{
@@ -17,7 +17,7 @@ body{
     height: 38px;
 }
 
-.text-desc{
+.text_desc{
     font-size: 12px;
     font-weight: normal;
     color: #999;
@@ -31,6 +31,42 @@ body{
     margin: 50px;
 }
 
-.comment{
+.comment_edit{
     margin: 10px 0;
+}
+
+.comment-display{
+    margin-top: 20px;
+}
+.comment_section{
+    padding-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: #eee solid 1px;
+}
+
+.comment_operate{
+    margin-top: 10px;
+}
+
+.comment_operate .icon{
+    font-size: 16px;
+    margin-right: 10px;
+    color: #999;
+    cursor: pointer;
+}
+
+.comment_operate .icon:hover{
+    color: #499ef3;
+}
+
+.question_title{
+    margin-top: 25px;
+}
+
+.sub_comment{
+    margin-top: 10px;
+    padding: 20px 15px 10px;
+    border: #eee solid 1px;
+    border-radius: 5px;
 }

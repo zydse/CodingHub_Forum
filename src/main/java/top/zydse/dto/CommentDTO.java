@@ -1,19 +1,24 @@
 package top.zydse.dto;
 
 import lombok.Data;
-
-import java.io.Serializable;
+import top.zydse.model.User;
 
 /**
  * CreateBy: zydse
  * ClassName: CommentDTO
  * Description:
  *
- * @Date: 2020/3/11
+ * @Date: 2020/3/13
  */
 @Data
-public class CommentDTO implements Serializable {
+public class CommentDTO {
+    private Long id;
     private Long parentId;
-    private String content;
     private Integer type;
+    private Long reviewer;
+    private Long gmtCreate;
+    private Long gmtModified;
+    private Integer thumbCount;
+    private String content;
+    private User user;
 }
