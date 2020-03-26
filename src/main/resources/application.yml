@@ -1,0 +1,57 @@
+spring:
+  profiles:
+    active: dev
+
+logging:
+  file:
+    name: logs/forum.log
+    max-size: 200MB
+    max-history: 30
+  level:
+    root: info
+    top:
+      zydse:
+        mapper: info
+# 增加的全局变量，用于注入取值
+github:
+  client:
+    id: 6f77efebf08b5cde324b
+    secret: 648a15f8f24b8d6f98a975dd2b2ced260354856f
+  redirectUri: http://localhost:8080/callback
+  oauthUrl: https://github.com/login/oauth/access_token
+  getTokenUrl: https://api.github.com/user?access_token
+
+mybatis:
+  # 配置mapper的xml文件位置
+  mapper-locations: classpath:mapper/*.xml
+  # 配置MyBatis实体类的别名，resultType可以不用使用全类名
+  type-aliases-package: top.zydse.model
+  configuration:
+    # 配置MyBatis的数据库列使用下划线映射Pojo属性大写字母
+    map-underscore-to-camel-case: true
+
+---
+
+spring:
+  profiles: prod
+  # 配置使用Mysql数据库
+  datasource:
+    url: jdbc:mysql://47.93.221.170:11306/forum
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: Mysql@47.93.
+
+#github:
+#  redirectUri: http://zydse.top/callback
+---
+
+spring:
+  profiles: dev
+  # 配置使用Mysql数据库
+  datasource:
+    url: jdbc:mysql:///forum
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+github:
+  redirectUri: http://localhost:8080/callback

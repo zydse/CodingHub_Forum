@@ -51,12 +51,16 @@ body{
 
 .comment_operate .icon{
     font-size: 16px;
-    margin-right: 10px;
+    vertical-align: middle;
+    margin-right: 15px;
     color: #999;
     cursor: pointer;
 }
 
 .comment_operate .icon:hover{
+    color: #499ef3;
+}
+.comment_operate .icon.active{
     color: #499ef3;
 }
 

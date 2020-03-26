@@ -27,16 +27,59 @@ function subComment(e) {
  */
 function collapseComment(e) {
     var id = $(e).data("id");
+    var commentContainer = $("#comment-" + id);
 
-    if ($("#comment-" + id).hasClass("in")) {
-        $("#comment-" + id).removeClass("in");
-        e.setAttribute("style", "color: #999");
+    if (commentContainer.hasClass("in")) {
+        commentContainer.removeClass("in");
+        var inputElem = commentContainer.get(0).lastElementChild;
+        commentContainer.empty();
+        commentContainer.append($(inputElem));
+        $(e).removeClass("active");
     } else {
         $.getJSON("/comment/" + id, function (response) {
-            console.log(response.data);
+            var inputElem = commentContainer.get(0).lastElementChild;
+            commentContainer.empty();
+            $.each(response.data, function (index, comment) {
+                var $mediaLeft = $("<div/>", {
+                    class: "media-left"
+                });
+                var $a = $("<a/>", {
+                    href: "#"
+                });
+                var $avatar = $("<img/>", {
+                    class: "media-object",
+                    src: comment.user.avatarUrl
+                });
+                var $mediaBody = $("<div/>", {
+                    class: "media-body"
+                });
+                var $name = $("<h5/>", {
+                    class: "media-heading text_desc",
+                    html: comment.user.name
+                });
+                var $text = $("<div/>", {
+                    html: comment.content
+                });
+                var $operate = $("<div/>", {
+                    class: "comment_operate"
+                });
+                var $date = $("<span/>", {
+                    class: "text_desc pull-right",
+                    html: getMyDate(comment.gmtModified)
+                });
+                $mediaBody.append($name).append($text).append($operate.append($date));
+                $a.append($avatar);
+                $mediaLeft.append($a);
+                var elem = $("<div/>", {
+                    class: "col-lg-12 col-md-12 col-sm-12 col-xs-12 media comment_section"
+                });
+                elem.append($mediaLeft).append($mediaBody);
+                commentContainer.append(elem);
+            });
+            commentContainer.append($(inputElem));
+            $("#comment-" + id).addClass("in");
+            $(e).addClass("active");
         });
-        $("#comment-" + id).addClass("in");
-        e.setAttribute("style", "color: #499ef3");
     }
 }
 
@@ -58,9 +101,11 @@ function sendComment(parentId, content, commentType) {
             "type": commentType
         }),
         success: function (result) {
-            console.log(result);
             if (result.code == 200 && commentType == 1) {
                 $("#comment_main").hide();
+            } else if (result.code == 200 && commentType == 2) {
+                $("input[name=input-" + parentId + "]").val("");
+                $("#collapse-" + parentId).click();
             } else if (result.code == 2002) {
                 var isAccept = confirm(result.message);
                 if (isAccept) {
@@ -72,4 +117,45 @@ function sendComment(parentId, content, commentType) {
             }
         }
     });
+}
+
+function getMyDate(str) {
+    /* + ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);*/
+    /*oHour = oDate.getHours(),oMin = oDate.getMinutes(),oSen = oDate.getSeconds(),*/
+    var oDate = new Date(str),
+        oYear = oDate.getFullYear(),
+        oMonth = oDate.getMonth() + 1,
+        oDay = oDate.getDate();//最后拼接时间
+    return oYear + '-' + addZero(oMonth) + '-' + addZero(oDay);
+}
+
+//补0操作
+function addZero(num) {
+    if (parseInt(num) < 10) {
+        num = '0' + num;
+    }
+    return num;
+}
+
+function verifyInfo() {
+    var username = $("#username-input").val();
+    if('' == username){
+        alert("用户名不能为空");
+        return;
+    }
+    var password = $("#password-input").val();
+    if('' == password){
+        alert("密码不能为空");
+        return;
+    }
+    var retype = $("#password-retype").val();
+    if('' == retype){
+        alert("重输不能为空");
+        return;
+    }
+
+    if(password != retype){
+        alert("两次输入的密码不一致，请重试");
+        return;
+    }
 }

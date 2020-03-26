@@ -3,6 +3,8 @@ package top.zydse.dto;
 import lombok.Data;
 import top.zydse.model.User;
 
+import java.io.Serializable;
+
 /**
  * CreateBy: zydse
  * ClassName: CommentDTO
@@ -11,7 +13,7 @@ import top.zydse.model.User;
  * @Date: 2020/3/13
  */
 @Data
-public class CommentDTO {
+public class CommentDTO implements Serializable {
     private Long id;
     private Long parentId;
     private Integer type;
@@ -19,6 +21,7 @@ public class CommentDTO {
     private Long gmtCreate;
     private Long gmtModified;
     private Integer thumbCount;
+    private Integer subCommentCount;
     private String content;
     private User user;
 }

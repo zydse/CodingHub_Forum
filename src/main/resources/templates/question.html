@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${question.title}">问题</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}">
-    <link rel="stylesheet" th:href="@{/css/forum.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/forum.css}"/>
+    <link rel="stylesheet" th:href="@{/css/editormd.preview.min.css}"/>
     <script type="application/javascript" th:src="@{/js/forum.js}"></script>
 </head>
 <body>
 <script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
 <script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
+<script th:src="@{/js/editormd.min.js}"></script>
+<script th:src="@{/js/lib/marked.min.js}"></script>
+<script th:src="@{/js/lib/prettify.min.js}"></script>
 
 <div th:insert="navigation :: nav"></div>
 
@@ -27,9 +31,26 @@
                 阅读数:<span th:text="${question.viewCount}"></span>
             </span>
                 <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
-                <div th:text="${question.description}"></div>
+                <div id="markdown-preview" style="border: solid #efefef 1px;">
+                    <textarea style="display:none;" th:text="${question.description}">### Hello world!</textarea>
+                    <script type="text/javascript">
+                        $(function () {
+                            editormd.markdownToHTML("markdown-preview", {
+                                // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+                                // htmlDecode : true,  // Enable / disable HTML tag encode.
+                                // htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+                            });
+                        });
+                    </script>
+                </div>
                 <hr/>
-                <div>这里展示问题的标签</div>
+                <div>
+                    <span class="label label-info" style="margin-right: 5px"
+                          th:each="tag : ${question.tags.split(',')}">
+                        <span class="glyphicon glyphicon-tag"></span>
+                        <span th:text="${tag}"></span>
+                    </span>
+                </div>
                 <hr/>
                 <div th:if="${session.user != null && question.user.id == session.user.id}">
                     <a th:href="@{/publish/{questionId}(questionId = ${question.id})}" class="text_desc">
@@ -40,7 +61,7 @@
             </div>
 
             <!--回复-->
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 comment-display">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 comment-display" id="comments">
                 <h4 th:text="${question.commentCount} + '个回复'"></h4>
                 <hr style="margin-top: 0;"/>
                 <div class="media comment_section" th:each="comment : ${comments}">
@@ -53,31 +74,20 @@
                         <h5 class="media-heading text_desc" th:text="${comment.user.name}">USERNAME</h5>
                         <div th:text="${comment.content}">这里是评论内容</div>
                         <div class="comment_operate">
-                            <span class="glyphicon glyphicon-thumbs-up icon"></span>
-                            <span class="glyphicon glyphicon-comment icon" th:data-id="${comment.id}"
-                                  onclick="collapseComment(this)"></span>
-                            <span th:text="${#dates.format(comment.gmtModified, 'yyyy-MM-dd')}"
+                            <span class="icon">
+                                <span class="glyphicon glyphicon-thumbs-up"></span>
+                                <span th:text="${comment.thumbCount}"></span>
+                            </span>
+                            <span class="icon" onclick="collapseComment(this)" th:data-id="${comment.id}"
+                                  th:id="${'collapse-' + comment.id}">
+                                <span class="glyphicon glyphicon-comment"></span>
+                                <span th:text="${comment.subCommentCount}"></span>
+                            </span>
+                            <span th:text=" ${#dates.format(comment.gmtModified, 'yyyy-MM-dd')}"
                                   class="text_desc pull-right"></span>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 collapse sub_comment"
                              th:id="'comment-' + ${comment.id}">
-                            <!--迭代二级评论-->
-                            <div class="media comment_section" th:each="comment : ${comments}">
-                                <div class="media-left">
-                                    <a href="#">
-                                        <img class="media-object" th:src="${comment.user.avatarUrl}"
-                                             alt="USER AVATAR">
-                                    </a>
-                                </div>
-                                <div class="media-body">
-                                    <h5 class="media-heading text_desc" th:text="${comment.user.name}">USERNAME</h5>
-                                    <div th:text="${comment.content}">这里是评论内容</div>
-                                </div>
-                                <div class="comment_operate">
-                                        <span th:text="${#dates.format(comment.gmtModified, 'yyyy-MM-dd')}"
-                                              class="text_desc pull-right"></span>
-                                </div>
-                            </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <input type="text" class="form-control" th:name="${'input-' + comment.id}"
                                        placeholder="评论一下...">
@@ -96,11 +106,13 @@
                 <div class="media">
                     <div class="media-left">
                         <a href="#">
-                            <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="User Avatar">
+                            <img class="media-object img-rounded"
+                                 th:src="${session.user == null ? '/images/anonymous_user_avatar.png' : session.user.avatarUrl}"
+                                 alt="User Avatar"/>
                         </a>
                     </div>
                     <div class="media-body">
-                        <h5 class="media-heading " style="padding-top: 10px" th:text="${question.user.name}">
+                        <h5 class="media-heading " style="padding-top: 10px" th:text="${session.user == null ? 'Anonymous user' : session.user.name}">
                             USERNAME</h5>
                     </div>
                 </div>
@@ -131,5 +143,6 @@
         </div>
     </div>
 </div>
+
 </body>
 </html>

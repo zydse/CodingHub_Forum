@@ -1,17 +1,15 @@
-create table question
+CREATE TABLE QUESTION
 (
-	id BIGINT auto_increment,
-	title VARCHAR(50),
-	description TEXT,
-	gmt_create BIGINT,
-	gmt_modified BIGINT,
-	creator BIGINT,
-	comment_count INT default 0,
-	view_count INT default 0,
-	thumb_count INT default 0,
-	tags VARCHAR(256),
-	constraint question_pk
-		primary key (id)
+	ID BIGINT AUTO_INCREMENT,
+	TITLE VARCHAR(50),
+	DESCRIPTION TEXT,
+	GMT_CREATE BIGINT,
+	GMT_MODIFIED BIGINT,
+	CREATOR BIGINT,
+	COMMENT_COUNT INT DEFAULT 0,
+	VIEW_COUNT INT DEFAULT 0,
+	THUMB_COUNT INT DEFAULT 0,
+	TAGS VARCHAR(256),
+	CONSTRAINT QUESTION_PK
+		PRIMARY KEY (ID)
 );
-
-comment on table question is '问题表';

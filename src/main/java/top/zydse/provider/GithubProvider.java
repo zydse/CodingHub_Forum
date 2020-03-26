@@ -2,6 +2,7 @@ package top.zydse.provider;
 
 import com.alibaba.fastjson.JSON;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.zydse.dto.AccessTokenDTO;
 import top.zydse.dto.GithubUserDTO;
@@ -19,14 +20,20 @@ import java.io.IOException;
 public class GithubProvider {
     private OkHttpClient client;
 
-    public GithubProvider(){
+    @Value("${github.oauthUrl}")
+    private String oauthUrl;
+    @Value("${github.getTokenUrl}")
+    private String getTokenUrl;
+
+    public GithubProvider() {
         client = new OkHttpClient();
     }
+
     public String getAccessToken(AccessTokenDTO accessTokenDTO) {
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON.toJSONString(accessTokenDTO), mediaType);
         Request request = new Request.Builder()
-                .url("https://github.com/login/oauth/access_token")
+                .url(oauthUrl)
                 .post(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
@@ -40,11 +47,10 @@ public class GithubProvider {
 
     public GithubUserDTO getGithubUser(String token) {
         Request request = new Request.Builder()
-                .url("https://api.github.com/user?access_token=" + token)
+                .url(getTokenUrl + "=" + token)
                 .build();
         try (Response response = client.newCall(request).execute()) {
             String string = response.body().string();
-//            System.out.println("get user information from github\n" + string);
             return JSON.parseObject(string, GithubUserDTO.class);
         } catch (IOException e) {
             e.printStackTrace();

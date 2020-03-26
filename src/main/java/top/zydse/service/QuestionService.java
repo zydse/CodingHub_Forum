@@ -1,14 +1,18 @@
 package top.zydse.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import top.zydse.dto.PageDTO;
+import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.QuestionDTO;
+import top.zydse.dto.QuestionQueryDTO;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.QuestionMapper;
+import top.zydse.mapper.QuestionMapperExt;
 import top.zydse.mapper.UserMapper;
 import top.zydse.model.Question;
 import top.zydse.model.QuestionExample;
@@ -30,58 +34,70 @@ public class QuestionService {
     private UserMapper userMapper;
     @Autowired
     private QuestionMapper questionMapper;
+    @Autowired
+    private QuestionMapperExt questionMapperExt;
 
-    public PageDTO findAll(Integer page, Integer size) {
-        PageDTO pageDTO = new PageDTO();
-        int totalCount = (int) questionMapper.countByExample(new QuestionExample());
-        int pageCount = totalCount % size == 0 ? totalCount / size : totalCount / size + 1;
-        page = page < 1 ? 1 : page;
-        page = page > pageCount ? pageCount : page;
-        pageDTO.setPagination(pageCount, page);
-        int offset = (page - 1) * size;
+    //有查询条件的方法
+    public PaginationDTO<QuestionDTO> findAll(String search, Integer page, Integer size) {
+        if (StringUtils.isNotBlank(search)) {
+            search = search.replace(" ", "|");
+        }
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
+        int totalCount = questionMapperExt.countBySearch(search);
+        paginationDTO.setPagination(totalCount, page, size);
         QuestionExample example = new QuestionExample();
         example.setOrderByClause("gmt_create desc");
-        List<Question> questionList = questionMapper.selectByExampleWithRowbounds(
-                example, new RowBounds(offset, size));
-        List<QuestionDTO> dtoList = new ArrayList<>();
-        for (Question question : questionList) {
-            User user = userMapper.selectByPrimaryKey(question.getCreator());
-            QuestionDTO questionDTO = new QuestionDTO();
-            BeanUtils.copyProperties(question, questionDTO);
-            questionDTO.setUser(user);
-            dtoList.add(questionDTO);
-        }
-        pageDTO.setQuestions(dtoList);
-        return pageDTO;
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        QuestionQueryDTO queryDTO = new QuestionQueryDTO();
+        queryDTO.setSearch(search);
+        queryDTO.setOffset(offset);
+        queryDTO.setSize(size);
+        List<Question> questionList = questionMapperExt.selectBySearch(queryDTO);
+        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
     }
 
-    public PageDTO findAll(int page, int size, Long id) {
-        PageDTO pageDTO = new PageDTO();
+    //没有查询条件的查询方法
+    public PaginationDTO<QuestionDTO> findAll(Integer page, Integer size) {
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
+        int totalCount = (int) questionMapper.countByExample(new QuestionExample());
+        paginationDTO.setPagination(totalCount, page, size);
+        QuestionExample example = new QuestionExample();
+        example.setOrderByClause("gmt_create desc");
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        List<Question> questionList = questionMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
+        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+    }
+
+    public PaginationDTO<QuestionDTO> findAll(int page, int size, Long id) {
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
         QuestionExample example = new QuestionExample();
         example.createCriteria().andCreatorEqualTo(id);
         example.setOrderByClause("gmt_create desc");
         int totalCount = (int) questionMapper.countByExample(example);
-        int pageCount = totalCount % size == 0 ? totalCount / size : totalCount / size + 1;
-        page = page < 1 ? 1 : page;
-        page = page > pageCount ? pageCount : page;
-        pageDTO.setPagination(pageCount, page);
-        int offset = (page - 1) * size;
-        List<Question> plainQuestions = questionMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
+        paginationDTO.setPagination(totalCount, page, size);
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        List<Question> questionList = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset, size));
+        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+    }
+
+    @NotNull
+    private PaginationDTO<QuestionDTO> getQuestionDTOPaginationDTO(PaginationDTO<QuestionDTO> paginationDTO, List<Question> questionList) {
         List<QuestionDTO> dtoList = new ArrayList<>();
-        for (Question plainQuestion : plainQuestions) {
+        for (Question plainQuestion : questionList) {
             User user = userMapper.selectByPrimaryKey(plainQuestion.getCreator());
             QuestionDTO questionDTO = new QuestionDTO();
             BeanUtils.copyProperties(plainQuestion, questionDTO);
             questionDTO.setUser(user);
             dtoList.add(questionDTO);
         }
-        pageDTO.setQuestions(dtoList);
-        return pageDTO;
+        paginationDTO.setPageData(dtoList);
+
+        return paginationDTO;
     }
 
     public QuestionDTO findById(Long questionId) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
-        if(question == null)
+        if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
         QuestionDTO dto = new QuestionDTO();
@@ -99,8 +115,8 @@ public class QuestionService {
         } else {
             //更新问题信息
             question.setGmtModified(System.currentTimeMillis());
-            int count = questionMapper.updateByPrimaryKey(question);
-            if(count != 1)
+            int count = questionMapper.updateByPrimaryKeySelective(question);
+            if (count != 1)
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_ALREADY_DELETED);
         }
     }

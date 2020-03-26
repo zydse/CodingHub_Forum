@@ -1,5 +1,6 @@
 package top.zydse.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,7 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 import top.zydse.enums.CustomizeErrorCode;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * CreateBy: zydse
@@ -20,7 +20,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller
 @RequestMapping("${server.error.path:${error.path:/error}}")
+@Slf4j
 public class CustomizeErrorController implements ErrorController {
+
     @Override
     public String getErrorPath() {
         return "error";
@@ -28,6 +30,7 @@ public class CustomizeErrorController implements ErrorController {
 
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView errorHtml(HttpServletRequest request) {
+        log.info("Now you are in errorController");
         HttpStatus status = getStatus(request);
         ModelAndView error = new ModelAndView("error");
         if(status.is4xxClientError()){

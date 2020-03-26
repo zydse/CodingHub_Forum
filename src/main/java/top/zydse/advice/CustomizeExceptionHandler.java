@@ -1,7 +1,6 @@
 package top.zydse.advice;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;

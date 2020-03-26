@@ -8,13 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import top.zydse.dto.QuestionDTO;
-import top.zydse.mapper.QuestionMapper;
-import top.zydse.mapper.UserMapper;
 import top.zydse.model.Question;
 import top.zydse.model.User;
 import top.zydse.service.QuestionService;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&amp;subset=devanagari,latin-ext"
+          rel="stylesheet">
+    <title>注册</title>
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/css/animate.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootsnav.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+</head>
+<body>
+<section class="signin signup popup-in">
+    <div class="container">
+        <div class="sign-content popup-in-content">
+            <div class="popup-in-txt">
+                <h2>注册</h2>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="signin-form">
+                            <form action="signin.html">
+                                <div class="form-group">
+                                    <label for="username-input">用户名</label>
+                                    <input type="text" class="form-control" id="username-input" name="username"
+                                           placeholder="用户名">
+                                </div><!--/.form-group -->
+                                <div class="form-group">
+                                    <label for="password-input">密码</label>
+                                    <input type="password" class="form-control" id="password-input" name="username"
+                                           placeholder="密码">
+                                </div><!--/.form-group -->
+                                <div class="form-group">
+                                    <label for="password-retype">确认密码</label>
+                                    <input type="password" class="form-control" id="password-retype"
+                                           placeholder="请重新输入密码">
+                                </div><!--/.form-group -->
+                            </form><!--/form -->
+                        </div><!--/.signin-form -->
+                    </div><!--/.col -->
+                </div><!--/.row -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="signin-footer">
+                            <button type="button" class="btn signin_btn" data-toggle="modal"
+                                    data-target="#notice">
+                                注册
+                            </button>
+                            <p>
+                                已经是会员了 ?
+                                <a th:href="@{/user/login}">登录</a>
+                            </p>
+                        </div><!--/.signin-footer -->
+                    </div><!--/.col-->
+                </div><!--/.row -->
+                <div class="modal fade" id="notice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                            </div>
+                            <div class="modal-body">
+                                我出现了
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!--/.sign-content -->
+    </div><!--/.container -->
+</section><!--/.signin -->
+<!--footer copyright start -->
+<footer class="footer-copyright">
+    <div id="scroll-Top">
+        <i class="fa fa-angle-double-up return-to-top" id="scroll-top" data-toggle="tooltip" data-placement="top"
+           title="" data-original-title="Back to Top" aria-hidden="true"></i>
+    </div><!--/.scroll-Top-->
+</footer><!--/.hm-footer-copyright-->
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/modernizr.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/bootsnav.js}"></script>
+<script th:src="@{/js/jquery.sticky.js}"></script>
+<script th:src="@{/js/jquery.easing.min.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+<script th:src="@{/js/forum.js}"></script>
+</body>
+
+</html>

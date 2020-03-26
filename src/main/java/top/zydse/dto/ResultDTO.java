@@ -1,10 +1,9 @@
 package top.zydse.dto;
 
 import lombok.Data;
-import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * CreateBy: zydse
@@ -14,7 +13,7 @@ import java.util.List;
  * @Date: 2020/3/11
  */
 @Data
-public class ResultDTO<T> {
+public class ResultDTO<T> implements Serializable {
     private Integer code;
     private String message;
     private T data;
@@ -24,10 +23,6 @@ public class ResultDTO<T> {
         resultDTO.setCode(code);
         resultDTO.setMessage(message);
         return resultDTO;
-    }
-
-    public static ResultDTO errorOf(CustomizeErrorCode noLogin) {
-        return valueOf(noLogin.getCode(), noLogin.getMessage());
     }
 
     public static ResultDTO successOf() {

@@ -1,12 +1,12 @@
 package top.zydse.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import top.zydse.dto.AccessTokenDTO;
 import top.zydse.dto.GithubUserDTO;
-import top.zydse.mapper.UserMapper;
 import top.zydse.model.User;
 import top.zydse.provider.GithubProvider;
 import top.zydse.service.UserService;
@@ -23,6 +23,7 @@ import java.util.UUID;
  * @Date: 2020/3/3
  */
 @Controller
+@Slf4j
 public class AuthorizeController {
 
     @Autowired
@@ -34,7 +35,7 @@ public class AuthorizeController {
     private String clientId;
     @Value("${github.client.secret}")
     private String clientSecret;
-    @Value("${github.redirect.uri}")
+    @Value("${github.redirectUri}")
     private String redirectUri;
 
     @GetMapping("/callback")
@@ -48,7 +49,7 @@ public class AuthorizeController {
         accessTokenDTO.setRedirect_uri(redirectUri);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         GithubUserDTO githubUser = githubProvider.getGithubUser(accessToken);
-        if (githubUser != null) {
+        if (githubUser != null && githubUser.getId() != null) {
             User user = new User();
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setToken(UUID.randomUUID().toString());
@@ -60,6 +61,7 @@ public class AuthorizeController {
             return "redirect:/";
         } else {
             //重新登录
+            log.error("Fail to get message from github {}",githubUser);
             return "redirect:/";
         }
     }

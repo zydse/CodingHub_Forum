@@ -1,10 +1,97 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>登录|这里</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/font-family.css}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&subset=devanagari,latin-ext"
+          rel="stylesheet">
+    <title>登录页</title>
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/css/animate.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootsnav.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
 </head>
 <body>
+<section class="signin popup-in">
+    <div class="container">
+        <div class="sign-content popup-in-content">
+            <div class="popup-in-txt">
+                <h2>登录</h2>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="signin-form">
+                            <form action="login.html">
+                                <div class="form-group">
+                                    <label for="signin_form">用户名</label>
+                                    <input type="email" class="form-control" id="signin_form" placeholder="请输入你的用户名">
+                                </div><!--/.form-group -->
+                                <div class="form-group">
+                                    <label for="signin_form">密码</label>
+                                    <input type="password" class="form-control" id="signin_form" placeholder="请输入你的密码">
+                                </div><!--/.form-group -->
+                            </form><!--/form -->
+                        </div><!--/.signin-form -->
+                    </div><!--/.col -->
+                </div><!--/.row -->
 
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="signin-password">
+                            <div class="awesome-checkbox-list">
+                                <ul class="unstyled centered">
+                                    <li>
+                                        <input class="styled-checkbox" id="styled-checkbox-2" type="checkbox"
+                                               value="value2">
+                                        <label for="styled-checkbox-2">记住我</label>
+                                    </li>
+
+                                    <li>
+                                        <a th:href="@{/user/forget}">忘记了你的账户或密码 ?</a>
+                                    </li>
+
+                                </ul>
+                            </div><!--/.awesome-checkbox-list -->
+                        </div><!--/.signin-password -->
+                    </div><!--/.col -->
+                </div><!--/.row -->
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="signin-footer">
+                            <button type="button" class="btn signin_btn" data-toggle="modal"
+                                    data-target=".signin_modal">
+                                登录
+                            </button>
+                            <p>
+                                还没有账户?
+                                <a th:href="@{/user/register}">注册</a>
+                            </p>
+                        </div><!--/.signin-footer -->
+                    </div><!--/.col-->
+                </div><!--/.row -->
+            </div>
+        </div><!--/.sign-content -->
+
+    </div><!--/.container -->
+
+</section><!--/.signin -->
+
+<footer class="footer-copyright">
+    <div id="scroll-Top">
+        <i class="fa fa-angle-double-up return-to-top" id="scroll-top" data-toggle="tooltip" data-placement="top"
+           title="" data-original-title="Back to Top" aria-hidden="true"></i>
+    </div><!--/.scroll-Top-->
+</footer><!--/.hm-footer-copyright-->
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/modernizr.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/bootsnav.js}"></script>
+<script th:src="@{/js/jquery.sticky.js}"></script>
+<script th:src="@{/js/jquery.easing.min.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
 </body>
 </html>

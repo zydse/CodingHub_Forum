@@ -11,6 +11,9 @@
 [OkHttp](https://square.github.io/okhttp/)
 
 [lombok](https://projectlombok.org/)
+
+[EditorMD](http://editor.md.ipandao.com/)
+
 ```bash
 # flyway插件运行
 mvn flyway:migrate
@@ -52,3 +55,18 @@ mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
 2. 学习了Lambda与streamAPI
 3. 展示评论的子评论
 4. 完成子评论列表的后台，前台动态展示未完成
+
+## 2020.03.14
+
+1. 完成子评论的异步加载，刷新页面
+
+## 2020.03.22
+
+1. 完成基本的通知功能展示与浏览
+2. 修复多用户登录
+3. 用户通知的同步，每次刷新页面都可以看到通知数
+
+## 2020.03.23
+
+1. 日志
+2. 富文本编辑，使用MySQL数据库

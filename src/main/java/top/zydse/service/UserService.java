@@ -25,10 +25,12 @@ public class UserService {
         userExample.createCriteria().andAccountIdEqualTo(user.getAccountId());
         List<User> users = userMapper.selectByExample(userExample);
         if (users.size() == 0) {
+            //新增用户
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
-            userMapper.insert(user);
+            userMapper.insertSelective(user);
         } else {
+            //更新用户资料
             User u = new User();
             u.setGmtModified(System.currentTimeMillis());
             u.setBio(user.getBio());
