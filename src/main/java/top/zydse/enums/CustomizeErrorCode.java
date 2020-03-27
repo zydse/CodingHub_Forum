@@ -11,6 +11,7 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     NO_LOGIN(2002, "当前操作需要登录才可使用"),
     SYSTEM_ERROR(2005, "程序员太菜了，这里写了一个BUG"),
     AUTHORITY_ERROR(2006, "抱歉，你当前登录的用户没有权限查看这些内容"),
+    ALI_SERVER_ERROR(2007, "阿里云短信服务好像有点问题，程序员正在抢修"),
     BAD_REQUEST(4004, "你的请求看起来有点问题"),
     COMMENT_TARGET_NOT_FOUND(3001, "未选中问题或评论进行回复"),
     COMMENT_TYPE_NOT_FOUND(3002, "请告诉我，你要回复问题还是评论"),

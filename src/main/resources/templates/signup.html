@@ -27,19 +27,34 @@
                                 <div class="form-group">
                                     <label for="username-input">用户名</label>
                                     <input type="text" class="form-control" id="username-input" name="username"
-                                           minlength="3" maxlength="10" placeholder="请输入用户名">
+                                           minlength="3" maxlength="10" required placeholder="请输入用户名(3到10个字符)">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password-input">密码</label>
                                     <input type="password" class="form-control" id="password-input" name="password"
-                                           minlength="6" maxlength="12" required placeholder="请输入密码">
+                                           minlength="6" maxlength="12" required placeholder="请输入密码(至少6位)">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password-retype">确认密码</label>
                                     <input type="password" class="form-control" id="password-retype" minlength="6"
                                            maxlength="12" required placeholder="请重新输入密码">
                                 </div><!--/.form-group -->
-
+                                <div class="form-group">
+                                    <label for="verify-code">手机号</label>
+                                    <input type="text" class="form-control" id="phone-number" name="phone-number"
+                                           pattern="(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$"
+                                           required placeholder="请输入手机号获得验证码">
+                                </div><!--/.form-group -->
+                                <div class="form-col">
+                                    <input type="text" class="form-control" id="verify-code" name="verify-code"
+                                           required placeholder="请输入你获得的验证码">
+                                </div>
+                                <div class="form-col1">
+                                    <button type="button" id="code-btn" class="btn"
+                                            style="height: 46px;background: #5a84fd; color: #fff;">
+                                        获取验证码
+                                    </button>
+                                </div>
                             </div><!--/.signin-form -->
                         </div><!--/.col -->
                     </div><!--/.row -->
@@ -47,7 +62,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="signin-footer">
-                                <button type="submit" class="btn signin_btn" data-toggle="modal" data-target="#notice">
+                                <button type="submit" id="signup-btn" class="btn signin_btn">
                                     注册
                                 </button>
                                 <p>
@@ -77,43 +92,137 @@
 <script th:src="@{/js/forum.js}"></script>
 <script th:src="@{/js/jquery.md5.js}"></script>
 <script>
-    var uname = '';
+    var staticName = '';
+    var countdown = 60;
+    var timer;
     $('input#username-input').blur(function () {
-        var username = $("input#username-input").val();
-        if (!username) {
-            return;
+        if (this.validity.valueMissing) {
+            $(".modal-body").text('用户名不可为空');
+            $('#notice').modal('show');
+        } else if (this.validity.tooShort) {
+            $(".modal-body").text('你输入的用户名太短了');
+            $('#notice').modal('show');
+        } else {
+            var username = $("input#username-input").val();
+            if (!username || staticName === username) {
+                return;
+            }
+            staticName = username;
+            $.ajax({
+                type: "POST",
+                url: "/user/register/verifyUsername",
+                dataType: "json",
+                data: {
+                    "username": username,
+                    "timestamp": new Date().getTime()
+                },
+                success: function (result) {
+                    if (result.code != 200) {
+                        $(".modal-body").text(result.message);
+                        $('#notice').modal('show');
+                        $("input#username-input").val("");
+                        return false;
+                    }
+                }
+            });
         }
+    });
+    $("#sign-up-form").submit(function (e) {
+        e.preventDefault();
+        var username = $("#username-input").val();
+        if (username == null || username === '' || username.length < 3) {
+            $(".modal-body").text("你输入的用户名不符合规范");
+            $('#notice').modal('show');
+            return false;
+        }
+        var password = $("#password-input").val();
+        if (password == null || password === '' || password.length < 6) {
+            $(".modal-body").text("你输入的密码不符合规范");
+            $('#notice').modal('show');
+            return false;
+        }
+        var retype = $("#password-retype").val();
+        if (retype == null || retype === '' || retype.length < 6) {
+            $(".modal-body").text("你输入的确认密码不符合规范");
+            $('#notice').modal('show');
+            return false;
+        }
+        if (password != retype) {
+            $(".modal-body").text("你两次输入的密码不一致");
+            $('#notice').modal("show");
+            return false;
+        }
+        var phoneNumber = $("input#phone-number").val();
+        var verifyCode = $("input#verify-code").val();
         $.ajax({
             type: "POST",
-            url: "/user/register/verifyUsername",
+            url: "/user/register",
+            contentType: "application/json",
             dataType: "json",
-            data: {
+            data: JSON.stringify({
                 "username": username,
-                "timestamp": new Date().getTime()
-            },
+                "password": $.md5(password),
+                "phoneNumber": phoneNumber,
+                "verifyCode": verifyCode,
+                "gmtCreate": new Date().getTime()
+            }),
             success: function (result) {
                 if (result.code != 200) {
                     $(".modal-body").text(result.message);
                     $('#notice').modal('show');
                     $("input#username-input").val("");
                     return false;
+                } else {
+                    window.location = "http://localhost:8080/user/login";
                 }
             }
         });
     });
-    $("#sign-up-form").submit(function (e) {
-        var username = $("#username-input").val();
-        var password = $("#password-input").val();
-        var retype = $("#password-retype").val();
-        if (password != retype) {
-            $(".modal-body").text("你两次输入的密码不一致");
-            $('#notice').modal("show");
-            e.preventDefault();
-            return false;
+    $('#phone-number').blur(function () {
+        if (this.validity.valueMissing) {
+            $(".modal-body").text("手机号不能为空");
+            $('#notice').modal('show');
+        } else if (this.validity.patternMismatch) {
+            $(".modal-body").text("手机号格式不正确");
+            $('#notice').modal('show');
         }
-        e.preventDefault();
-        $.ajax({});
     });
+    $("#code-btn").on("click", function () {
+        var phoneNumber = $("input#phone-number").val();
+        task($('#code-btn'));
+        $.ajax({
+            type: "POST",
+            url: "/user/register/verifyCode",
+            dataType: "json",
+            data: {
+                "phoneNumber": phoneNumber,
+                "timestamp": new Date().getTime()
+            },
+            success: function (result) {
+                if (result.code != 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    return false;
+                }
+            }
+        });
+    });
+
+    function task($val) {
+        if (countdown === 0) {
+            clearTimeout(timer);
+            $val.attr("disabled", false);
+            $val.text("获取验证码");
+            countdown = 60;
+        } else {
+            $val.attr("disabled", true);
+            $val.text("重新发送(" + countdown + ")");
+            countdown--;
+            timer = setTimeout(function () {
+                task($('#code-btn'));
+            }, 1000);
+        }
+    }
 </script>
 </body>
 </html>

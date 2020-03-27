@@ -2,6 +2,8 @@ package top.zydse.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * CreateBy: zydse
  * ClassName: RegisterDTO
@@ -10,8 +12,10 @@ import lombok.Data;
  * @Date: 2020/3/27
  */
 @Data
-public class RegisterDTO {
+public class RegisterDTO implements Serializable {
     String username;
     String password;
+    String phoneNumber;
+    String verifyCode;
     Long gmtCreate;
 }

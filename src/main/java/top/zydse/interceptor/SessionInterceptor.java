@@ -35,8 +35,10 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("进入拦截器");
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {
+            log.info("session有user");
             long count = notificationService.unreadCount(user.getId());
             request.setAttribute("unreadCount", count);
             return true;
@@ -45,6 +47,7 @@ public class SessionInterceptor implements HandlerInterceptor {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("token".equals(cookie.getName())) {
+                    log.info("匹配cookie");
                     UserExample userExample = new UserExample();
                     userExample.createCriteria().andTokenEqualTo(cookie.getValue());
                     List<User> users = userMapper.selectByExample(userExample);

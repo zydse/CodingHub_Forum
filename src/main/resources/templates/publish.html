@@ -61,9 +61,7 @@
                 </div>
                 <div>
                     <span class="alert alert-danger" th:if="${error}" th:text="${error}"></span>
-                    <button type="submit" class="btn btn-success btn_float_right" data-toggle="modal"
-                            data-target="#notice">发布
-                    </button>
+                    <button type="submit" class="btn btn-success btn_float_right">发布</button>
                 </div>
             </form>
         </div>
@@ -103,7 +101,6 @@
             $(".modal-body").text("请为问题选择标签，能更有效的获得解答");
             $('#notice').modal("show");
             e.preventDefault();
-            return;
         }
     });
 </script>

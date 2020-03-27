@@ -8,10 +8,10 @@
         <!--分页支持的插件-->
         <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
 
-        <jdbcConnection driverClass="org.h2.Driver"
-                        connectionURL="jdbc:h2:E:/H2EMBEDDED/forum"
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/forum"
                         userId="root"
-                        password="root">
+                        password="123456">
         </jdbcConnection>
 
         <javaTypeResolver>
@@ -38,6 +38,7 @@
         <table tableName="question" domainObjectName="Question"/>
         <table tableName="comment" domainObjectName="Comment"/>
         <table tableName="notification" domainObjectName="Notification"/>
+        <table tableName="VERIFICATION" domainObjectName="Verification"/>
 
     </context>
 </generatorConfiguration>

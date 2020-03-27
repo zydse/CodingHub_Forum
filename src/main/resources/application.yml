@@ -30,6 +30,12 @@ mybatis:
     # 配置MyBatis的数据库列使用下划线映射Pojo属性大写字母
     map-underscore-to-camel-case: true
 
+aliyun:
+  regionId: cn-hangzhou
+  accessKeyId: LTAIluIdnWI4vAwN
+  accessSecret: 5aS8Tb6AKhpeUGD6WofK0U547M7bdP
+  signName: CRMsdf
+  templateCode: SMS_167040753
 ---
 
 spring:

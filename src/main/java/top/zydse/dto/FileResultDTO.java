@@ -2,6 +2,8 @@ package top.zydse.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * CreateBy: zydse
  * ClassName: FileResultDTO
@@ -10,7 +12,7 @@ import lombok.Data;
  * @Date: 2020/3/22
  */
 @Data
-public class FileResultDTO {
+public class FileResultDTO implements Serializable {
     private int success;
     private String message;
     private String url;

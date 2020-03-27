@@ -120,16 +120,12 @@ function sendComment(parentId, content, commentType) {
 }
 
 function getMyDate(str) {
-    /* + ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);*/
-    /*oHour = oDate.getHours(),oMin = oDate.getMinutes(),oSen = oDate.getSeconds(),*/
     var oDate = new Date(str), oHour = oDate.getHours(), oMin = oDate.getMinutes(), oSen = oDate.getSeconds(),
         oYear = oDate.getFullYear(),
         oMonth = oDate.getMonth() + 1,
         oDay = oDate.getDate();//最后拼接时间
     return oYear + '-' + addZero(oMonth) + '-' + addZero(oDay)+ ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);
 }
-
-//补0操作
 function addZero(num) {
     if (parseInt(num) < 10) {
         num = '0' + num;

@@ -130,13 +130,13 @@ html, body {
 }
 
 .signin-form .form-col {
-    width: 48.5%;
+    width: 75%;
     float: left;
 
 }
 
 .signin-form .form-col1 {
-    width: 48%;
+    width: 20%;
     float: right;
 }
 

@@ -21,72 +21,66 @@
         <div class="sign-content popup-in-content">
             <div class="popup-in-txt">
                 <h2 class="h2">登录</h2>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="signin-form">
-                            <form action="login.html">
+                <form th:action="@{/user/login}" method="post" id="login-form">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="signin-form">
+
                                 <div class="form-group">
-                                    <label for="signin_form">用户名</label>
-                                    <input type="text" class="form-control" id="signin_form" placeholder="请输入你的用户名">
+                                    <label for="username">用户名</label>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="请输入你的用户名">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
-                                    <label for="signin_form">密码</label>
-                                    <input type="password" class="form-control" id="signin_form" placeholder="请输入你的密码">
+                                    <label for="password">密码</label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="请输入你的密码">
                                 </div><!--/.form-group -->
-                            </form><!--/form -->
-                        </div><!--/.signin-form -->
-                    </div><!--/.col -->
-                </div><!--/.row -->
 
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="signin-password">
-                            <div class="awesome-checkbox-list">
-                                <ul class="unstyled centered">
-                                    <li>
-                                        <input class="styled-checkbox" id="styled-checkbox-2" type="checkbox"
-                                               value="value2">
-                                        <label for="styled-checkbox-2">记住我</label>
-                                    </li>
+                            </div><!--/.signin-form -->
+                        </div><!--/.col -->
+                    </div><!--/.row -->
 
-                                    <li>
-                                        <a th:href="@{/user/forget}">忘记了你的账户或密码 ?</a>
-                                    </li>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="signin-password">
+                                <div class="awesome-checkbox-list">
+                                    <ul class="unstyled centered">
+                                        <li>
+                                            <input class="styled-checkbox" id="styled-checkbox-2" type="checkbox"
+                                                   value="value2">
+                                            <label for="styled-checkbox-2">记住我</label>
+                                        </li>
 
-                                </ul>
-                            </div><!--/.awesome-checkbox-list -->
-                        </div><!--/.signin-password -->
-                    </div><!--/.col -->
-                </div><!--/.row -->
+                                        <li>
+                                            <a th:href="@{/user/forget}">忘记了你的账户或密码 ?</a>
+                                        </li>
 
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="signin-footer">
-                            <button type="button" class="btn signin_btn" data-toggle="modal"
-                                    data-target=".signin_modal">
-                                登录
-                            </button>
-                            <p>
-                                还没有账户?
-                                <a th:href="@{/user/register}">注册</a>
-                            </p>
-                            <p>
-                                <a th:href="@{/}">返回首页</a>
-                            </p>
-                        </div><!--/.signin-footer -->
-                    </div><!--/.col-->
-                </div><!--/.row -->
+                                    </ul>
+                                </div><!--/.awesome-checkbox-list -->
+                            </div><!--/.signin-password -->
+                        </div><!--/.col -->
+                    </div><!--/.row -->
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="signin-footer">
+                                <button type="submit" id="login-btn" class="btn signin_btn">
+                                    登录
+                                </button>
+                                <p>
+                                    还没有账户?
+                                    <a th:href="@{/user/register}">注册</a>
+                                </p>
+                                <p>
+                                    <a th:href="@{/}">返回首页</a>
+                                </p>
+                            </div><!--/.signin-footer -->
+                        </div><!--/.col-->
+                    </div><!--/.row -->
+                </form><!--/form -->
             </div>
         </div><!--/.sign-content -->
     </div><!--/.container -->
 </section><!--/.signin -->
-
-<footer class="footer-copyright">
-    <div id="scroll-Top">
-        <i class="fa fa-angle-double-up return-to-top" id="scroll-top" data-toggle="tooltip" data-placement="top"
-           title="" data-original-title="Back to Top" aria-hidden="true"></i>
-    </div><!--/.scroll-Top-->
-</footer><!--/.hm-footer-copyright-->
 <div th:insert="alert :: modal"></div>
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/modernizr.min.js}"></script>
@@ -95,5 +89,16 @@
 <script th:src="@{/js/jquery.sticky.js}"></script>
 <script th:src="@{/js/jquery.easing.min.js}"></script>
 <script th:src="@{/js/custom.js}"></script>
+<script th:src="@{/js/jquery.md5.js}"></script>
+<script>
+    $("#login-btn").on("click", function (e) {
+    });
+    $("#login-form").submit(function (e) {
+        var $password = $("input#password");
+        var password = $password.val();
+        $password.val($.md5(password));
+        e.submit();
+    });
+</script>
 </body>
 </html>
