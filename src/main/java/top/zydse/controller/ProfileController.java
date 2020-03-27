@@ -41,8 +41,6 @@ public class ProfileController {
             model.addAttribute("error", "未登录");
             return "redirect:/";
         }
-//        long unreadCount = notificationService.unreadCount(user.getId());
-//        model.addAttribute("unreadCount", unreadCount);
         if ("questions".equals(action)) {
             model.addAttribute("section", "questions");
             model.addAttribute("sectionName", "我的提问");

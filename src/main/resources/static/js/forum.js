@@ -122,11 +122,11 @@ function sendComment(parentId, content, commentType) {
 function getMyDate(str) {
     /* + ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);*/
     /*oHour = oDate.getHours(),oMin = oDate.getMinutes(),oSen = oDate.getSeconds(),*/
-    var oDate = new Date(str),
+    var oDate = new Date(str), oHour = oDate.getHours(), oMin = oDate.getMinutes(), oSen = oDate.getSeconds(),
         oYear = oDate.getFullYear(),
         oMonth = oDate.getMonth() + 1,
         oDay = oDate.getDate();//最后拼接时间
-    return oYear + '-' + addZero(oMonth) + '-' + addZero(oDay);
+    return oYear + '-' + addZero(oMonth) + '-' + addZero(oDay)+ ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);
 }
 
 //补0操作
@@ -135,27 +135,4 @@ function addZero(num) {
         num = '0' + num;
     }
     return num;
-}
-
-function verifyInfo() {
-    var username = $("#username-input").val();
-    if('' == username){
-        alert("用户名不能为空");
-        return;
-    }
-    var password = $("#password-input").val();
-    if('' == password){
-        alert("密码不能为空");
-        return;
-    }
-    var retype = $("#password-retype").val();
-    if('' == retype){
-        alert("重输不能为空");
-        return;
-    }
-
-    if(password != retype){
-        alert("两次输入的密码不一致，请重试");
-        return;
-    }
 }

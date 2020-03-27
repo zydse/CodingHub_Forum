@@ -40,6 +40,8 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: Mysql@47.93.
+    hikari:
+      connection-test-query: select 1
 
 #github:
 #  redirectUri: http://zydse.top/callback
@@ -53,5 +55,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 123456
+    hikari:
+      connection-test-query: select 1
 github:
   redirectUri: http://localhost:8080/callback

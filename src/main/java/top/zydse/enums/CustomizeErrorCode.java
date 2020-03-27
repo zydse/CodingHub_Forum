@@ -18,7 +18,8 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     CONTENT_IS_EMPTY_OR_TO_SHORT(3004, "你的评论内容可能迷路了，或者你回复的内容太短了"),
     QUESTION_NOT_FOUND(3005, "没有找到你想看的问题，或者问题已经不存在了"),
     QUESTION_ALREADY_DELETED(3006, "问题已经被删除了，请重新发布"),
-    NOTIFICATION_NOT_FOUND(3007, "通知已经不存在，或者迷路了");
+    NOTIFICATION_NOT_FOUND(3007, "通知已经不存在，或者迷路了"),
+    DUPLICATE_USERNAME(4001, "用户名已经被注册过了，请你换个名字试试");
 
     private String message;
     private Integer code;

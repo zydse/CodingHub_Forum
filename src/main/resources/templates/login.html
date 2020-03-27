@@ -20,14 +20,14 @@
     <div class="container">
         <div class="sign-content popup-in-content">
             <div class="popup-in-txt">
-                <h2>登录</h2>
+                <h2 class="h2">登录</h2>
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="signin-form">
                             <form action="login.html">
                                 <div class="form-group">
                                     <label for="signin_form">用户名</label>
-                                    <input type="email" class="form-control" id="signin_form" placeholder="请输入你的用户名">
+                                    <input type="text" class="form-control" id="signin_form" placeholder="请输入你的用户名">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="signin_form">密码</label>
@@ -70,14 +70,15 @@
                                 还没有账户?
                                 <a th:href="@{/user/register}">注册</a>
                             </p>
+                            <p>
+                                <a th:href="@{/}">返回首页</a>
+                            </p>
                         </div><!--/.signin-footer -->
                     </div><!--/.col-->
                 </div><!--/.row -->
             </div>
         </div><!--/.sign-content -->
-
     </div><!--/.container -->
-
 </section><!--/.signin -->
 
 <footer class="footer-copyright">
@@ -86,6 +87,7 @@
            title="" data-original-title="Back to Top" aria-hidden="true"></i>
     </div><!--/.scroll-Top-->
 </footer><!--/.hm-footer-copyright-->
+<div th:insert="alert :: modal"></div>
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/modernizr.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>

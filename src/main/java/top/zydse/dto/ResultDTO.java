@@ -1,6 +1,7 @@
 package top.zydse.dto;
 
 import lombok.Data;
+import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ public class ResultDTO<T> implements Serializable {
     private String message;
     private T data;
 
-    public static ResultDTO valueOf(Integer code, String message) {
+    private static ResultDTO valueOf(Integer code, String message) {
         ResultDTO resultDTO = new ResultDTO();
         resultDTO.setCode(code);
         resultDTO.setMessage(message);
@@ -31,6 +32,9 @@ public class ResultDTO<T> implements Serializable {
 
     public static ResultDTO errorOf(CustomizeException ex) {
         return valueOf(ex.getCode(), ex.getMessage());
+    }
+    public static ResultDTO errorOf(CustomizeErrorCode code) {
+        return valueOf(code.getCode(), code.getMessage());
     }
 
     public static <T> ResultDTO successOf(T data) {

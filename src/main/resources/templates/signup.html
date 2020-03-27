@@ -15,78 +15,58 @@
     <link rel="stylesheet" th:href="@{/css/responsive.css}">
 </head>
 <body>
-<section class="signin signup popup-in">
+<section class="signin signup popup-up">
     <div class="container">
         <div class="sign-content popup-in-content">
-            <div class="popup-in-txt">
-                <h2>注册</h2>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="signin-form">
-                            <form action="signin.html">
+            <form th:action="@{/user/register}" id="sign-up-form" method="post">
+                <div class="popup-in-txt">
+                    <h2 class="h2">注册</h2>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="signin-form">
                                 <div class="form-group">
                                     <label for="username-input">用户名</label>
                                     <input type="text" class="form-control" id="username-input" name="username"
-                                           placeholder="用户名">
+                                           minlength="3" maxlength="10" placeholder="请输入用户名">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password-input">密码</label>
-                                    <input type="password" class="form-control" id="password-input" name="username"
-                                           placeholder="密码">
+                                    <input type="password" class="form-control" id="password-input" name="password"
+                                           minlength="6" maxlength="12" required placeholder="请输入密码">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password-retype">确认密码</label>
-                                    <input type="password" class="form-control" id="password-retype"
-                                           placeholder="请重新输入密码">
+                                    <input type="password" class="form-control" id="password-retype" minlength="6"
+                                           maxlength="12" required placeholder="请重新输入密码">
                                 </div><!--/.form-group -->
-                            </form><!--/form -->
-                        </div><!--/.signin-form -->
-                    </div><!--/.col -->
-                </div><!--/.row -->
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="signin-footer">
-                            <button type="button" class="btn signin_btn" data-toggle="modal"
-                                    data-target="#notice">
-                                注册
-                            </button>
-                            <p>
-                                已经是会员了 ?
-                                <a th:href="@{/user/login}">登录</a>
-                            </p>
-                        </div><!--/.signin-footer -->
-                    </div><!--/.col-->
-                </div><!--/.row -->
-                <div class="modal fade" id="notice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                        aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                            </div>
-                            <div class="modal-body">
-                                我出现了
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Save changes</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-            </div>
+                            </div><!--/.signin-form -->
+                        </div><!--/.col -->
+                    </div><!--/.row -->
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="signin-footer">
+                                <button type="submit" class="btn signin_btn" data-toggle="modal" data-target="#notice">
+                                    注册
+                                </button>
+                                <p>
+                                    已经是会员了?
+                                    <a th:href="@{/user/login}">登录</a>
+                                </p>
+                                <p>
+                                    <a th:href="@{/}">返回首页</a>
+                                </p>
+                            </div><!--/.signin-footer -->
+                        </div><!--/.col-->
+                    </div><!--/.row -->
+                </div>
+            </form><!--/form -->
         </div><!--/.sign-content -->
     </div><!--/.container -->
 </section><!--/.signin -->
-<!--footer copyright start -->
-<footer class="footer-copyright">
-    <div id="scroll-Top">
-        <i class="fa fa-angle-double-up return-to-top" id="scroll-top" data-toggle="tooltip" data-placement="top"
-           title="" data-original-title="Back to Top" aria-hidden="true"></i>
-    </div><!--/.scroll-Top-->
-</footer><!--/.hm-footer-copyright-->
+
+<div th:insert="alert :: modal"></div>
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/modernizr.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
@@ -95,6 +75,45 @@
 <script th:src="@{/js/jquery.easing.min.js}"></script>
 <script th:src="@{/js/custom.js}"></script>
 <script th:src="@{/js/forum.js}"></script>
+<script th:src="@{/js/jquery.md5.js}"></script>
+<script>
+    var uname = '';
+    $('input#username-input').blur(function () {
+        var username = $("input#username-input").val();
+        if (!username) {
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/user/register/verifyUsername",
+            dataType: "json",
+            data: {
+                "username": username,
+                "timestamp": new Date().getTime()
+            },
+            success: function (result) {
+                if (result.code != 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    $("input#username-input").val("");
+                    return false;
+                }
+            }
+        });
+    });
+    $("#sign-up-form").submit(function (e) {
+        var username = $("#username-input").val();
+        var password = $("#password-input").val();
+        var retype = $("#password-retype").val();
+        if (password != retype) {
+            $(".modal-body").text("你两次输入的密码不一致");
+            $('#notice').modal("show");
+            e.preventDefault();
+            return false;
+        }
+        e.preventDefault();
+        $.ajax({});
+    });
+</script>
 </body>
-
 </html>

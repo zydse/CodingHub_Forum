@@ -9,27 +9,25 @@
     <link rel="stylesheet" th:href="@{/css/editormd.css}"/>
 </head>
 <body>
-
 <script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
 <script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
 <script th:src="@{/js/editormd.min.js}"></script>
-
 <div th:replace="navigation :: nav"></div>
 <div class="container-fluid main">
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
             <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>提问</h2>
             <hr/>
-            <form action="/publish" method="post">
+            <form action="/publish" method="post" id="questionForm">
                 <input type="hidden" name="id" th:value="${id}">
                 <div class="form-group">
-                    <label for="questionTitle">问题描述（简单扼要）</label>
+                    <label for="questionTitle">问题描述（简单扼要）：</label>
                     <input type="text" class="form-control" name="questionTitle" id="questionTitle"
                            placeholder="问题" th:value="${title}">
                 </div>
 
+                <label for="description">问题详细信息（必填项）：</label>
                 <div class="form-group" id="description-editor">
-                    <label for="description">问题详细信息（必填项）：</label>
                     <textarea class="form-control" name="description" id="description" cols="30"
                               rows="10" th:text="${description}" style="display:none;"></textarea>
                     <script type="text/javascript">
@@ -63,7 +61,9 @@
                 </div>
                 <div>
                     <span class="alert alert-danger" th:if="${error}" th:text="${error}"></span>
-                    <button type="submit" class="btn btn-success btn_float_right">发布</button>
+                    <button type="submit" class="btn btn-success btn_float_right" data-toggle="modal"
+                            data-target="#notice">发布
+                    </button>
                 </div>
             </form>
         </div>
@@ -81,5 +81,31 @@
         </div>
     </div>
 </div>
+<div th:replace="alert :: modal"></div>
+<script type="application/javascript">
+    $("#questionForm").submit(function (e) {
+        var questionTitle = $("#questionTitle").val();
+        if ('' == questionTitle) {
+            $(".modal-body").text("请输入问题的标题");
+            $('#notice').modal("show");
+            e.preventDefault();
+            return;
+        }
+        var description = $("#description").val();
+        if ('' == description) {
+            $(".modal-body").text("请输入更多的信息来描述你的问题，这样才能获得更好的解答");
+            $('#notice').modal("show");
+            e.preventDefault();
+            return;
+        }
+        var tags = $("#tags").val();
+        if ('' == tags) {
+            $(".modal-body").text("请为问题选择标签，能更有效的获得解答");
+            $('#notice').modal("show");
+            e.preventDefault();
+            return;
+        }
+    });
+</script>
 </body>
 </html>
