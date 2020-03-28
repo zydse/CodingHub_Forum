@@ -9,9 +9,9 @@
         <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/forum"
+                        connectionURL="jdbc:mysql://47.93.221.170:11306/forum"
                         userId="root"
-                        password="123456">
+                        password="Mysql@47.93.">
         </jdbcConnection>
 
         <javaTypeResolver>
@@ -31,19 +31,19 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="user" domainObjectName="User">
+        <table tableName="USER" domainObjectName="User">
             <!--为false时可以转换为驼峰命名，默认为false-->
             <property name="useActualColumnNames" value="false"/>
         </table>
-        <table tableName="question" domainObjectName="Question"/>
-        <table tableName="comment" domainObjectName="Comment"/>
-        <table tableName="notification" domainObjectName="Notification"/>
-        <table tableName="tag" domainObjectName="Tag"/>
-        <table tableName="role" domainObjectName="Role"/>
-        <table tableName="sub_comment" domainObjectName="SubComment"/>
-        <table tableName="question_tag" domainObjectName="QuestionTag"/>
-        <table tableName="view_history" domainObjectName="ViewHistory"/>
-        <table tableName="thumb_history" domainObjectName="ThumbHistory"/>
+        <table tableName="QUESTION" domainObjectName="Question"/>
+        <table tableName="COMMENT" domainObjectName="Comment"/>
+        <table tableName="NOTIFICATION" domainObjectName="Notification"/>
+        <table tableName="TAG" domainObjectName="Tag"/>
+        <table tableName="ROLE" domainObjectName="Role"/>
+        <table tableName="SUB_COMMENT" domainObjectName="SubComment"/>
+        <table tableName="QUESTION_TAG" domainObjectName="QuestionTag"/>
+        <table tableName="VIEW_HISTORY" domainObjectName="ViewHistory"/>
+        <table tableName="THUMB_HISTORY" domainObjectName="ThumbHistory"/>
 
     </context>
 </generatorConfiguration>

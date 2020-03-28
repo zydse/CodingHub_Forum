@@ -14,6 +14,9 @@
 
 [EditorMD](http://editor.md.ipandao.com/)
 
+[MyBatis Generator](http://mybatis.org/generator/)
+
+
 ```bash
 # flyway插件运行
 mvn flyway:migrate
