@@ -38,7 +38,12 @@
         <table tableName="question" domainObjectName="Question"/>
         <table tableName="comment" domainObjectName="Comment"/>
         <table tableName="notification" domainObjectName="Notification"/>
-        <table tableName="VERIFICATION" domainObjectName="Verification"/>
+        <table tableName="tag" domainObjectName="Tag"/>
+        <table tableName="role" domainObjectName="Role"/>
+        <table tableName="sub_comment" domainObjectName="SubComment"/>
+        <table tableName="question_tag" domainObjectName="QuestionTag"/>
+        <table tableName="view_history" domainObjectName="ViewHistory"/>
+        <table tableName="thumb_history" domainObjectName="ThumbHistory"/>
 
     </context>
 </generatorConfiguration>

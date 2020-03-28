@@ -22,68 +22,6 @@ function subComment(e) {
 }
 
 /**
- * 点击评论按钮展开二级评论列表
- * @param e
- */
-function collapseComment(e) {
-    var id = $(e).data("id");
-    var commentContainer = $("#comment-" + id);
-
-    if (commentContainer.hasClass("in")) {
-        commentContainer.removeClass("in");
-        var inputElem = commentContainer.get(0).lastElementChild;
-        commentContainer.empty();
-        commentContainer.append($(inputElem));
-        $(e).removeClass("active");
-    } else {
-        $.getJSON("/comment/" + id, function (response) {
-            var inputElem = commentContainer.get(0).lastElementChild;
-            commentContainer.empty();
-            $.each(response.data, function (index, comment) {
-                var $mediaLeft = $("<div/>", {
-                    class: "media-left"
-                });
-                var $a = $("<a/>", {
-                    href: "#"
-                });
-                var $avatar = $("<img/>", {
-                    class: "media-object",
-                    src: comment.user.avatarUrl
-                });
-                var $mediaBody = $("<div/>", {
-                    class: "media-body"
-                });
-                var $name = $("<h5/>", {
-                    class: "media-heading text_desc",
-                    html: comment.user.name
-                });
-                var $text = $("<div/>", {
-                    html: comment.content
-                });
-                var $operate = $("<div/>", {
-                    class: "comment_operate"
-                });
-                var $date = $("<span/>", {
-                    class: "text_desc pull-right",
-                    html: getMyDate(comment.gmtModified)
-                });
-                $mediaBody.append($name).append($text).append($operate.append($date));
-                $a.append($avatar);
-                $mediaLeft.append($a);
-                var elem = $("<div/>", {
-                    class: "col-lg-12 col-md-12 col-sm-12 col-xs-12 media comment_section"
-                });
-                elem.append($mediaLeft).append($mediaBody);
-                commentContainer.append(elem);
-            });
-            commentContainer.append($(inputElem));
-            $("#comment-" + id).addClass("in");
-            $(e).addClass("active");
-        });
-    }
-}
-
-/**
  * 发送评论内容到服务端
  * @param parentId
  * @param content
@@ -101,19 +39,107 @@ function sendComment(parentId, content, commentType) {
             "type": commentType
         }),
         success: function (result) {
-            if (result.code == 200 && commentType == 1) {
-                $("#comment_main").hide();
-            } else if (result.code == 200 && commentType == 2) {
+            if (result.code === 200 && commentType === 1) {
+                window.location.reload();
+            } else if (result.code === 200 && commentType === 2) {
                 $("input[name=input-" + parentId + "]").val("");
-                $("#collapse-" + parentId).click();
-            } else if (result.code == 2002) {
-                var isAccept = confirm(result.message);
-                if (isAccept) {
-                    window.open("https://github.com/login/oauth/authorize?client_id=6f77efebf08b5cde324b&redirect_uri=http://localhost:8080/callback&scope=user&state=1");
-                    window.localStorage.setItem("closable", "true");
-                }
+                var $collapse = $("#collapse-" + parentId);
+                var $subCount = $("#subCount-" + parentId);
+                var count = parseInt($subCount.text());
+                $subCount.text(count + 1);
+                $collapse.click();
             } else {
                 alert(result.message);
+            }
+        }
+    });
+}
+
+/**
+ * 点击评论按钮展开二级评论列表
+ * @param e
+ */
+function collapseComment(e) {
+    var id = $(e).data("id");
+    var commentContainer = $("#comment-" + id);
+    if (commentContainer.hasClass("in")) {
+        commentContainer.removeClass("in");
+        var inputElem = commentContainer.get(0).lastElementChild;
+        commentContainer.empty();
+        commentContainer.append($(inputElem));
+        $(e).removeClass("active");
+    } else {
+        $.getJSON("/comment/list/" + id, function (response) {
+            var inputElem = commentContainer.get(0).lastElementChild;
+            commentContainer.empty();
+            var $subCount = $("#subCount-" + id);
+            $subCount.text(response.data.length);
+            $.each(response.data, function (index, subComment) {
+                var $mediaLeft = $("<div/>", {
+                    class: "media-left"
+                });
+                var $a = $("<a/>", {
+                    href: "#"
+                });
+                var $avatar = $("<img/>", {
+                    class: "media-object",
+                    src: subComment.user.avatarUrl
+                });
+                var $mediaBody = $("<div/>", {
+                    class: "media-body"
+                });
+                var $name = $("<h5/>", {
+                    class: "media-heading text_desc",
+                    html: subComment.user.name
+                });
+                var $text = $("<div/>", {
+                    html: subComment.content
+                });
+                var $operate = $("<div/>", {
+                    class: "comment_operate"
+                });
+                var $date = $("<span/>", {
+                    class: "text_desc pull-right",
+                    html: getMyDate(subComment.gmtModified)
+                });
+                $mediaBody.append($name).append($text).append($operate.append($date));
+                $a.append($avatar);
+                $mediaLeft.append($a);
+                var elem = $("<div/>", {
+                    class: "col-lg-12 col-md-12 col-sm-12 col-xs-12 media comment_section"
+                });
+                elem.append($mediaLeft).append($mediaBody);
+                commentContainer.append(elem);
+            });
+            commentContainer.append($(inputElem));
+            $("#comment-" + id).addClass("in");
+            $(e).addClass("active");
+        });
+    }
+}
+
+function thumbComment(e) {
+    var id = $(e).data("id");
+    var active = $(e).data("active");
+    if ($(e).hasClass("active") || active !== 1) {
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/comment/thumb',
+        dataType: 'json',
+        data: {
+            commentId: id
+        },
+        success: function (result) {
+            if (result.code !== 200) {
+                alert(result.message);
+            } else {
+                $(e).addClass("active");
+                var $thumbCount = $("#thumbCount-" + id);
+                $thumbCount.addClass("active");
+                var count = parseInt($thumbCount.text());
+                $thumbCount.text(count + 1);
             }
         }
     });
@@ -124,8 +150,9 @@ function getMyDate(str) {
         oYear = oDate.getFullYear(),
         oMonth = oDate.getMonth() + 1,
         oDay = oDate.getDate();//最后拼接时间
-    return oYear + '-' + addZero(oMonth) + '-' + addZero(oDay)+ ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);
+    return oYear + '-' + addZero(oMonth) + '-' + addZero(oDay) + ' ' + addZero(oHour) + ':' + addZero(oMin) + ':' + addZero(oSen);
 }
+
 function addZero(num) {
     if (parseInt(num) < 10) {
         num = '0' + num;

@@ -18,16 +18,22 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <form class="navbar-form navbar-left" th:action="@{/question/search}">
                     <div class="form-group">
-                        <input type="text" class="form-control" name="search" placeholder="搜索问题" th:value="${search} == null ? '' : ${search}"/>
+                        <input type="text" class="form-control" name="search" placeholder="搜索问题"
+                               th:value="${search} == null ? '' : ${search}"/>
                     </div>
                     <button type="submit" class="btn btn-default">搜索</button>
                 </form>
                 <ul class="nav navbar-nav navbar-right">
                     <li th:if="${session.user == null}">
-                        <a th:href="@{https://github.com/login/oauth/authorize(client_id='6f77efebf08b5cde324b', redirect_uri=${#httpServletRequest.getRequestURL()}+'callback',scope='user',state=1)}">登录</a>
+                        <a th:href="@{https://github.com/login/oauth/authorize(client_id='6f77efebf08b5cde324b', redirect_uri=${#httpServletRequest.getRequestURL()}+'callback',scope='user',state=1)}">
+                            <img alt="github oAuth" title="使用GitHub账户登录本站" height="20" width="20" th:src="@{/images/GitHubMark.png}">
+                        </a>
                     </li>
                     <li th:if="${session.user == null}">
-                        <a th:href="@{/user/login}">自主登录</a>
+                        <a th:href="@{/user/register}">注册</a>
+                    </li>
+                    <li th:if="${session.user == null}">
+                        <a th:href="@{/user/login}">登录</a>
                     </li>
                     <li th:if="${session.user != null}">
                         <a th:href="@{/publish}">发布问题</a>
@@ -35,7 +41,7 @@
                     <li th:if="${session.user != null}">
                         <a th:href="@{/profile/replies}">
                             <span class="glyphicon glyphicon-bell"></span>
-                            <span class="badge" th:text="${unreadCount}">15</span>
+                            <span class="badge" th:if="${unreadCount > 0}" th:text="${unreadCount}">15</span>
                         </a>
                     </li>
                     <li class="dropdown" th:if="${session.user != null}">

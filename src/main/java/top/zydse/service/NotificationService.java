@@ -73,10 +73,6 @@ public class NotificationService {
         NotificationDTO notificationDTO = new NotificationDTO();
         BeanUtils.copyProperties(notification, notificationDTO);
         notificationDTO.setTypeName(NotificationType.nameOf(notification.getType()));
-        if(notification.getType() == NotificationType.ANSWER_COMMENT.getType()){
-            Comment comment = commentMapper.selectByPrimaryKey(notification.getOuterId());
-            notificationDTO.setOuterId(comment.getParentId());
-        }
         notification.setStatus(1);
         notificationMapper.updateByPrimaryKey(notification);
         return notificationDTO;

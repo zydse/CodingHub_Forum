@@ -13,15 +13,13 @@ import java.io.Serializable;
  * @Date: 2020/3/13
  */
 @Data
-public class CommentDTO implements Serializable {
+public class SubCommentDTO implements Serializable {
     private Long id;
     private Long questionId;
+    private Long commentId;
     private Long reviewer;
-    private String content;
     private Long gmtCreate;
     private Long gmtModified;
-    private Integer thumbCount;
-    private Integer subCommentCount;
-    private Integer isThumbUp;
+    private String content;
     private User user;
 }

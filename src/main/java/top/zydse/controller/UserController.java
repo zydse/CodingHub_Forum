@@ -1,27 +1,19 @@
 package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import top.zydse.dto.AliResponseDTO;
+import org.springframework.web.bind.annotation.*;
 import top.zydse.dto.RegisterDTO;
 import top.zydse.dto.ResultDTO;
+import top.zydse.dto.VerificationDTO;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.model.User;
-import top.zydse.provider.AliMessageProvider;
 import top.zydse.service.UserService;
-import top.zydse.service.VerificationService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Random;
-import java.util.UUID;
 
 /**
  * CreateBy: zydse
@@ -38,9 +30,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private VerificationService verificationService;
-
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().removeAttribute("user");
@@ -52,37 +41,64 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login() {
+    public String login(HttpServletRequest request) {
+        String refer = request.getHeader("Referer");
+        if(refer.contains("/user/login") || refer.contains("/user/register"))
+            refer = "/";
+        request.getSession().setAttribute("referUrl", refer);
         return "login";
     }
 
+    @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(String username, String password,HttpServletResponse response) {
+    public ResultDTO login(@RequestParam(name = "username") String username,
+                           @RequestParam(name = "password") String password,
+                           @RequestParam(name = "isRemember", defaultValue = "0") Integer isRemember,
+                           HttpServletResponse response,
+                           HttpServletRequest request) {
+        String referUrl = (String) request.getSession().getAttribute("referUrl");
         User user = userService.checkUser(username, password);
-        if(user == null)
-            return "redirect:/user/login";
-        log.info("查有此人，设置cookie");
+        if (user == null) {
+            return ResultDTO.errorOf(CustomizeErrorCode.USERNAME_OR_PASSWORD_INCORRECT);
+        }
+        if (isRemember != 1) {
+            request.getSession().removeAttribute("referUrl");
+            request.getSession().setAttribute("user", user);
+            return ResultDTO.successOf(referUrl);
+        }
         Cookie token = new Cookie("token", user.getToken());
         token.setPath("/");
         response.addCookie(token);
-        return "redirect:/";
+        request.getSession().removeAttribute("referUrl");
+        return ResultDTO.successOf(referUrl);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String register() {
-        return "signup";
+    public String register(HttpServletRequest request) {
+        String refer = request.getHeader("Referer");
+        if(refer.contains("/user/login") || refer.contains("/user/register"))
+            refer = "/";
+        request.getSession().setAttribute("referUrl", refer);
+        return "register";
     }
 
     @ResponseBody
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResultDTO register(@RequestBody RegisterDTO registerDTO) {
-        return userService.save(registerDTO);
+    public ResultDTO register(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
+        VerificationDTO verificationCode = (VerificationDTO) request.getSession().getAttribute("verificationCode");
+        ResultDTO resultDTO = userService.save(registerDTO, verificationCode);
+        if(resultDTO.getCode() != 200)
+            return resultDTO;
+        User user = userService.checkUser(registerDTO.getUsername(), registerDTO.getPassword());
+        String referUrl = (String) request.getSession().getAttribute("referUrl");
+        request.getSession().setAttribute("user", user);
+        return ResultDTO.successOf(referUrl);
     }
 
     @ResponseBody
     @RequestMapping(path = "/register/verifyUsername")
-    public ResultDTO verifyUsername(@Param("username") String username,
-                                    @Param("timestamp") Long timestamp) {
+    public ResultDTO verifyUsername(@RequestParam("username") String username,
+                                    @RequestParam("timestamp") Long timestamp) {
         User user = userService.selectByName(username);
         if (user != null) {
             return ResultDTO.errorOf(CustomizeErrorCode.DUPLICATE_USERNAME);
@@ -92,9 +108,15 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(path = "/register/verifyCode")
-    public ResultDTO verifyCode(@Param("phoneNumber") String phoneNumber,
-                                @Param("timestamp") Long timestamp) {
-        return verificationService.sendSms(phoneNumber, timestamp);
+    public ResultDTO verifyCode(@RequestParam("phoneNumber") String phoneNumber,
+                                @RequestParam("timestamp") Long timestamp,
+                                HttpServletRequest request) {
+        ResultDTO resultDTO = userService.sendSms(phoneNumber, timestamp);
+        if (resultDTO.getCode() == 200) {
+            request.getSession().setAttribute("verificationCode", resultDTO.getData());
+            resultDTO.setData(null);
+        }
+        return resultDTO;
     }
 
 }

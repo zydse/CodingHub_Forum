@@ -27,27 +27,27 @@
                                 <div class="form-group">
                                     <label for="username-input">用户名</label>
                                     <input type="text" class="form-control" id="username-input" name="username"
-                                           minlength="3" maxlength="10" required placeholder="请输入用户名(3到10个字符)">
+                                           minlength="3" maxlength="15" required placeholder="请输入用户名(3到15个字符)">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password-input">密码</label>
                                     <input type="password" class="form-control" id="password-input" name="password"
-                                           minlength="6" maxlength="12" required placeholder="请输入密码(至少6位)">
+                                           minlength="6" required placeholder="请输入密码(至少6位)">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password-retype">确认密码</label>
                                     <input type="password" class="form-control" id="password-retype" minlength="6"
-                                           maxlength="12" required placeholder="请重新输入密码">
+                                           required placeholder="请重新输入密码">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="verify-code">手机号</label>
                                     <input type="text" class="form-control" id="phone-number" name="phone-number"
-                                           pattern="(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$"
+                                           pattern="(\d{11})|(\d{3}-\d{4}-\d{4})$"
                                            required placeholder="请输入手机号获得验证码">
                                 </div><!--/.form-group -->
                                 <div class="form-col">
                                     <input type="text" class="form-control" id="verify-code" name="verify-code"
-                                           required placeholder="请输入你获得的验证码">
+                                           required maxlength="6" minlength="6" placeholder="请输入你获得的验证码">
                                 </div>
                                 <div class="form-col1">
                                     <button type="button" id="code-btn" class="btn"
@@ -92,22 +92,19 @@
 <script th:src="@{/js/forum.js}"></script>
 <script th:src="@{/js/jquery.md5.js}"></script>
 <script>
-    var staticName = '';
     var countdown = 60;
     var timer;
+    //用户名唯一性验证
     $('input#username-input').blur(function () {
         if (this.validity.valueMissing) {
-            $(".modal-body").text('用户名不可为空');
-            $('#notice').modal('show');
         } else if (this.validity.tooShort) {
             $(".modal-body").text('你输入的用户名太短了');
             $('#notice').modal('show');
         } else {
             var username = $("input#username-input").val();
-            if (!username || staticName === username) {
+            if (!username) {
                 return;
             }
-            staticName = username;
             $.ajax({
                 type: "POST",
                 url: "/user/register/verifyUsername",
@@ -127,6 +124,7 @@
             });
         }
     });
+    //注册
     $("#sign-up-form").submit(function (e) {
         e.preventDefault();
         var username = $("#username-input").val();
@@ -170,24 +168,29 @@
                 if (result.code != 200) {
                     $(".modal-body").text(result.message);
                     $('#notice').modal('show');
-                    $("input#username-input").val("");
                     return false;
                 } else {
-                    window.location = "http://localhost:8080/user/login";
+                    window.location = result.data;
                 }
             }
         });
     });
+    //手机号码格式校验
     $('#phone-number').blur(function () {
         if (this.validity.valueMissing) {
-            $(".modal-body").text("手机号不能为空");
-            $('#notice').modal('show');
         } else if (this.validity.patternMismatch) {
             $(".modal-body").text("手机号格式不正确");
             $('#notice').modal('show');
+            $(this).val('');
         }
     });
+    //获取验证码
     $("#code-btn").on("click", function () {
+        if($("input#phone-number").val() === ''){
+            $(".modal-body").text("手机号不能为空");
+            $('#notice').modal('show');
+            return;
+        }
         var phoneNumber = $("input#phone-number").val();
         task($('#code-btn'));
         $.ajax({

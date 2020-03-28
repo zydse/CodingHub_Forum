@@ -34,7 +34,7 @@ aliyun:
   regionId: cn-hangzhou
   accessKeyId: LTAIluIdnWI4vAwN
   accessSecret: 5aS8Tb6AKhpeUGD6WofK0U547M7bdP
-  signName: CRMsdf
+  signName: CRM
   templateCode: SMS_167040753
 ---
 
@@ -49,8 +49,8 @@ spring:
     hikari:
       connection-test-query: select 1
 
-#github:
-#  redirectUri: http://zydse.top/callback
+github:
+  redirectUri: http://zydse.top/callback
 ---
 
 spring:

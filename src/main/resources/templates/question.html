@@ -74,16 +74,18 @@
                         <h5 class="media-heading text_desc" th:text="${comment.user.name}">USERNAME</h5>
                         <div th:text="${comment.content}">这里是评论内容</div>
                         <div class="comment_operate">
-                            <span class="icon">
+                            <span th:class="${comment.isThumbUp == 1 ? 'icon active' : 'icon'}"
+                                  onclick="thumbComment(this)" th:data-id="${comment.id}"
+                                  th:data-active="${sessin.user == null ? 0 : 1}" th:id="${'thumb-' + comment.id}">
                                 <span class="glyphicon glyphicon-thumbs-up"></span>
-                                <span th:text="${comment.thumbCount}"></span>
+                                <span th:id="${'thumbCount-' + comment.id}" th:text="${comment.thumbCount}"></span>
                             </span>
                             <span class="icon" onclick="collapseComment(this)" th:data-id="${comment.id}"
                                   th:id="${'collapse-' + comment.id}">
                                 <span class="glyphicon glyphicon-comment"></span>
-                                <span th:text="${comment.subCommentCount}"></span>
+                                <span th:id="${'subCount-' + comment.id}" th:text="${comment.subCommentCount}"></span>
                             </span>
-                            <span th:text=" ${#dates.format(comment.gmtModified, 'yyyy-MM-dd')}"
+                            <span th:text=" ${#dates.format(comment.gmtModified, 'yyyy-MM-dd HH:mm')}"
                                   class="text_desc pull-right"></span>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 collapse sub_comment"
@@ -112,7 +114,8 @@
                         </a>
                     </div>
                     <div class="media-body">
-                        <h5 class="media-heading " style="padding-top: 10px" th:text="${session.user == null ? 'Anonymous user' : session.user.name}">
+                        <h5 class="media-heading " style="padding-top: 10px"
+                            th:text="${session.user == null ? '匿名用户' : session.user.name}">
                             USERNAME</h5>
                     </div>
                 </div>

@@ -28,11 +28,13 @@
 
                                 <div class="form-group">
                                     <label for="username">用户名</label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="请输入你的用户名">
+                                    <input type="text" class="form-control" id="username" name="username"
+                                           required placeholder="请输入你的用户名">
                                 </div><!--/.form-group -->
                                 <div class="form-group">
                                     <label for="password">密码</label>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="请输入你的密码">
+                                    <input type="password" class="form-control" id="password" name="password"
+                                           required placeholder="请输入你的密码">
                                 </div><!--/.form-group -->
 
                             </div><!--/.signin-form -->
@@ -45,9 +47,9 @@
                                 <div class="awesome-checkbox-list">
                                     <ul class="unstyled centered">
                                         <li>
-                                            <input class="styled-checkbox" id="styled-checkbox-2" type="checkbox"
-                                                   value="value2">
-                                            <label for="styled-checkbox-2">记住我</label>
+                                            <input class="styled-checkbox" id="isRemember" type="checkbox"
+                                                   name="isRemember" value="1">
+                                            <label for="isRemember">记住我</label>
                                         </li>
 
                                         <li>
@@ -91,13 +93,30 @@
 <script th:src="@{/js/custom.js}"></script>
 <script th:src="@{/js/jquery.md5.js}"></script>
 <script>
-    $("#login-btn").on("click", function (e) {
-    });
     $("#login-form").submit(function (e) {
-        var $password = $("input#password");
-        var password = $password.val();
-        $password.val($.md5(password));
-        e.submit();
+        e.preventDefault();
+        var username = $("input#username").val();
+        var password = $("input#password").val();
+        var isRemember = $("input#isRemember").prop("checked") ? 1 : 0;
+        $.ajax({
+            type: "POST",
+            url: "/user/login",
+            dataType: "json",
+            data: {
+                "username": username,
+                "password": $.md5(password),
+                "isRemember": isRemember
+            },
+            success: function (result) {
+                if (result.code != 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    return false;
+                } else {
+                    window.location = result.data;
+                }
+            }
+        });
     });
 </script>
 </body>

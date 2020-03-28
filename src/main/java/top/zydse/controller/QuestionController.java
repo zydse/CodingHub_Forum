@@ -11,9 +11,11 @@ import top.zydse.dto.CommentDTO;
 import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.QuestionDTO;
 import top.zydse.enums.CommentTypeEnum;
+import top.zydse.model.User;
 import top.zydse.service.CommentService;
 import top.zydse.service.QuestionService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -31,12 +33,14 @@ public class QuestionController {
     private CommentService commentService;
 
     @GetMapping("/question/{id}")
-    public String list(@PathVariable(name = "id")Long questionId,Model model){
+    public String list(@PathVariable(name = "id") Long questionId,
+                       HttpServletRequest request) {
         QuestionDTO questionDTO = questionService.findById(questionId);
-        List<CommentDTO> commentDTOList = commentService.listByParentId(questionId, CommentTypeEnum.QUESTION);
+        User user = (User) request.getSession().getAttribute("user");
+        List<CommentDTO> commentDTOList = commentService.listComment(questionId, user);
         questionService.increaseViewCount(questionDTO.getId());
-        model.addAttribute("question",questionDTO);
-        model.addAttribute("comments",commentDTOList);
+        request.setAttribute("question", questionDTO);
+        request.setAttribute("comments", commentDTOList);
         return "question";
     }
 
@@ -44,13 +48,13 @@ public class QuestionController {
     public String search(@RequestParam(name = "page", defaultValue = "1") Integer page,
                          @RequestParam(name = "size", defaultValue = "5") Integer size,
                          @RequestParam(name = "search", required = false) String search,
-                         Model model){
+                         Model model) {
         search = search.trim();
-        if(!StringUtils.isNotBlank(search)){
+        if (!StringUtils.isNotBlank(search)) {
             return "redirect:/";
         }
         PaginationDTO<QuestionDTO> paginationDTO = questionService.findAll(search, page, size);
-        model.addAttribute("pagination",paginationDTO);
+        model.addAttribute("pagination", paginationDTO);
         model.addAttribute("search", search);
         return "index";
     }

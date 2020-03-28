@@ -76,7 +76,7 @@ public class QuestionService {
         int totalCount = (int) questionMapper.countByExample(example);
         paginationDTO.setPagination(totalCount, page, size);
         int offset = (paginationDTO.getCurrentPage() - 1) * size;
-        List<Question> questionList = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset, size));
+        List<Question> questionList = questionMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
         return getQuestionDTOPaginationDTO(paginationDTO, questionList);
     }
 

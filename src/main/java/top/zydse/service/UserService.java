@@ -1,14 +1,22 @@
 package top.zydse.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import top.zydse.dto.AliResponseDTO;
 import top.zydse.dto.RegisterDTO;
 import top.zydse.dto.ResultDTO;
+import top.zydse.dto.VerificationDTO;
+import top.zydse.enums.CustomizeErrorCode;
+import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.UserMapper;
 import top.zydse.model.User;
 import top.zydse.model.UserExample;
+import top.zydse.provider.AliMessageProvider;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -19,16 +27,26 @@ import java.util.UUID;
  * @Date: 2020/3/10
  */
 @Service
+@Slf4j
 public class UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AliMessageProvider aliMessageProvider;
 
-    public void saveOrUpdate(User user) {
+    public void saveGithubUser(User user) {
         UserExample userExample = new UserExample();
-        userExample.createCriteria().andAccountIdEqualTo(user.getAccountId());
+        userExample.createCriteria().
+                andAccountIdEqualTo(user.getAccountId());
+        List<User> githubUsers = userMapper.selectByExample(userExample);
+        userExample.clear();
+        userExample.createCriteria().andNameEqualTo(user.getName());
         List<User> users = userMapper.selectByExample(userExample);
-        if (users.size() == 0) {
+        if(users.size() != 0){
+            throw new CustomizeException(CustomizeErrorCode.DUPLICATE_USERNAME);
+        } else if (githubUsers.size() == 0) {
             //新增用户
+            user.setRoleId(2);
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             userMapper.insertSelective(user);
@@ -55,17 +73,26 @@ public class UserService {
         return userList.get(0);
     }
 
-
-    public ResultDTO save(RegisterDTO registerDTO) {
-        User user = new User();
-        user.setName(registerDTO.getUsername());
-        user.setPassword(registerDTO.getPassword());
-        user.setPhoneNumber(registerDTO.getPhoneNumber());
-        user.setGmtCreate(registerDTO.getGmtCreate());
-        user.setGmtModified(user.getGmtCreate());
-        user.setAvatarUrl("https://avatars1.githubusercontent.com/u/35904888");
-        userMapper.insertSelective(user);
-        return ResultDTO.successOf();
+    @Transactional
+    public ResultDTO save(RegisterDTO registerDTO, VerificationDTO verificationCode) {
+        if (verificationCode == null || !registerDTO.getPhoneNumber().equals(verificationCode.getPhoneNumber())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.VERIFICATION_CODE_ERROR);
+        }
+        long gap = (registerDTO.getGmtCreate() - verificationCode.getGmtCreate()) / 1000 / 60;
+        if (verificationCode.getCode().equals(registerDTO.getVerifyCode()) && gap < 15L) {
+            User user = new User();
+            user.setRoleId(2);
+            user.setName(registerDTO.getUsername());
+            user.setPassword(registerDTO.getPassword());
+            user.setPhoneNumber(registerDTO.getPhoneNumber());
+            user.setGmtCreate(registerDTO.getGmtCreate());
+            user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl("https://avatars1.githubusercontent.com/u/35904888");
+            userMapper.insertSelective(user);
+            return ResultDTO.successOf();
+        } else {
+            return ResultDTO.errorOf(CustomizeErrorCode.VERIFICATION_CODE_INACTIVE);
+        }
     }
 
     public User checkUser(String username, String password) {
@@ -74,6 +101,7 @@ public class UserService {
                 .andNameEqualTo(username)
                 .andPasswordEqualTo(password);
         List<User> userList = userMapper.selectByExample(userExample);
+        System.out.println(userList);
         if (userList == null || userList.size() != 1)
             return null;
         User user = userList.get(0);
@@ -81,5 +109,24 @@ public class UserService {
         user.setGmtModified(System.currentTimeMillis());
         userMapper.updateByPrimaryKeySelective(user);
         return user;
+    }
+
+    public ResultDTO sendSms(String phoneNumber, long timestamp) {
+        StringBuilder code = new StringBuilder();
+        UUID uuid = UUID.randomUUID();
+        long bits = uuid.getLeastSignificantBits();
+        Random rand = new Random(bits);
+        for (int i = 0; i < 6; i++)
+            code.append(rand.nextInt(10));
+        AliResponseDTO aliResponseDTO = aliMessageProvider.sendSms(phoneNumber, code.toString());
+        log.info(aliResponseDTO.toString());
+        if ("OK".equals(aliResponseDTO.getCode())) {
+            VerificationDTO record = new VerificationDTO();
+            record.setCode(code.toString());
+            record.setPhoneNumber(phoneNumber);
+            record.setGmtCreate(timestamp);
+            return ResultDTO.successOf(record);
+        }
+        return ResultDTO.errorOf(CustomizeErrorCode.ALI_SERVER_ERROR);
     }
 }

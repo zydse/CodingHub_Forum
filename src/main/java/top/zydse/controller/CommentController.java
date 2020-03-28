@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import top.zydse.dto.CommentCreateDTO;
 import top.zydse.dto.CommentDTO;
 import top.zydse.dto.ResultDTO;
+import top.zydse.dto.SubCommentDTO;
 import top.zydse.enums.CommentTypeEnum;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.model.Comment;
+import top.zydse.model.SubComment;
 import top.zydse.model.User;
 import top.zydse.service.CommentService;
 
@@ -45,22 +47,44 @@ public class CommentController {
         }
         if (StringUtils.isBlank(commentCreateDTO.getContent()))
             throw new CustomizeException(CustomizeErrorCode.CONTENT_IS_EMPTY_OR_TO_SHORT);
-        Comment comment;
-        comment = new Comment();
-        comment.setContent(commentCreateDTO.getContent());
-        comment.setParentId(commentCreateDTO.getParentId());
-        comment.setType(commentCreateDTO.getType());
-        comment.setGmtCreate(System.currentTimeMillis());
-        comment.setGmtModified(comment.getGmtCreate());
-        comment.setReviewer(user.getId());
-        commentService.insert(comment, user);
+        if (commentCreateDTO.getType().equals(1)) {
+            Comment comment = new Comment();
+            comment.setReviewer(user.getId());
+            comment.setContent(commentCreateDTO.getContent());
+            comment.setQuestionId(commentCreateDTO.getParentId());
+            comment.setGmtCreate(System.currentTimeMillis());
+            comment.setGmtModified(comment.getGmtCreate());
+            commentService.insert(comment, user);
+        } else {
+            SubComment subComment = new SubComment();
+            subComment.setReviewer(user.getId());
+            subComment.setCommentId(commentCreateDTO.getParentId());
+            subComment.setContent(commentCreateDTO.getContent());
+            subComment.setGmtCreate(System.currentTimeMillis());
+            subComment.setGmtModified(subComment.getGmtCreate());
+            commentService.insert(subComment, user);
+        }
         return ResultDTO.successOf();
     }
 
     @ResponseBody
-    @GetMapping("/comment/{parentId}")
-    public ResultDTO<List<CommentDTO>> subComment(@PathVariable(name = "parentId") Long pid) {
-        List<CommentDTO> commentDTOList = commentService.listByParentId(pid, CommentTypeEnum.COMMENT);
-        return ResultDTO.successOf(commentDTOList);
+    @GetMapping("/comment/list/{commentId}")
+    public ResultDTO<List<CommentDTO>> subComment(@PathVariable(name = "commentId") Long commentId) {
+        List<SubCommentDTO> subCommentDTO = commentService.listSubComment(commentId);
+        return ResultDTO.successOf(subCommentDTO);
     }
+
+    @ResponseBody
+    @PostMapping("/comment/thumb")
+    public ResultDTO thumbComment(@RequestParam(name = "commentId") Long commentId,
+                                  HttpServletRequest request) {
+        System.out.println(commentId);
+        User user = (User) request.getSession().getAttribute("user");
+        if(user == null){
+            return ResultDTO.errorOf(CustomizeErrorCode.NO_LOGIN);
+        }
+        long thumb = commentService.thumbUpComment(commentId, user);
+        return ResultDTO.successOf(thumb);
+    }
+
 }
