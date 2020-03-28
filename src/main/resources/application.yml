@@ -19,7 +19,7 @@ github:
     secret: 648a15f8f24b8d6f98a975dd2b2ced260354856f
   redirectUri: http://localhost:8080/callback
   oauthUrl: https://github.com/login/oauth/access_token
-  getTokenUrl: https://api.github.com/user?access_token
+  getTokenUrl: https://api.github.com/user
 
 mybatis:
   # 配置mapper的xml文件位置

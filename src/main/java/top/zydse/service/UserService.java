@@ -40,7 +40,9 @@ public class UserService {
                 andAccountIdEqualTo(user.getAccountId());
         List<User> githubUsers = userMapper.selectByExample(userExample);
         userExample.clear();
-        userExample.createCriteria().andNameEqualTo(user.getName());
+        userExample.createCriteria()
+                .andNameEqualTo(user.getName())
+                .andAccountIdIsNull();
         List<User> users = userMapper.selectByExample(userExample);
         if(users.size() != 0){
             throw new CustomizeException(CustomizeErrorCode.DUPLICATE_USERNAME);
@@ -59,7 +61,7 @@ public class UserService {
             u.setToken(user.getToken());
             u.setName(user.getName());
             UserExample example = new UserExample();
-            example.createCriteria().andIdEqualTo(users.get(0).getId());
+            example.createCriteria().andIdEqualTo(githubUsers.get(0).getId());
             userMapper.updateByExampleSelective(u, example);
         }
     }

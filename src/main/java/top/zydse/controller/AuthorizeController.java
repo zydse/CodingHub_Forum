@@ -41,6 +41,7 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(String code, Integer state,
                            HttpServletResponse response) {
+        log.info("进入回调 code {} state {}", code, state);
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(clientId);
         accessTokenDTO.setCode(code);
@@ -48,7 +49,9 @@ public class AuthorizeController {
         accessTokenDTO.setState(state);
         accessTokenDTO.setRedirect_uri(redirectUri);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
+        log.info("进入回调 accessToken {}", accessToken);
         GithubUserDTO githubUser = githubProvider.getGithubUser(accessToken);
+        log.info("进入回调 githubUser {}", githubUser);
         if (githubUser != null && githubUser.getId() != null) {
             User user = new User();
             user.setAccountId(String.valueOf(githubUser.getId()));

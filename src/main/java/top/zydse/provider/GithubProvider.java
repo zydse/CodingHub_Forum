@@ -1,6 +1,7 @@
 package top.zydse.provider;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.io.IOException;
  * @Date: 2020/3/3
  */
 @Component
+@Slf4j
 public class GithubProvider {
     private OkHttpClient client;
 
@@ -46,9 +48,12 @@ public class GithubProvider {
     }
 
     public GithubUserDTO getGithubUser(String token) {
+        log.info("使用token获取用户信息");
         Request request = new Request.Builder()
-                .url(getTokenUrl + "=" + token)
+                .url(getTokenUrl)
+                .header("Authorization", "token " + token )
                 .build();
+
         try (Response response = client.newCall(request).execute()) {
             String string = response.body().string();
             return JSON.parseObject(string, GithubUserDTO.class);

@@ -102,6 +102,7 @@ public class QuestionService {
         User user = userMapper.selectByPrimaryKey(question.getCreator());
         QuestionDTO dto = new QuestionDTO();
         BeanUtils.copyProperties(question, dto);
+        dto.setTags("标签1,标签2");
         dto.setUser(user);
         return dto;
     }

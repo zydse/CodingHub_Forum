@@ -46,13 +46,13 @@ public class PublishController {
     public String doPublish(
             @RequestParam("questionTitle") String title,
             @RequestParam("description") String description,
-            @RequestParam("tags") String tags,
+            @RequestParam("tags") String tag,
             @RequestParam(name = "id", required = false) Long id,
             HttpServletRequest request,
             Model model) {
         model.addAttribute("title", title);
         model.addAttribute("description", description);
-        model.addAttribute("tags", tags);
+        model.addAttribute("tags", tag);
         if (title == null || "".equals(title)) {
             model.addAttribute("error", "标题不能为空");
             return "publish";
@@ -61,7 +61,7 @@ public class PublishController {
             model.addAttribute("error", "问题的详细信息不能为空");
             return "publish";
         }
-        if (tags == null || "".equals(tags)) {
+        if (tag == null || "".equals(tag)) {
             model.addAttribute("error", "标签不能为空");
             return "publish";
         }
@@ -75,6 +75,10 @@ public class PublishController {
         question.setTitle(title);
         question.setDescription(description);
         question.setCreator(user.getId());
+        String[] tags = tag.split(",");
+        for (String s : tags) {
+            System.out.println(s);
+        }
         questionService.saveOrUpdate(question);
         return "redirect:/";
     }
