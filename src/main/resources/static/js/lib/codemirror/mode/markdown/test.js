@@ -20,10 +20,10 @@
      "[strong&formatting&formatting-strong __][strong foo][strong&formatting&formatting-strong __]");
 
   FT("formatting_codeBackticks",
-     "[comment&formatting&formatting-code `][comment foo][comment&formatting&formatting-code `]");
+     "[title&formatting&formatting-code `][title foo][title&formatting&formatting-code `]");
 
   FT("formatting_doubleBackticks",
-     "[comment&formatting&formatting-code ``][comment foo ` bar][comment&formatting&formatting-code ``]");
+     "[title&formatting&formatting-code ``][title foo ` bar][title&formatting&formatting-code ``]");
 
   FT("formatting_atxHeader",
      "[header&header-1&formatting&formatting-header&formatting-header-1 #][header&header-1  foo # bar ][header&header-1&formatting&formatting-header&formatting-header-1 #]");
@@ -75,75 +75,75 @@
 
   // Code blocks using 4 spaces (regardless of CodeMirror.tabSize value)
   MT("codeBlocksUsing4Spaces",
-     "    [comment foo]");
+     "    [title foo]");
 
   // Code blocks using 4 spaces with internal indentation
   MT("codeBlocksUsing4SpacesIndentation",
-     "    [comment bar]",
-     "        [comment hello]",
-     "            [comment world]",
-     "    [comment foo]",
+     "    [title bar]",
+     "        [title hello]",
+     "            [title world]",
+     "    [title foo]",
      "bar");
 
   // Code blocks using 4 spaces with internal indentation
   MT("codeBlocksUsing4SpacesIndentation",
      " foo",
-     "    [comment bar]",
-     "        [comment hello]",
-     "    [comment world]");
+     "    [title bar]",
+     "        [title hello]",
+     "    [title world]");
 
   // Code blocks should end even after extra indented lines
   MT("codeBlocksWithTrailingIndentedLine",
-     "    [comment foo]",
-     "        [comment bar]",
-     "    [comment baz]",
+     "    [title foo]",
+     "        [title bar]",
+     "    [title baz]",
      "    ",
      "hello");
 
   // Code blocks using 1 tab (regardless of CodeMirror.indentWithTabs value)
   MT("codeBlocksUsing1Tab",
-     "\t[comment foo]");
+     "\t[title foo]");
 
   // Inline code using backticks
   MT("inlineCodeUsingBackticks",
-     "foo [comment `bar`]");
+     "foo [title `bar`]");
 
   // Block code using single backtick (shouldn't work)
   MT("blockCodeSingleBacktick",
-     "[comment `]",
+     "[title `]",
      "foo",
-     "[comment `]");
+     "[title `]");
 
   // Unclosed backticks
   // Instead of simply marking as CODE, it would be nice to have an
   // incomplete flag for CODE, that is styled slightly different.
   MT("unclosedBackticks",
-     "foo [comment `bar]");
+     "foo [title `bar]");
 
   // Per documentation: "To include a literal backtick character within a
   // code span, you can use multiple backticks as the opening and closing
   // delimiters"
   MT("doubleBackticks",
-     "[comment ``foo ` bar``]");
+     "[title ``foo ` bar``]");
 
   // Tests based on Dingus
   // http://daringfireball.net/projects/markdown/dingus
   //
   // Multiple backticks within an inline code block
   MT("consecutiveBackticks",
-     "[comment `foo```bar`]");
+     "[title `foo```bar`]");
 
   // Multiple backticks within an inline code block with a second code block
   MT("consecutiveBackticks",
-     "[comment `foo```bar`] hello [comment `world`]");
+     "[title `foo```bar`] hello [title `world`]");
 
   // Unclosed with several different groups of backticks
   MT("unclosedBackticks",
-     "[comment ``foo ``` bar` hello]");
+     "[title ``foo ``` bar` hello]");
 
   // Closed with several different groups of backticks
   MT("closedBackticks",
-     "[comment ``foo ``` bar` hello``] world");
+     "[title ``foo ``` bar` hello``] world");
 
   // atx headers
   // http://daringfireball.net/projects/markdown/syntax#header
@@ -297,28 +297,28 @@
      "[variable-2 * ][variable-2&em *foo*][variable-2  bar]",
      "[variable-2 * ][variable-2&strong **foo**][variable-2  bar]",
      "[variable-2 * ][variable-2&strong **][variable-2&em&strong *foo**][variable-2&em *][variable-2  bar]",
-     "[variable-2 * ][variable-2&comment `foo`][variable-2  bar]");
+     "[variable-2 * ][variable-2&title `foo`][variable-2  bar]");
 
   // Formatting in lists (+)
   MT("listPlusFormatting",
      "[variable-2 + ][variable-2&em *foo*][variable-2  bar]",
      "[variable-2 + ][variable-2&strong **foo**][variable-2  bar]",
      "[variable-2 + ][variable-2&strong **][variable-2&em&strong *foo**][variable-2&em *][variable-2  bar]",
-     "[variable-2 + ][variable-2&comment `foo`][variable-2  bar]");
+     "[variable-2 + ][variable-2&title `foo`][variable-2  bar]");
 
   // Formatting in lists (-)
   MT("listDashFormatting",
      "[variable-2 - ][variable-2&em *foo*][variable-2  bar]",
      "[variable-2 - ][variable-2&strong **foo**][variable-2  bar]",
      "[variable-2 - ][variable-2&strong **][variable-2&em&strong *foo**][variable-2&em *][variable-2  bar]",
-     "[variable-2 - ][variable-2&comment `foo`][variable-2  bar]");
+     "[variable-2 - ][variable-2&title `foo`][variable-2  bar]");
 
   // Formatting in lists (1.)
   MT("listNumberFormatting",
      "[variable-2 1. ][variable-2&em *foo*][variable-2  bar]",
      "[variable-2 2. ][variable-2&strong **foo**][variable-2  bar]",
      "[variable-2 3. ][variable-2&strong **][variable-2&em&strong *foo**][variable-2&em *][variable-2  bar]",
-     "[variable-2 4. ][variable-2&comment `foo`][variable-2  bar]");
+     "[variable-2 4. ][variable-2&title `foo`][variable-2  bar]");
 
   // Paragraph lists
   MT("listParagraph",
@@ -385,7 +385,7 @@
      "",
      "[variable-2 * bar]",
      "",
-     "        [comment > hello]",
+     "        [title > hello]",
      "",
      "    [variable-2 world]");
 
@@ -395,7 +395,7 @@
      "",
      "    [variable-2 bar]",
      "",
-     "        [comment hello]",
+     "        [title hello]",
      "",
      "    [variable-2 world]");
 
@@ -442,16 +442,16 @@
      "",
      "    [variable-3 + bar]",
      "",
-     "            [comment hello]");
+     "            [title hello]");
 
   // Code with internal indentation
   MT("listCodeIndentation",
      "[variable-2 * foo]",
      "",
-     "        [comment bar]",
-     "            [comment hello]",
-     "                [comment world]",
-     "        [comment foo]",
+     "        [title bar]",
+     "            [title hello]",
+     "                [title world]",
+     "        [title foo]",
      "    [variable-2 bar]");
 
   // List nesting edge cases
@@ -474,7 +474,7 @@
   MT("listCodeText",
      "[variable-2 * foo]",
      "",
-     "        [comment bar]",
+     "        [title bar]",
      "",
      "hello");
 
@@ -698,7 +698,7 @@
      "foo \\`bar\\`");
 
   MT("doubleEscapeBacktick",
-     "foo \\\\[comment `bar\\\\`]");
+     "foo \\\\[title `bar\\\\`]");
 
   MT("escapeAsterisk",
      "foo \\*bar\\*");
@@ -729,9 +729,9 @@
      "[variable-2 * [ ]] bar]");
 
   MT("fencedCodeBlocks",
-     "[comment ```]",
+     "[title ```]",
      "foo",
-     "[comment ```]");
+     "[title ```]");
 
   // Tests that require XML mode
 

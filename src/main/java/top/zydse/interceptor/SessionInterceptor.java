@@ -4,14 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import top.zydse.enums.CustomizeErrorCode;
-import top.zydse.exception.CustomizeException;
-import top.zydse.mapper.NotificationMapper;
 import top.zydse.mapper.UserMapper;
-import top.zydse.model.NotificationExample;
 import top.zydse.model.User;
 import top.zydse.model.UserExample;
-import top.zydse.service.NotificationService;
+import top.zydse.service.impl.NotificationServiceImpl;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +27,7 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private NotificationService notificationService;
+    private NotificationServiceImpl notificationService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

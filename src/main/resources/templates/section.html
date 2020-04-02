@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--我的浏览历史-->
+<div th:fragment="view" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="panel panel-default" th:each="viewHistory : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading">
+                        你浏览了
+                        <a th:href="@{/user/{userId}(userId = ${viewHistory.userId})}"
+                           th:text="${viewHistory.username}"></a>
+                        的问题
+                        <a th:href="@{/question/{questionId}(questionId = ${viewHistory.questionId})}"
+                           th:text="${viewHistory.title}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span th:text="${#dates.format(viewHistory.gmtModified, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
+    </div>
+</div>
+<!--我的点赞-->
+<div th:fragment="thumb" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="panel panel-default" th:each="thumbHistory : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading">
+                        你点赞了
+                        <a th:href="@{/user/{userId}(userId = ${thumbHistory.userId})}"
+                           th:text="${thumbHistory.username}"></a>
+                        的回复
+                        <a th:href="@{/question/{questionId}(questionId = ${thumbHistory.questionId})}"
+                           th:text="${thumbHistory.comment}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span th:text="${#dates.format(thumbHistory.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
+    </div>
+</div>
+<!--我的通知-->
+<div th:fragment="notification" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="panel panel-default" th:each="notification : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading">
+                        <a th:href="@{/user/{userId}(userId = ${notification.notifier})}"
+                           th:text="${notification.notifierName}">用户</a>
+                        <span th:text="${notification.typeName}">评论了</span>
+                        <a th:href="@{/notification/{noticfication}(noticfication = ${notification.id})}"
+                           th:text="${notification.outerTitle}">问题名称</a>
+                        <span class="label label-danger" th:if="${notification.status == 0}">未读</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span th:text="${#dates.format(notification.gmtCreate, 'yyyy-MM-dd HH:mm')}">刚刚</span>
+        </div>
+    </div>
+</div>
+<!--我的提问-->
+<div th:fragment="publish" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="media" th:each="question : ${pagination.pageData}">
+        <div class="media-left">
+            <a th:href="@{/user/{userId}(userId = ${question.user.id})}">
+                <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="用户头像">
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">
+                <a th:href="@{/question/{questionId}(questionId = ${question.id})}"
+                   th:text="${question.title}"></a>
+            </h4>
+            <span class="text_desc">
+                <span th:text="${question.commentCount}">00</span> 个回复 •
+                <span th:text="${question.viewCount}">00</span> 次浏览 •
+                <span th:text="${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}">刚刚</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

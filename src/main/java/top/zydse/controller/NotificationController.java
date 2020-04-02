@@ -1,8 +1,8 @@
 package top.zydse.controller;
 
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import top.zydse.dto.NotificationDTO;
@@ -25,6 +25,7 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
+    @RequiresAuthentication
     @RequestMapping("/notification/{id}")
     public String notification(HttpServletRequest request,
                                @PathVariable(name = "id") Long id) {

@@ -7,7 +7,7 @@
     <link th:href="@{/css/font-family.css}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&subset=devanagari,latin-ext"
           rel="stylesheet">
-    <title>登录页</title>
+    <title>登录页 | CodingHub</title>
     <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
     <link rel="stylesheet" th:href="@{/css/animate.css}">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
@@ -23,9 +23,8 @@
                 <h2 class="h2">登录</h2>
                 <form th:action="@{/user/login}" method="post" id="login-form">
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="signin-form">
-
                                 <div class="form-group">
                                     <label for="username">用户名</label>
                                     <input type="text" class="form-control" id="username" name="username"
@@ -36,13 +35,11 @@
                                     <input type="password" class="form-control" id="password" name="password"
                                            required placeholder="请输入你的密码">
                                 </div><!--/.form-group -->
-
                             </div><!--/.signin-form -->
                         </div><!--/.col -->
                     </div><!--/.row -->
-
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="signin-password">
                                 <div class="awesome-checkbox-list">
                                     <ul class="unstyled centered">
@@ -51,7 +48,6 @@
                                                    name="isRemember" value="1">
                                             <label for="isRemember">记住我</label>
                                         </li>
-
                                         <li>
                                             <a th:href="@{/user/forget}">忘记了你的账户或密码 ?</a>
                                         </li>
@@ -63,14 +59,14 @@
                     </div><!--/.row -->
 
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="signin-footer">
                                 <button type="submit" id="login-btn" class="btn signin_btn">
                                     登录
                                 </button>
                                 <p>
-                                    还没有账户?
-                                    <a th:href="@{/user/register}">注册</a>
+                                    还没有账户?去
+                                    <a th:href="@{/user/toRegister}">注册</a>
                                 </p>
                                 <p>
                                     <a th:href="@{/}">返回首页</a>

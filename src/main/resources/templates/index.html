@@ -1,49 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CodingHub</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/css/editormd.preview.min.css}"/>
     <link rel="stylesheet" th:href="@{/css/forum.css}">
     <script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
     <script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
-    <script type="application/javascript">
-        $(function () {
-            var closable = window.localStorage.getItem("closable");
-            if(closable == "true"){
-                window.localStorage.removeItem("closable");
-                window.close();
-            }
-        });
-    </script>
+    <script th:src="@{/js/editormd.min.js}"></script>
+    <script th:src="@{/js/lib/marked.min.js}"></script>
+    <script th:src="@{/js/lib/prettify.min.js}"></script>
 </head>
 <body>
-<div th:insert="navigation :: nav"></div>
-
+<div th:replace="navigation :: nav"></div>
 <div class="container-fluid main">
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h2><span class="glyphicon glyphicon-list" aria-hidden="true"></span> 发现</h2>
-            <hr/>
+            <h2>
+                <span class="glyphicon glyphicon-list" aria-hidden="true" th:data-ids="${ids}" id="questionIds"></span>
+                发现
+            </h2>
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a th:href="@{/}">最新</a></li>
+                <li role="presentation"><a th:href="@{/}">七天最热</a></li>
+                <li role="presentation"><a th:href="@{/}" class="text-danger">消灭零回复</a></li>
+            </ul>
             <div class="media" th:each="question : ${pagination.pageData}">
                 <div class="media-left">
-                    <a href="#">
+                    <a th:href="@{/profile/{userId}(userId = ${question.creator})}">
                         <img class="media-object img-rounded" th:src="${question.user.avatarUrl}"
-                             src="https://avatars0.githubusercontent.com/u/35904985?v=4" alt="用户头像">
+                             src="https://avatars0.githubusercontent.com/u/35904985?v=4" alt="avatar">
                     </a>
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading">
-                        <a th:href="@{/question/{questionId}(questionId = ${question.id})}"
-                           th:text="${question.title}"></a>
-                    </h4>
-                    <span class="text_desc"><span th:text="${question.commentCount}">00</span> 个回复 • <span
-                            th:text="${question.viewCount}">00</span> 次浏览 •
-                        <span th:text="${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}">刚刚</span>
-                    </span>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <span>[[${question.title}]]</span>
+                            </h3>
+                        </div>
+                        <div class="panel-body" style="padding: 5px;">
+                            <div id="markdown-preview" th:attrappend="id=${question.id}"
+                                 style="background-color: rgb(242,242,245); border-radius: 10px;">
+                                <textarea style="display:none;">[[${question.description}]]</textarea>
+                            </div>
+
+
+                        </div>
+                        <div class="panel-footer">
+                                <span class="text_desc">
+                                    <span>[[${question.commentCount}]]</span> 个回复 •
+                                    <span>[[${question.viewCount}]]</span> 次浏览 •
+                                    <span>[[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span>
+                                </span>
+                            <a class="pull-right" th:href="@{/question/{questionId}(questionId = ${question.id})}">
+                                查看全文
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <script type="text/javascript">
+                $(function () {
+                    var str = $("#questionIds").data('ids').toString();
+                    var ids = str.split(",");
+                    $.each(ids, function (index, element) {
+                        editormd.markdownToHTML("markdown-preview" + element, {});
+                    });
+                });
+            </script>
             <div th:if="${search == null}" th:insert="pageNav :: index"></div>
             <div th:if="${search != null}" th:insert="pageNav :: search"></div>
         </div>

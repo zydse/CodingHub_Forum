@@ -1,6 +1,14 @@
 package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.SavedRequest;
+import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +30,9 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @Date: 2020/3/3
  */
+@Slf4j
 @Controller
 @RequestMapping("/user")
-@Slf4j
 public class UserController {
 
     @Autowired
@@ -32,67 +40,63 @@ public class UserController {
 
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
+        log.info("准备退出");
         request.getSession().removeAttribute("user");
+        log.info("移除user");
         Cookie cookie = new Cookie("token", null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+        System.out.println(request.getSession());
+        request.getSession().invalidate();
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(HttpServletRequest request) {
-        String refer = request.getHeader("Referer");
-        if(refer.contains("/user/login") || refer.contains("/user/register"))
-            refer = "/";
-        request.getSession().setAttribute("referUrl", refer);
-        return "login";
-    }
-
     @ResponseBody
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PostMapping("/login")
     public ResultDTO login(@RequestParam(name = "username") String username,
-                           @RequestParam(name = "password") String password,
-                           @RequestParam(name = "isRemember", defaultValue = "0") Integer isRemember,
-                           HttpServletResponse response,
-                           HttpServletRequest request) {
-        String referUrl = (String) request.getSession().getAttribute("referUrl");
-        User user = userService.checkUser(username, password);
-        if (user == null) {
-            return ResultDTO.errorOf(CustomizeErrorCode.USERNAME_OR_PASSWORD_INCORRECT);
+                        @RequestParam(name = "password") String password,
+                        @RequestParam(name = "isRemember", defaultValue = "0") Integer isRemember,
+                        HttpServletResponse response,
+                        HttpServletRequest request) {
+        log.info("username : {} password : {}",username, password);
+        Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+        try {
+            subject.login(token);
+            SavedRequest savedRequest = WebUtils.getSavedRequest(request);
+            System.out.println(savedRequest != null);
+            String url = savedRequest == null ? "/" : savedRequest.getRequestUrl();
+            log.info("user request from :: " + url);
+            User user = (User) subject.getPrincipal();
+            log.info("login-ed user : " + user.getToken());
+            if (isRemember == 1) {
+                Cookie cookie = new Cookie("token", user.getToken());
+                cookie.setPath("/");
+                response.addCookie(cookie);
+            }
+            request.getSession().setAttribute("user",user);
+            return ResultDTO.successOf(url);
+        } catch (UnknownAccountException e) {
+            return ResultDTO.errorOf(CustomizeErrorCode.USERNAME_INCORRECT);
+        } catch (IncorrectCredentialsException e) {
+            return ResultDTO.errorOf(CustomizeErrorCode.PASSWORD_INCORRECT);
+        } catch (AuthenticationException e) {
+            return ResultDTO.errorOf(CustomizeErrorCode.SYSTEM_ERROR);
         }
-        if (isRemember != 1) {
-            request.getSession().removeAttribute("referUrl");
-            request.getSession().setAttribute("user", user);
-            return ResultDTO.successOf(referUrl);
-        }
-        Cookie token = new Cookie("token", user.getToken());
-        token.setPath("/");
-        response.addCookie(token);
-        request.getSession().removeAttribute("referUrl");
-        return ResultDTO.successOf(referUrl);
-    }
-
-    @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String register(HttpServletRequest request) {
-        String refer = request.getHeader("Referer");
-        if(refer.contains("/user/login") || refer.contains("/user/register"))
-            refer = "/";
-        request.getSession().setAttribute("referUrl", refer);
-        return "register";
     }
 
     @ResponseBody
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @PostMapping(value = "/register")
     public ResultDTO register(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
         VerificationDTO verificationCode = (VerificationDTO) request.getSession().getAttribute("verificationCode");
-        ResultDTO resultDTO = userService.save(registerDTO, verificationCode);
-        if(resultDTO.getCode() != 200)
+        ResultDTO resultDTO = userService.register(registerDTO, verificationCode);
+        if (resultDTO.getCode() != 200)
             return resultDTO;
-        User user = userService.checkUser(registerDTO.getUsername(), registerDTO.getPassword());
-        String referUrl = (String) request.getSession().getAttribute("referUrl");
-        request.getSession().setAttribute("user", user);
-        return ResultDTO.successOf(referUrl);
+        UsernamePasswordToken token = new UsernamePasswordToken(registerDTO.getUsername(), registerDTO.getPassword());
+        SecurityUtils.getSubject().login(token);
+        log.info("request url from {}", WebUtils.getSavedRequest(request).getRequestUrl());
+        return ResultDTO.successOf(WebUtils.getSavedRequest(request).getRequestUrl());
     }
 
     @ResponseBody
@@ -111,7 +115,7 @@ public class UserController {
     public ResultDTO verifyCode(@RequestParam("phoneNumber") String phoneNumber,
                                 @RequestParam("timestamp") Long timestamp,
                                 HttpServletRequest request) {
-        ResultDTO resultDTO = userService.sendSms(phoneNumber, timestamp);
+        ResultDTO<VerificationDTO> resultDTO = userService.sendSms(phoneNumber, timestamp);
         if (resultDTO.getCode() == 200) {
             request.getSession().setAttribute("verificationCode", resultDTO.getData());
             resultDTO.setData(null);

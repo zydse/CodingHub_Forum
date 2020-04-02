@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>CodingHub</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>发布 | CodingHub</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}">
     <link rel="stylesheet" th:href="@{/css/forum.css}">
     <link rel="stylesheet" th:href="@{/css/editormd.css}"/>
 </head>
@@ -16,37 +17,37 @@
 <div class="container-fluid main">
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>提问</h2>
+            <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 提问</h2>
             <hr/>
             <form action="/publish" method="post" id="questionForm">
                 <input type="hidden" name="id" th:value="${id}">
                 <div class="form-group">
                     <label for="questionTitle">问题描述（简单扼要）：</label>
                     <input type="text" class="form-control" name="questionTitle" id="questionTitle"
-                           placeholder="问题" th:value="${title}">
+                           placeholder="问题标题" th:value="${title}">
                 </div>
 
                 <label for="description">问题详细信息（必填项）：</label>
                 <div class="form-group" id="description-editor">
                     <textarea class="form-control" name="description" id="description" cols="30"
-                              rows="10" th:text="${description}" style="display:none;"></textarea>
+                              rows="10" style="display:none;">[[${description}]]</textarea>
                     <script type="text/javascript">
                         $(function () {
                             editormd("description-editor", {
                                 width: "100%",
-                                height: "500px",
+                                height: "700px",
                                 delay: 0,
-                                placeholder: "Input the description of your question......",
+                                placeholder: "请输入问题的详细描述...",
                                 imageUpload: true,
                                 imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                                 imageUploadURL: "/file/upload",
                                 path: "/js/lib/",
+                                watch: false,
+                                toolbarAutoFixed: false,
                                 toolbarIcons: function () {
                                     return ["undo", "redo", "|",
-                                        "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|",
-                                        "h1", "h2", "h3", "h4", "|",
-                                        "list-ul", "list-ol", "hr", "|",
-                                        "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime", "html-entities", "pagebreak", "|",
+                                        "bold", "del", "italic", "ucwords", "uppercase", "lowercase", "|",
+                                        "link", "reference-link", "image", "code", "code-block", "table", "datetime", "html-entities", "pagebreak", "|",
                                         "watch", "preview", "clear"];
                                 }
                             });
@@ -57,7 +58,23 @@
                 <div class="form-group">
                     <label for="tags">添加标签：</label>
                     <input type="text" class="form-control" name="tags" id="tags" placeholder="创建或者搜索添加新话题..."
-                           th:value="${tags}">
+                           th:value="${tags}" onfocus="showSelectTag()" readonly>
+                    <div id="select-tag" class="publish-tag-tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" th:class="${type.type == 'language' ? 'active' : ''}" th:each="type : ${typeList}">
+                                <a th:href="${'#'+ type.getType()}" aria-controls="home" role="tab" data-toggle="tab"
+                                   aria-expanded="false">[[${type.type}]]</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" th:id="${type.type}" th:each="type : ${typeList}"
+                                 th:class="${type.type == 'language'? 'active tab-pane' : 'tab-pane'}">
+                                <span th:each="tag : ${type.tags}" th:text="${tag}" class="community-tag"
+                                      onclick="selectTag(this)" th:data-tag="${tag}">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <span class="alert alert-danger" th:if="${error}" th:text="${error}"></span>
@@ -65,7 +82,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
             <h3>提问指南</h3>
             这里是一些提问的帮助信息
             <br>
@@ -83,26 +100,47 @@
 <script type="application/javascript">
     $("#questionForm").submit(function (e) {
         var questionTitle = $("#questionTitle").val();
-        if ('' == questionTitle) {
+        if ('' === questionTitle) {
             $(".modal-body").text("请输入问题的标题");
             $('#notice').modal("show");
             e.preventDefault();
             return;
         }
         var description = $("#description").val();
-        if ('' == description) {
+        if ('' === description) {
             $(".modal-body").text("请输入更多的信息来描述你的问题，这样才能获得更好的解答");
             $('#notice').modal("show");
             e.preventDefault();
             return;
         }
         var tags = $("#tags").val();
-        if ('' == tags) {
+        if ('' === tags) {
             $(".modal-body").text("请为问题选择标签，能更有效的获得解答");
             $('#notice').modal("show");
             e.preventDefault();
         }
     });
+
+    function showSelectTag() {
+        $("#select-tag").show();
+    }
+
+    function selectTag(e) {
+        var value = e.getAttribute("data-tag");
+        var $tags = $("#tags");
+        var previous = $tags.val() ? "," + $tags.val() + "," : "";
+        if (previous.indexOf("," + value + ",") === -1) {
+            if (previous) {
+                var present = previous + value + ',';
+                $tags.val(present.substr(1, present.length - 2));
+            } else {
+                $tags.val(value);
+            }
+        } else {
+            present = previous.replace("," + value + ",", ",");
+            $tags.val(present.substr(1, present.length - 2));
+        }
+    }
 </script>
 </body>
 </html>

@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Data
 public class NotificationDTO implements Serializable {
     private Long id;
-    private Long gmtCreate;
     private Integer status;
     private Long notifier;
     private Long outerId;
@@ -22,4 +21,5 @@ public class NotificationDTO implements Serializable {
     private String notifierName;
     private Integer type;
     private String typeName;
+    private Long gmtCreate;
 }

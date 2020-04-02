@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&amp;subset=devanagari,latin-ext"
           rel="stylesheet">
-    <title>注册</title>
+    <title>注册 | CodingHub</title>
     <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
     <link rel="stylesheet" th:href="@{/css/animate.css}">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
@@ -22,7 +22,7 @@
                 <div class="popup-in-txt">
                     <h2 class="h2">注册</h2>
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="signin-form">
                                 <div class="form-group">
                                     <label for="username-input">用户名</label>
@@ -60,14 +60,14 @@
                     </div><!--/.row -->
 
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="signin-footer">
                                 <button type="submit" id="signup-btn" class="btn signin_btn">
                                     注册
                                 </button>
                                 <p>
-                                    已经是会员了?
-                                    <a th:href="@{/user/login}">登录</a>
+                                    已经是会员了?去
+                                    <a th:href="@{/user/toLogin}">登录</a>
                                 </p>
                                 <p>
                                     <a th:href="@{/}">返回首页</a>
@@ -95,7 +95,7 @@
     var countdown = 60;
     var timer;
     //用户名唯一性验证
-    $('input#username-input').blur(function () {
+    $('input#username-input').on("blur", function () {
         if (this.validity.valueMissing) {
         } else if (this.validity.tooShort) {
             $(".modal-body").text('你输入的用户名太短了');
@@ -145,7 +145,7 @@
             $('#notice').modal('show');
             return false;
         }
-        if (password != retype) {
+        if (password !== retype) {
             $(".modal-body").text("你两次输入的密码不一致");
             $('#notice').modal("show");
             return false;
@@ -165,7 +165,7 @@
                 "gmtCreate": new Date().getTime()
             }),
             success: function (result) {
-                if (result.code != 200) {
+                if (result.code !== 200) {
                     $(".modal-body").text(result.message);
                     $('#notice').modal('show');
                     return false;
@@ -176,7 +176,7 @@
         });
     });
     //手机号码格式校验
-    $('#phone-number').blur(function () {
+    $('#phone-number').on("blur", function () {
         if (this.validity.valueMissing) {
         } else if (this.validity.patternMismatch) {
             $(".modal-body").text("手机号格式不正确");
@@ -186,7 +186,7 @@
     });
     //获取验证码
     $("#code-btn").on("click", function () {
-        if($("input#phone-number").val() === ''){
+        if ($("input#phone-number").val() === '') {
             $(".modal-body").text("手机号不能为空");
             $('#notice').modal('show');
             return;

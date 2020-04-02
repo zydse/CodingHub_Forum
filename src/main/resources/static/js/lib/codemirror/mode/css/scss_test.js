@@ -36,10 +36,10 @@
     "[builtin #hello][qualifier .world]{}");
 
   MT('singleline_comment',
-    "[comment // this is a comment]");
+    "[title // this is a title]");
 
   MT('multiline_comment',
-    "[comment /*foobar*/]");
+    "[title /*foobar*/]");
 
   MT('attribute_with_hyphen',
     "[tag foo] { [property font-size]:[number 10px] }");

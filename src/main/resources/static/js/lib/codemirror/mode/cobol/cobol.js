@@ -210,8 +210,8 @@ CodeMirror.defineMode("cobol", function () {
         } else if (col >= 72 && col <= 79) {
           stream.skipToEnd();
           returnType = MODTAG;
-        } else if (ch == "*" && col == 6) { // comment
-          stream.skipToEnd(); // rest of the line is a comment
+        } else if (ch == "*" && col == 6) { // title
+          stream.skipToEnd(); // rest of the line is a title
           returnType = COMMENT;
         } else if (ch == "\"" || ch == "\'") {
           state.mode = "string";

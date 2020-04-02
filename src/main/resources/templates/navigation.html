@@ -2,8 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="nav">
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -30,28 +30,28 @@
                         </a>
                     </li>
                     <li th:if="${session.user == null}">
-                        <a th:href="@{/user/register}">注册</a>
+                        <a th:href="@{/user/toRegister}">注册</a>
                     </li>
                     <li th:if="${session.user == null}">
-                        <a th:href="@{/user/login}">登录</a>
+                        <a th:href="@{/user/toLogin}">登录</a>
                     </li>
                     <li th:if="${session.user != null}">
                         <a th:href="@{/publish}">发布问题</a>
                     </li>
                     <li th:if="${session.user != null}">
-                        <a th:href="@{/profile/replies}">
+                        <a th:href="@{/profile/notification}">
                             <span class="glyphicon glyphicon-bell"></span>
-                            <span class="badge" th:if="${unreadCount > 0}" th:text="${unreadCount}">15</span>
+                            <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
                         </a>
                     </li>
                     <li class="dropdown" th:if="${session.user != null}">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
-                            <span th:text="${session.user.getName()}">我</span>
+                            <span>[[${session.user.getName()}]]</span>
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="/profile/questions">我的发布</a></li>
+                            <li><a href="/profile/publish">个人中心</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a th:href="@{/user/logout}">退出登录</a></li>
                         </ul>

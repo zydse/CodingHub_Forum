@@ -1,6 +1,8 @@
 package top.zydse.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,18 +29,16 @@ import java.util.List;
  * @Date: 2020/3/11
  */
 @Controller
+@Slf4j
 public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    @ResponseBody
     @PostMapping("/comment")
+    @ResponseBody
+    @RequiresAuthentication
     public ResultDTO post(@RequestBody CommentCreateDTO commentCreateDTO,
                           HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            throw new CustomizeException(CustomizeErrorCode.NO_LOGIN);
-        }
         if (commentCreateDTO.getParentId() == null || commentCreateDTO.getParentId() == 0) {
             throw new CustomizeException(CustomizeErrorCode.COMMENT_TARGET_NOT_FOUND);
         }
@@ -47,6 +47,7 @@ public class CommentController {
         }
         if (StringUtils.isBlank(commentCreateDTO.getContent()))
             throw new CustomizeException(CustomizeErrorCode.CONTENT_IS_EMPTY_OR_TO_SHORT);
+        User user = (User) request.getSession().getAttribute("user");
         if (commentCreateDTO.getType().equals(1)) {
             Comment comment = new Comment();
             comment.setReviewer(user.getId());
@@ -55,6 +56,7 @@ public class CommentController {
             comment.setGmtCreate(System.currentTimeMillis());
             comment.setGmtModified(comment.getGmtCreate());
             commentService.insert(comment, user);
+            return ResultDTO.successOf();
         } else {
             SubComment subComment = new SubComment();
             subComment.setReviewer(user.getId());
@@ -74,17 +76,13 @@ public class CommentController {
         return ResultDTO.successOf(subCommentDTO);
     }
 
+    @RequiresAuthentication
     @ResponseBody
     @PostMapping("/comment/thumb")
     public ResultDTO thumbComment(@RequestParam(name = "commentId") Long commentId,
                                   HttpServletRequest request) {
-        System.out.println(commentId);
         User user = (User) request.getSession().getAttribute("user");
-        if(user == null){
-            return ResultDTO.errorOf(CustomizeErrorCode.NO_LOGIN);
-        }
-        long thumb = commentService.thumbUpComment(commentId, user);
-        return ResultDTO.successOf(thumb);
+        return commentService.thumbUpComment(commentId, user);
     }
 
 }

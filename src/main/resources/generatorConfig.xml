@@ -31,17 +31,16 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="USER" domainObjectName="User">
-            <!--为false时可以转换为驼峰命名，默认为false-->
-            <property name="useActualColumnNames" value="false"/>
-        </table>
-        <table tableName="QUESTION" domainObjectName="Question"/>
-        <table tableName="COMMENT" domainObjectName="Comment"/>
-        <table tableName="NOTIFICATION" domainObjectName="Notification"/>
         <table tableName="TAG" domainObjectName="Tag"/>
         <table tableName="ROLE" domainObjectName="Role"/>
+        <table tableName="PERMISSION" domainObjectName="Permission"/>
+        <table tableName="USER_ROLE" domainObjectName="UserRole"/>
+        <table tableName="ROLE_PERMISSION" domainObjectName="RolePermission"/>
+        <table tableName="USER" domainObjectName="User"/>
+        <table tableName="QUESTION" domainObjectName="Question"/>
+        <table tableName="COMMENT" domainObjectName="Comment"/>
         <table tableName="SUB_COMMENT" domainObjectName="SubComment"/>
-        <table tableName="QUESTION_TAG" domainObjectName="QuestionTag"/>
+        <table tableName="NOTIFICATION" domainObjectName="Notification"/>
         <table tableName="VIEW_HISTORY" domainObjectName="ViewHistory"/>
         <table tableName="THUMB_HISTORY" domainObjectName="ThumbHistory"/>
 

@@ -2,20 +2,34 @@
  * 发起异步的一级评论请求
  */
 function comment() {
+    var active = $("#comments").data("active");
+    if (active !== 1) {
+        $(".modal-body").html("<p>回复需要登录后的用户才可以操作哟&hellip;</p>");
+        $('#error_notice').modal('show');
+        return;
+    }
     var questionId = $("#question_id").val();
     var content = $("#comment_content").val();
     if (!content) {
-        alert("请先输入评论内容");
+        $(".modal-body").html("<p>请先输入评论内容&hellip;</p>");
+        $('#error_notice').modal('show');
         return;
     }
     sendComment(questionId, content, 1);
 }
 
 function subComment(e) {
+    var active = $("#comments").data("active");
+    if (active !== 1) {
+        $(".modal-body").html("<p>回复需要登录后的用户才可以操作哟&hellip;</p>");
+        $('#error_notice').modal('show');
+        return;
+    }
     var id = $(e).data("id");
     var content = $("input[name=input-" + id + "]").val();
     if (!content) {
-        alert("请先输入评论内容");
+        $(".modal-body").html("<p>请先输入评论内容&hellip;</p>");
+        $('#error_notice').modal('show');
         return;
     }
     sendComment(id, content, 2);
@@ -121,7 +135,12 @@ function collapseComment(e) {
 function thumbComment(e) {
     var id = $(e).data("id");
     var active = $(e).data("active");
-    if ($(e).hasClass("active") || active !== 1) {
+    if ($(e).hasClass("active")) {
+        return;
+    }
+    if (active !== 1) {
+        $(".modal-body").html("<p>点赞需要登录后的用户才可以操作哟&hellip;</p>");
+        $('#error_notice').modal('show');
         return;
     }
     $.ajax({
@@ -133,7 +152,8 @@ function thumbComment(e) {
         },
         success: function (result) {
             if (result.code !== 200) {
-                alert(result.message);
+                $(".modal-body").html("<p>" + result.message + "&hellip;</p>");
+                $('#error_notice').modal('show');
             } else {
                 $(e).addClass("active");
                 var $thumbCount = $("#thumbCount-" + id);

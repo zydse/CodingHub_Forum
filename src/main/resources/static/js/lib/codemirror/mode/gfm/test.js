@@ -8,15 +8,15 @@
   function FT(name) { test.mode(name, modeHighlightFormatting, Array.prototype.slice.call(arguments, 1)); }
 
   FT("codeBackticks",
-     "[comment&formatting&formatting-code `][comment foo][comment&formatting&formatting-code `]");
+     "[title&formatting&formatting-code `][title foo][title&formatting&formatting-code `]");
 
   FT("doubleBackticks",
-     "[comment&formatting&formatting-code ``][comment foo ` bar][comment&formatting&formatting-code ``]");
+     "[title&formatting&formatting-code ``][title foo ` bar][title&formatting&formatting-code ``]");
 
   FT("codeBlock",
-     "[comment&formatting&formatting-code-block ```css]",
+     "[title&formatting&formatting-code-block ```css]",
      "[tag foo]",
-     "[comment&formatting&formatting-code-block ```]");
+     "[title&formatting&formatting-code-block ```]");
 
   FT("taskList",
      "[variable-2&formatting&formatting-list&formatting-list-ul - ][meta&formatting&formatting-task [ ]]][variable-2  foo]",
@@ -38,17 +38,17 @@
      "[strong __][em&strong _foo__][em _] bar");
 
   MT("fencedCodeBlocks",
-     "[comment ```]",
-     "[comment foo]",
+     "[title ```]",
+     "[title foo]",
      "",
-     "[comment ```]",
+     "[title ```]",
      "bar");
 
   MT("fencedCodeBlockModeSwitching",
-     "[comment ```javascript]",
+     "[title ```javascript]",
      "[variable foo]",
      "",
-     "[comment ```]",
+     "[title ```]",
      "bar");
 
   MT("taskListAsterisk",
@@ -143,26 +143,26 @@
      "foo [em *][em&link http://www.example.com/index.html][em *] bar");
 
   MT("notALink",
-     "[comment ```css]",
+     "[title ```css]",
      "[tag foo] {[property color]:[keyword black];}",
-     "[comment ```][link http://www.example.com/]");
+     "[title ```][link http://www.example.com/]");
 
   MT("notALink",
-     "[comment ``foo `bar` http://www.example.com/``] hello");
+     "[title ``foo `bar` http://www.example.com/``] hello");
 
   MT("notALink",
-     "[comment `foo]",
+     "[title `foo]",
      "[link http://www.example.com/]",
-     "[comment `foo]",
+     "[title `foo]",
      "",
      "[link http://www.example.com/]");
 
   MT("headerCodeBlockGithub",
      "[header&header-1 # heading]",
      "",
-     "[comment ```]",
-     "[comment code]",
-     "[comment ```]",
+     "[title ```]",
+     "[title code]",
+     "[title ```]",
      "",
      "Commit: [link be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2]",
      "Issue: [link #1]",

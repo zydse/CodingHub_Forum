@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.zydse.mapper.CommonExtensionMapper">
+    <resultMap id="BaseResultMap" type="top.zydse.model.Question">
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="TITLE" jdbcType="VARCHAR" property="title"/>
+        <result column="DESCRIPTION" jdbcType="CLOB" property="description"/>
+        <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate"/>
+        <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified"/>
+        <result column="CREATOR" jdbcType="BIGINT" property="creator"/>
+        <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount"/>
+        <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount"/>
+        <result column="THUMB_COUNT" jdbcType="INTEGER" property="thumbCount"/>
+        <result column="TAGS" jdbcType="VARCHAR" property="tags"/>
+    </resultMap>
+
+    <select id="listViewHistory" resultType="top.zydse.dto.ViewHistoryDTO">
+        SELECT u.id userId, u.name username, q.ID questionId, q.TITLE title, vh.gmt_Modified gmtModified
+        FROM VIEW_HISTORY vh
+        JOIN QUESTION q ON vh.QUESTION_ID = q.ID
+        JOIN USER u ON q.CREATOR = u.ID
+        where vh.viewer = #{userId}
+        limit #{offset},#{size};
+    </select>
+
+    <select id="listThumbHistory" resultType="top.zydse.dto.ThumbHistoryDTO">
+        SELECT u.id userId, u.name username, c.ID commentId, c.content comment,
+         th.gmt_create gmtCreate, q.id questionId
+        FROM THUMB_HISTORY th
+        JOIN COMMENT c ON th.comment_id = c.ID
+        JOIN USER u ON c.reviewer = u.ID
+        JOIN QUESTION q on q.id = c.question_id
+        where th.thumb_user = #{userId}
+        limit #{offset},#{size};
+    </select>
+
+    <insert id="savePublish" parameterType="top.zydse.model.Question">
+        insert into QUESTION (title,description,creator,gmt_create,gmt_modified)
+        values (#{title},#{description},#{creator},#{gmtCreate},#{gmtModified});
+        <selectKey resultType="java.lang.Long" keyColumn="id" keyProperty="id" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+    <insert id="saveUser" parameterType="top.zydse.model.User">
+        insert into USER (`name` ,`salt`,`password`,`token`,`avatar_url`,`phone_number`,``gmt_create`,`gmt_modified`)
+        values (#{name},#{salt},#{password},#{token}, #{avatar_url}, #{phone_number}, #{gmtCreate},#{gmtModified});
+        <selectKey resultType="java.lang.Long" keyColumn="id" keyProperty="id" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+    <select id="listTagsByQuestion" resultType="top.zydse.model.Tag">
+        SELECT t.id id,t.TAG_TYPE tagType, t.TAG_NAME tagName, t.COUNT count
+        FROM QUESTION_TAG qt
+        JOIN QUESTION q ON qt.QUESTION_ID = q.ID
+        JOIN TAG t ON t.ID = qt.TAG_ID
+        WHERE q.ID = #{questionId}
+    </select>
+
+    <select id="countBySearch" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from QUESTION
+        <where>
+            <if test="search != null and search != ''">
+                and title regexp #{search}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectBySearch" parameterType="top.zydse.dto.QuestionQueryDTO" resultMap="BaseResultMap">
+        select *
+        from QUESTION
+        <where>
+            <if test="search != null and search != ''">
+                and title regexp #{search}
+            </if>
+        </where>
+        order by gmt_create desc limit #{offset},#{size}
+    </select>
+
+    <select id="getPermCodeByUser" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT p.per_code
+        FROM USER_ROLE ur,ROLE_PERMISSION rp,PERMISSION p
+        WHERE ur.id = #{userId} AND rp.role_id = ur.role_id AND p.id = rp.permission_id
+    </select>
+
+    <insert id="insertQuestionTag" parameterType="top.zydse.model.QuestionTag">
+        insert into QUESTION_TAG (QUESTION_ID, TAG_ID, GMT_CREATE)
+        values (#{questionId,jdbcType=BIGINT}, #{tagId,jdbcType=INTEGER},
+        #{gmtCreate,jdbcType=BIGINT})
+--         ORDER BY GMT_CREATE desc
+    </insert>
+</mapper>

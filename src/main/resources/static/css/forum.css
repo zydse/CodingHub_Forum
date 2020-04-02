@@ -1,41 +1,32 @@
 body{
     background-color: #efefef;
+    padding-top: 70px;
 }
-
 .main{
+    margin: 20px 50px;
     background-color: #fff;
-    margin: 30px;
 }
-
 .btn_float_right{
     float: right;
     margin-bottom: 10px;
 }
-
+/*主要用于头像*/
 .media-object{
     width: 38px;
     height: 38px;
 }
-
+/*灰色描述文本*/
 .text_desc{
     font-size: 12px;
     font-weight: normal;
     color: #999;
 }
 
-.forum-menu{
-    font-size: 12px;
-}
-
-.jumbotron{
-    margin: 50px;
-}
-
 .comment_edit{
     margin: 10px 0;
 }
 
-.comment-display{
+.comment_display{
     margin-top: 20px;
 }
 .comment_section{
@@ -73,4 +64,36 @@ body{
     padding: 20px 15px 10px;
     border: #eee solid 1px;
     border-radius: 5px;
+}
+
+.community-tag:hover {
+    background-color: #339dff;
+    color: #fff !important;
+    text-decoration-line: none;
+}
+
+.community-tag {
+    text-decoration-line: none;
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    line-height: 16px;
+    padding: 2px 5px;
+    background-color: #99cfff;
+    font-size: 12px;
+    color: #fff !important;
+    border-radius: 4px;
+    margin: 4px;
+}
+
+.publish-tag-tab {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.publish-tag-tab .label-info {
+    white-space: normal;
+    margin: 5px 5px;
+    display: inline-block;
 }

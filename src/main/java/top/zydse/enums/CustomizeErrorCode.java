@@ -12,7 +12,7 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     SYSTEM_ERROR(2005, "程序员太菜了，这里写了一个BUG"),
     AUTHORITY_ERROR(2006, "抱歉，你当前登录的用户没有权限查看这些内容"),
     ALI_SERVER_ERROR(2007, "请检查你输入的手机号，如果没有问题，那阿里云短信服务好像有点问题，程序员正在抢修"),
-    BAD_REQUEST(4004, "你的请求看起来有点问题"),
+    BAD_REQUEST(2008, "你的请求看起来有点问题"),
     COMMENT_TARGET_NOT_FOUND(3001, "未选中问题或评论进行回复"),
     COMMENT_TYPE_NOT_FOUND(3002, "请告诉我，你要回复问题还是评论"),
     COMMENT_NOT_FOUND(3003, "对不起，你要回复的评论不存在了"),
@@ -20,10 +20,16 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     QUESTION_NOT_FOUND(3005, "没有找到你想看的问题，或者问题已经不存在了"),
     QUESTION_ALREADY_DELETED(3006, "问题已经被删除了，请重新发布"),
     NOTIFICATION_NOT_FOUND(3007, "通知已经不存在，或者迷路了"),
+    TAG_NOT_FOUND(3008, "你发布的问题中有错误标签"),
+    SENSITIVE_WORD_FOUND_IN_TITLE(3009, "你的提问标题中含有敏感词汇，为了共同建立更良好的社区环境，请修改你的标题"),
+    SENSITIVE_WORD_FOUND_IN_DESCRIPTION(3010, "你的提问描述中包含了敏感词汇，为了共同建立更良好的社区环境，请修改你的提问描述"),
+    DUPLICATE_THUMB_UP(3011, "这条回复你已经点赞过了"),
+    THUMB_UP_SELF(3012, "你不可以点赞自己的回复"),
     DUPLICATE_USERNAME(4001, "用户名已经被注册过了，请你换个名字试试"),
     VERIFICATION_CODE_ERROR(4002, "验证码有点问题，请重试"),
     VERIFICATION_CODE_INACTIVE(4003, "你输入的验证码错误，或者你太长时间没有操作，验证码已经失效了"),
-    USERNAME_OR_PASSWORD_INCORRECT(4004, "你输入的用户名或密码错误，请重新输入后登录");
+    USERNAME_INCORRECT(4004, "你看起来好像还没有注册过，请先注册后再登录"),
+    PASSWORD_INCORRECT(4005, "你输入的密码错了，请重新输入后登录");
 
     private String message;
     private Integer code;

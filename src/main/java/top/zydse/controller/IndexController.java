@@ -6,7 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import top.zydse.dto.PaginationDTO;
+import top.zydse.dto.QuestionDTO;
 import top.zydse.service.QuestionService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CreateBy: zydse
@@ -24,8 +28,19 @@ public class IndexController {
     public String index(Model model,
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
                         @RequestParam(name = "size", defaultValue = "5") Integer size) {
-        PaginationDTO pagination = questionService.findAll(page, size);
+        PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size);
+        List<QuestionDTO> pageData = pagination.getPageData();
+        List<Long> idList = pageData.stream().map(QuestionDTO::getId).collect(Collectors.toList());
+        String ids = idList.toString().replace(" ", "");
         model.addAttribute("pagination", pagination);
+//        model.addAttribute("search", "ggg");
+        model.addAttribute("ids", ids.substring(1, ids.length() - 1));
         return "index";
     }
+
+    @RequestMapping("/401")
+    public String unauthorized(){
+        return "401";
+    }
+
 }

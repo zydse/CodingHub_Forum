@@ -8,9 +8,9 @@ package top.zydse.enums;
  * @Date: 2020/3/16
  */
 public enum NotificationType {
-    ANSWER_QUESTION(1, "回复了问题"),
-    ANSWER_COMMENT(2, "回复了评论"),
-    THUMB_UP(3, "点赞了评论");
+    ANSWER_QUESTION(1, "回复了你的问题"),
+    ANSWER_COMMENT(2, "回复了你的评论"),
+    THUMB_UP(3, "点赞了你的评论");
 
     private int type;
     private String name;

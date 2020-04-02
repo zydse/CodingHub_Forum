@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  * @Date: 2020/3/11
  */
 @Controller
-@RequestMapping("${server.error.path:${error.path:/error}}")
+@RequestMapping({"${server.error.path:${error.path:/error}}"})
 @Slf4j
 public class CustomizeErrorController implements ErrorController {
 
@@ -33,12 +33,10 @@ public class CustomizeErrorController implements ErrorController {
         log.info("Now you are in errorController");
         HttpStatus status = getStatus(request);
         ModelAndView error = new ModelAndView("error");
-        if(status.is4xxClientError()){
+        if (status.is4xxClientError()) {
             error.addObject("message", CustomizeErrorCode.BAD_REQUEST.getMessage());
         }
-        if(status.is5xxServerError()){
-            error.addObject("message", CustomizeErrorCode.SYSTEM_ERROR.getMessage());
-        }
+        error.addObject("message", CustomizeErrorCode.SYSTEM_ERROR.getMessage());
         return error;
     }
 
@@ -49,8 +47,7 @@ public class CustomizeErrorController implements ErrorController {
         }
         try {
             return HttpStatus.valueOf(statusCode);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
     }

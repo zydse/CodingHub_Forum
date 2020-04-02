@@ -30,10 +30,10 @@
      "[keyword doctype] xml");
 
   MT("comment",
-     "[comment / Hello WORLD]");
+     "[title / Hello WORLD]");
 
   MT("notComment",
-     "[tag h1] This is not a / comment ");
+     "[tag h1] This is not a / title ");
 
   MT("attributes",
      "[tag a]([attribute title]=[string \"test\"]) [attribute href]=[string \"link\"]}");
@@ -62,8 +62,8 @@
 
   MT("multilineRuby",
       "[tag p]",
-      "  [comment /# this is a comment]",
-      "     [comment and this is a comment too]",
+      "  [title /# this is a title]",
+      "     [title and this is a title too]",
       "  | Date/Time",
       "  [operator&special -] [variable now] [operator =] [tag DateTime][operator .][property now]",
       "  [tag strong][operator&special =] [variable now]",
@@ -73,9 +73,9 @@
       "     [operator&special =][string \"Birthday\"]");
 
   MT("multilineComment",
-      "[comment /]",
-      "  [comment Multiline]",
-      "  [comment Comment]");
+      "[title /]",
+      "  [title Multiline]",
+      "  [title Comment]");
 
   MT("hamlAfterRubyTag",
     "[attribute&qualifier .block]",
