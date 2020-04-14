@@ -4,10 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import top.zydse.dto.QuestionQueryDTO;
 import top.zydse.dto.ThumbHistoryDTO;
 import top.zydse.dto.ViewHistoryDTO;
-import top.zydse.model.Permission;
-import top.zydse.model.Question;
-import top.zydse.model.QuestionTag;
-import top.zydse.model.Tag;
+import top.zydse.model.*;
 
 import java.util.List;
 
@@ -31,11 +28,13 @@ public interface CommonExtensionMapper {
 
     List<Tag> listTagsByQuestion(Long questionId);
 
-    int countBySearch(String search);
-
-    List<Question> selectBySearch(QuestionQueryDTO questionQueryDTO);
-
     int insertQuestionTag(QuestionTag record);
 
+    int saveUser(User user);
+
     List<String> getPermCodeByUser(Long userId);
+
+    void getTagPriority();
+
+    List<Question> relatedQuestion(Long questionId);
 }

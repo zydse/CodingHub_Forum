@@ -99,15 +99,16 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(registerDTO.getPhoneNumber());
             user.setGmtCreate(registerDTO.getGmtCreate());
             user.setGmtModified(user.getGmtCreate());
-            user.setAvatarUrl("https://avatars1.githubusercontent.com/u/35904888");
+            user.setAvatarUrl("/images/avatar" + registerDTO.getGmtCreate() % 10 + ".png");
             user.setToken(UUID.randomUUID().toString());
-            userMapper.insertSelective(user);
+            extensionMapper.saveUser(user);
             UserRole record = new UserRole();
+            record.setUserId(user.getId());
             record.setGmtCreate(System.currentTimeMillis());
             //注册后默认是初级用户
             record.setRoleId(3);
             userRoleMapper.insert(record);
-            return ResultDTO.successOf();
+            return ResultDTO.successOf(user);
         } else {
             return ResultDTO.errorOf(CustomizeErrorCode.VERIFICATION_CODE_INACTIVE);
         }
@@ -119,7 +120,6 @@ public class UserServiceImpl implements UserService {
         userExample.createCriteria()
                 .andNameEqualTo(username);
         List<User> userList = userMapper.selectByExample(userExample);
-        log.info("user : {}", userList);
         if (userList.size() != 1)
             return null;
         User user = userList.get(0);

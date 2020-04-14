@@ -31,10 +31,8 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("进入拦截器");
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {
-            log.info("session有user");
             long count = notificationService.unreadCount(user.getId());
             request.setAttribute("unreadCount", count);
             return true;

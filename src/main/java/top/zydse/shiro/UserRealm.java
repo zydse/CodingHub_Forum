@@ -1,5 +1,7 @@
 package top.zydse.shiro;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -24,6 +26,7 @@ import java.util.List;
  *
  * @Date: 2020/3/31
  */
+@Slf4j
 public class UserRealm extends AuthorizingRealm {
 
     @Autowired
@@ -38,11 +41,11 @@ public class UserRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        System.out.println("准备授权");
         User user = (User) principalCollection.getPrimaryPrincipal();
         List<String> permissionList = userService.getPermCode(user.getId());
         if (permissionList == null)
             return null;
+        log.info("权限列表:{}", permissionList);
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.addStringPermissions(permissionList);
         return info;
@@ -56,5 +59,10 @@ public class UserRealm extends AuthorizingRealm {
             return null;
         return new SimpleAuthenticationInfo(user, user.getPassword(),
                 ByteSource.Util.bytes(user.getSalt().toString()), this.getName());
+    }
+
+    public void clearCache(){
+        PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
+        super.clearCache(principals);
     }
 }

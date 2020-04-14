@@ -41,7 +41,6 @@ public class ElasticSearchConfig {
 
     @Bean(name = "transportClient")
     public TransportClient transportClient() {
-        log.info("Elasticsearch初始化开始。。。。。");
         TransportClient transportClient = null;
         try {
             // 配置信息

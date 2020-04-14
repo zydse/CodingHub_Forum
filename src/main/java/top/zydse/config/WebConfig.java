@@ -17,7 +17,7 @@ import java.util.Arrays;
  *
  * @Date: 2020/3/10
  */
-//@Configuration
+@Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
@@ -28,12 +28,13 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(sessionInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(Arrays.asList("/js/**", "/css/**", "/images/**",
-                        "/fonts/**", "/favicon.ico", "/user/logout", "/user/login/**", "/user/register/**"));
+                        "/fonts/**", "/favicon.ico", "/user/**", "/error", "/file/**"));
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/user/toLogin").setViewName("login");
-        registry.addViewController("/user/toRegistry").setViewName("registry");
+        registry.addViewController("/user/toRegister").setViewName("register");
+        registry.addViewController("/401").setViewName("401");
     }
 }

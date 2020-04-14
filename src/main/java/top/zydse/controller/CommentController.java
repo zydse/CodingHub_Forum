@@ -3,6 +3,7 @@ package top.zydse.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,9 +35,9 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    @RequiresPermissions("comment:create")
     @PostMapping("/comment")
     @ResponseBody
-    @RequiresAuthentication
     public ResultDTO post(@RequestBody CommentCreateDTO commentCreateDTO,
                           HttpServletRequest request) {
         if (commentCreateDTO.getParentId() == null || commentCreateDTO.getParentId() == 0) {
@@ -76,7 +77,7 @@ public class CommentController {
         return ResultDTO.successOf(subCommentDTO);
     }
 
-    @RequiresAuthentication
+    @RequiresPermissions("comment:thumb")
     @ResponseBody
     @PostMapping("/comment/thumb")
     public ResultDTO thumbComment(@RequestParam(name = "commentId") Long commentId,

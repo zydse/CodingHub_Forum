@@ -24,5 +24,7 @@ public class QuestionDTO implements Serializable {
     private Integer viewCount;
     private Integer commentCount;
     private Integer thumbCount;
+    private Integer isTop;
+    private Integer isQuality;
     private User user;
 }

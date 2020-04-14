@@ -45,7 +45,7 @@
     "[tag foo] { [property font-size]:[number 10px] }");
 
   MT('string_after_attribute',
-    "[tag foo] { [property content]:[string \"::\"] }");
+    "[tag foo] { [property description]:[string \"::\"] }");
 
   MT('directives',
     "[def @include] [qualifier .mixin]");

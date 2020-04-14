@@ -43,8 +43,83 @@
     </insert>
 
     <insert id="saveUser" parameterType="top.zydse.model.User">
-        insert into USER (`name` ,`salt`,`password`,`token`,`avatar_url`,`phone_number`,``gmt_create`,`gmt_modified`)
-        values (#{name},#{salt},#{password},#{token}, #{avatar_url}, #{phone_number}, #{gmtCreate},#{gmtModified});
+        insert into USER
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="name != null">
+                NAME,
+            </if>
+            <if test="password != null">
+                PASSWORD,
+            </if>
+            <if test="salt != null">
+                SALT,
+            </if>
+            <if test="phoneNumber != null">
+                PHONE_NUMBER,
+            </if>
+            <if test="token != null">
+                TOKEN,
+            </if>
+            <if test="credit != null">
+                CREDIT,
+            </if>
+            <if test="bio != null">
+                BIO,
+            </if>
+            <if test="accountId != null">
+                ACCOUNT_ID,
+            </if>
+            <if test="gmtCreate != null">
+                GMT_CREATE,
+            </if>
+            <if test="gmtModified != null">
+                GMT_MODIFIED,
+            </if>
+            <if test="avatarUrl != null">
+                AVATAR_URL,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="salt != null">
+                #{salt,jdbcType=BIGINT},
+            </if>
+            <if test="phoneNumber != null">
+                #{phoneNumber,jdbcType=CHAR},
+            </if>
+            <if test="token != null">
+                #{token,jdbcType=CHAR},
+            </if>
+            <if test="credit != null">
+                #{credit,jdbcType=INTEGER},
+            </if>
+            <if test="bio != null">
+                #{bio,jdbcType=VARCHAR},
+            </if>
+            <if test="accountId != null">
+                #{accountId,jdbcType=VARCHAR},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=BIGINT},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=BIGINT},
+            </if>
+            <if test="avatarUrl != null">
+                #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+        </trim>
         <selectKey resultType="java.lang.Long" keyColumn="id" keyProperty="id" order="AFTER">
             select last_insert_id();
         </selectKey>
@@ -58,37 +133,42 @@
         WHERE q.ID = #{questionId}
     </select>
 
-    <select id="countBySearch" parameterType="java.lang.String" resultType="java.lang.Integer">
-        select count(*)
-        from QUESTION
-        <where>
-            <if test="search != null and search != ''">
-                and title regexp #{search}
-            </if>
-        </where>
-    </select>
-
-    <select id="selectBySearch" parameterType="top.zydse.dto.QuestionQueryDTO" resultMap="BaseResultMap">
-        select *
-        from QUESTION
-        <where>
-            <if test="search != null and search != ''">
-                and title regexp #{search}
-            </if>
-        </where>
-        order by gmt_create desc limit #{offset},#{size}
-    </select>
-
     <select id="getPermCodeByUser" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT p.per_code
         FROM USER_ROLE ur,ROLE_PERMISSION rp,PERMISSION p
-        WHERE ur.id = #{userId} AND rp.role_id = ur.role_id AND p.id = rp.permission_id
+        WHERE ur.user_id = #{userId} AND rp.role_id = ur.role_id AND p.id = rp.permission_id
     </select>
 
     <insert id="insertQuestionTag" parameterType="top.zydse.model.QuestionTag">
         insert into QUESTION_TAG (QUESTION_ID, TAG_ID, GMT_CREATE)
         values (#{questionId,jdbcType=BIGINT}, #{tagId,jdbcType=INTEGER},
         #{gmtCreate,jdbcType=BIGINT})
---         ORDER BY GMT_CREATE desc
     </insert>
+
+    <select id="getTagPriority" resultType="java.lang.Integer">
+        SELECT t.ID id, t.TAG_NAME tagName, t.COUNT questionCount,
+         tc.comment_count commentCount,t.COUNT + tc.comment_count AS priority
+        FROM TAG t,(
+            SELECT qt.TAG_ID, SUM(q.COMMENT_COUNT) comment_count
+            FROM QUESTION_TAG qt, QUESTION q
+            WHERE qt.QUESTION_ID = q.ID
+            GROUP BY qt.tag_id) tc
+        WHERE t.id = tc.tag_id
+        ORDER BY priority DESC
+    </select>
+
+    <select id="relatedQuestion" parameterType="java.lang.Long" resultType="top.zydse.model.Question">
+        SELECT id, title, description, creator, comment_count commentCount,
+         view_count viewCount,is_top isTop, is_quality isQuality, gmt_modified gmtModified, gmt_create gmtCreate
+        FROM QUESTION
+        WHERE ID IN(
+            SELECT DISTINCT qt2.QUESTION_ID
+            FROM QUESTION_TAG qt2
+            WHERE qt2.QUESTION_ID != #{questionId} AND qt2.TAG_ID IN(
+                SELECT qt1.TAG_ID
+                FROM QUESTION_TAG qt1
+                WHERE qt1.QUESTION_ID = #{questionId}))
+        ORDER BY gmt_modified
+    </select>
+
 </mapper>

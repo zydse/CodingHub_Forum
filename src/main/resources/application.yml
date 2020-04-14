@@ -13,6 +13,10 @@ spring:
     elasticsearch:
       repositories:
         enabled: true
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 
 logging:
   file:
@@ -44,10 +48,10 @@ mybatis:
 
 aliyun:
   regionId: cn-hangzhou
-  accessKeyId: LTAIluIdnWI4vAwN
-  accessSecret: 5aS8Tb6AKhpeUGD6WofK0U547M7bdP
-  signName: CRM
-  templateCode: SMS_167040753
+  accessKeyId: LTAIpRvTUY5ZxRUZ
+  accessSecret: Y7I3xFCTTFwFMv0zCiF86aUs0ELkin
+  signName: CodingHub
+  templateCode: SMS_187930277
 
 sensitiveWord:
   path: classpath:SensitiveWord.txt

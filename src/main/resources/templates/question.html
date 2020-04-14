@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,18 +48,47 @@
                     </div>
                 </div>
                 <div>
-                    <span class="label label-info" style="margin-right: 5px"
-                          th:each="tag : ${question.tags.split(',')}">
+                    <span class="community-tag" th:each="tag : ${question.tags.split(',')}">
                         <span class="glyphicon glyphicon-tag"></span>
                         <span>[[${tag}]]</span>
                     </span>
                 </div>
                 <hr/>
-                <div th:if="${session.user != null && question.user.id == session.user.id}">
-                    <a th:href="@{/publish/{questionId}(questionId = ${question.id})}" class="text_desc">
+                <div shiro:authenticated="">
+                    <button class="text_desc" id="updateQuestion" th:if="${question.user.id == session.user.id}"
+                            th:attr="uri=@{/question/{questionId}(questionId = ${question.id})}">
                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         修改
-                    </a>
+                    </button>
+                    <button class="text_desc" id="deleteQuestion" shiro:hasPermission="question:delete"
+                            th:attr="uri=@{/question/{questionId}(questionId = ${question.id})}">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        删除
+                    </button>
+                    <button class="text_desc" id="qualityQuestion" shiro:hasPermission="question:quality"
+                            th:if="${question.isQuality == 0}"
+                            th:attr="uri=@{/question/quality/{questionId}(questionId = ${question.id})}">
+                        <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+                        加精
+                    </button>
+                    <button class="text_desc" id="qualityQuestion" shiro:hasPermission="question:quality"
+                            th:if="${question.isQuality == 1}"
+                            th:attr="uri=@{/question/quality/{questionId}(questionId = ${question.id})}">
+                        <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+                        取消加精
+                    </button>
+                    <button class="text_desc" id="topQuestion" shiro:hasPermission="question:top"
+                            th:if="${question.isTop == 0}"
+                            th:attr="uri=@{/question/top/{questionId}(questionId = ${question.id})}">
+                        <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span>
+                        置顶
+                    </button>
+                    <button class="text_desc" id="topQuestion" shiro:hasPermission="question:top"
+                            th:if="${question.isTop == 1}"
+                            th:attr="uri=@{/question/top/{questionId}(questionId = ${question.id})}">
+                        <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span>
+                        取消置顶
+                    </button>
                 </div>
             </div>
 
@@ -77,12 +106,13 @@
                                     <img class="media-object" th:src="${comment.user.avatarUrl}" alt="avatar">
                                 </div>
                                 <div class="media-body">
-                                    <h5 class="media-heading text_desc">${comment.user.name}</h5>
+                                    <h5 class="media-heading text_desc">[[${comment.user.name}]]</h5>
                                     <div>[[${comment.content}]]</div>
                                     <div class="comment_operate">
                                         <span th:class="${comment.isThumbUp == 1 ? 'icon active' : 'icon'}"
-                                            onclick="thumbComment(this)" th:data-id="${comment.id}"
-                                            th:data-active="${session.user == null ? 0 : 1}" th:id="${'thumb-' + comment.id}">
+                                              onclick="thumbComment(this)" th:data-id="${comment.id}"
+                                              th:data-active="${session.user == null ? 0 : 1}"
+                                              th:id="${'thumb-' + comment.id}">
                                             <span class="glyphicon glyphicon-thumbs-up"></span>
                                             <span th:id="${'thumbCount-' + comment.id}">[[${comment.thumbCount}]]</span>
                                         </span>
@@ -117,14 +147,12 @@
                 <hr style="margin-top: 0;"/>
                 <div class="media">
                     <div class="media-left">
-                        <a href="#">
-                            <img class="media-object img-rounded"
-                                 th:src="${session.user == null ? '/images/anonymous_user_avatar.png' : session.user.avatarUrl}"
-                                 alt="User Avatar"/>
-                        </a>
+                        <img class="media-object img-rounded"
+                             th:src="${session.user == null ? '/images/anonymous_user_avatar.png' : session.user.avatarUrl}"
+                             alt="avatar"/>
                     </div>
                     <div class="media-body">
-                        <h5 class="media-heading " style="padding-top: 10px" >
+                        <h5 class="media-heading name_vertical_center">
                             [[${session.user == null ? '匿名用户' : session.user.name}]]
                         </h5>
                     </div>
@@ -140,22 +168,65 @@
                 <h4>发起人</h4>
                 <div class="media">
                     <div class="media-left">
-                        <a th:href="@{/profile/{userId}(userid=${question.user.id})}">
-                            <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="User Avatar">
+                        <a th:href="@{/profile/user/{userId}(userId=${question.user.id})}">
+                            <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="avatar">
                         </a>
                     </div>
                     <div class="media-body">
-                        <h5 class="media-heading">[[${question.user.name}]]</h5>
+                        <h5 class="media-heading name_vertical_center">[[${question.user.name}]]</h5>
                     </div>
                 </div>
             </div>
             <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <h4>相关问题</h4>
+                <div class="text_desc" th:if="${related == null}">
+                    这个问题问的太有新意了，好像还没相关的问题呢...
+                </div>
+                <ul class="list-group" th:if="${related != null}">
+                    <li class="list-group-item" th:each="question : ${related}">
+                        <a th:href="@{/question/{questionId}(questionId = ${question.id})}">[[${question.title}]]</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 <div th:replace="alert :: original"></div>
+
+<div th:replace="navigation :: footer"></div>
+
+<form id="updateForm" method="post">
+    <input type="hidden" name="_method" value="put"/>
+</form>
+
+<form id="deleteForm" method="post">
+    <input type="hidden" name="_method" value="delete"/>
+</form>
+
+<form id="qualityForm" method="post"></form>
+
+<form id="topForm" method="post"></form>
+<script>
+    $("#updateQuestion").on("click", function () {
+        $("#updateForm").attr("action", $(this).attr("uri")).submit();
+        return;
+    });
+
+    $("#deleteQuestion").on("click", function () {
+        $("#deleteForm").attr("action", $(this).attr("uri")).submit();
+        return;
+    });
+
+    $("#qualityQuestion").on("click", function () {
+        $("#qualityForm").attr("action", $(this).attr("uri")).submit();
+        return;
+    });
+
+    $("#topQuestion").on("click", function () {
+        $("#topForm").attr("action", $(this).attr("uri")).submit();
+        return;
+    });
+</script>
 </body>
 </html>

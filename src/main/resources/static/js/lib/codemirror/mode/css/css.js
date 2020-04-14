@@ -401,7 +401,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   ], mediaFeatures = keySet(mediaFeatures_);
 
   var propertyKeywords_ = [
-    "align-content", "align-items", "align-self", "alignment-adjust",
+    "align-description", "align-items", "align-self", "alignment-adjust",
     "alignment-baseline", "anchor-point", "animation", "animation-delay",
     "animation-direction", "animation-duration", "animation-fill-mode",
     "animation-iteration-count", "animation-name", "animation-play-state",
@@ -443,7 +443,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     "grid-template", "grid-template-areas", "grid-template-columns",
     "grid-template-rows", "hanging-punctuation", "height", "hyphens",
     "icon", "image-orientation", "image-rendering", "image-resolution",
-    "inline-box-align", "justify-content", "left", "letter-spacing",
+    "inline-box-align", "justify-description", "left", "letter-spacing",
     "line-break", "line-height", "line-stacking", "line-stacking-ruby",
     "line-stacking-shift", "line-stacking-strategy", "list-style",
     "list-style-image", "list-style-position", "list-style-type", "margin",
@@ -552,7 +552,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     "cell", "center", "checkbox", "circle", "cjk-decimal", "cjk-earthly-branch",
     "cjk-heavenly-stem", "cjk-ideographic", "clear", "clip", "close-quote",
     "col-resize", "collapse", "column", "compact", "condensed", "contain", "content",
-    "content-box", "context-menu", "continuous", "copy", "counter", "counters", "cover", "crop",
+    "description-box", "context-menu", "continuous", "copy", "counter", "counters", "cover", "crop",
     "cross", "crosshair", "currentcolor", "cursive", "cyclic", "dashed", "decimal",
     "decimal-leading-zero", "default", "default-button", "destination-atop",
     "destination-in", "destination-out", "destination-over", "devanagari",

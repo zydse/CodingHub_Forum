@@ -51,7 +51,7 @@
           elementTop = s.stickyWrapper.offset().top,
           etse = elementTop - s.topSpacing - extra;
 
-        //update height in case of dynamic content
+        //update height in case of dynamic description
         s.stickyWrapper.css('height', s.stickyElement.outerHeight());
 
         if (scrollTop <= etse) {

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>没有权限</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}">
+    <link rel="stylesheet" th:href="@{/css/forum.css}">
+</head>
+<body>
+<script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
+<script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
+<div th:insert="navigation :: nav"></div>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron"  style="background-color: transparent;">
+                <h1>对不起你没有权限</h1>
+                <p class="text-danger">你看起来并没有相关操作的权限,请看看别的内容吧！！！</p>
+                <p><a class="btn btn-primary btn-lg" th:href="@{/}" role="button">返回首页</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="navigation :: footer"></div>
+</body>
+</html>

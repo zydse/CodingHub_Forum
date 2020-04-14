@@ -1,26 +1,32 @@
 package top.zydse.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.QuestionDTO;
-import top.zydse.dto.QuestionQueryDTO;
+import top.zydse.dto.TagTypeDTO;
+import top.zydse.elasticsearch.dao.PublishRepository;
+import top.zydse.elasticsearch.entity.Publish;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.*;
 import top.zydse.model.*;
 import top.zydse.service.QuestionService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,24 +49,42 @@ public class QuestionServiceImpl implements QuestionService {
     private TagMapper tagMapper;
     @Autowired
     private CommonExtensionMapper extensionMapper;
+    @Autowired
+    private ElasticsearchTemplate elasticsearchTemplate;
+    @Autowired
+    private PublishRepository publishRepository;
 
     //有查询条件的方法
     public PaginationDTO<QuestionDTO> findAll(String search, Integer page, Integer size) {
-        if (StringUtils.isNotBlank(search)) {
-            search = search.replace(" ", "|");
-        }
+        HashMap<String, Float> fields = new HashMap<>();
+        fields.put("title", 0.5f);
+        fields.put("description", 0.5f);
+        QueryStringQueryBuilder queryBuilder = QueryBuilders.queryStringQuery(search).fields(fields);
+        NativeSearchQuery countQuery = new NativeSearchQueryBuilder()
+                .withIndices("index_publish")
+                .withQuery(queryBuilder)
+                .build();
         PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
-        int totalCount = extensionMapper.countBySearch(search);
-        paginationDTO.setPagination(totalCount, page, size);
-        QuestionExample example = new QuestionExample();
-        example.setOrderByClause("gmt_create desc");
-        int offset = (paginationDTO.getCurrentPage() - 1) * size;
-        QuestionQueryDTO queryDTO = new QuestionQueryDTO();
-        queryDTO.setSearch(search);
-        queryDTO.setOffset(offset);
-        queryDTO.setSize(size);
-        List<Question> questionList = extensionMapper.selectBySearch(queryDTO);
-        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+        long totalCount = elasticsearchTemplate.count(countQuery);
+        log.info("count for search condition:{}", totalCount);
+        paginationDTO.setPagination((int) totalCount, page, size);
+        NativeSearchQuery resultQuery = new NativeSearchQueryBuilder()
+                .withQuery(queryBuilder)
+                .withPageable(PageRequest.of(paginationDTO.getCurrentPage() - 1, size))
+                .withSort(SortBuilders.fieldSort("gmtModified").order(SortOrder.DESC))
+                .build();
+        List<Publish> publishes = elasticsearchTemplate.queryForList(resultQuery, Publish.class);
+        List<QuestionDTO> dtoList = new ArrayList<>();
+        for (Publish publish : publishes) {
+            User user = new User();
+            user.setAvatarUrl(publish.getAvatarUrl());
+            QuestionDTO questionDTO = new QuestionDTO();
+            BeanUtils.copyProperties(publish, questionDTO);
+            questionDTO.setUser(user);
+            dtoList.add(questionDTO);
+        }
+        paginationDTO.setPageData(dtoList);
+        return paginationDTO;
     }
 
     //没有查询条件的查询方法
@@ -69,7 +93,7 @@ public class QuestionServiceImpl implements QuestionService {
         int totalCount = (int) questionMapper.countByExample(new QuestionExample());
         paginationDTO.setPagination(totalCount, page, size);
         QuestionExample example = new QuestionExample();
-        example.setOrderByClause("gmt_create desc");
+        example.setOrderByClause("is_top desc, is_quality desc, gmt_create desc");
         int offset = (paginationDTO.getCurrentPage() - 1) * size;
         List<Question> questionList = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset, size));
         return getQuestionDTOPaginationDTO(paginationDTO, questionList);
@@ -106,10 +130,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Transactional
-    public QuestionDTO viewQuestion(Long questionId, User viewer, boolean viewed) {
+    public QuestionDTO viewQuestion(Long questionId, User viewer) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
         if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        boolean viewed = false;
         User creator = userMapper.selectByPrimaryKey(question.getCreator());
         if (viewer != null && !(viewed = viewer.getId().equals(creator.getId()))) {
             //登录用户，浏览别人发帖，记录浏览历史
@@ -149,7 +174,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Transactional
-    public void saveOrUpdate(Question question, String tag) {
+    public void saveOrUpdate(Question question, String tag, String avatarUrl) {
         String[] tags = tag.split(",");
         TagExample tagExample = new TagExample();
         tagExample.createCriteria().andTagNameIn(Arrays.asList(tags));
@@ -163,6 +188,12 @@ public class QuestionServiceImpl implements QuestionService {
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
             extensionMapper.savePublish(question);
+            Publish publish = new Publish();
+            BeanUtils.copyProperties(question, publish);
+            publish.setAvatarUrl(avatarUrl);
+            publish.setCommentCount(0);
+            publish.setViewCount(0);
+            publishRepository.save(publish);
             for (String t : tags) {
                 Tag tagObj = tagMap.get(t);
                 QuestionTag record = new QuestionTag();
@@ -179,6 +210,10 @@ public class QuestionServiceImpl implements QuestionService {
             int count = questionMapper.updateByPrimaryKeySelective(question);
             if (count != 1)
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_ALREADY_DELETED);
+            Publish publish = new Publish();
+            BeanUtils.copyProperties(question, publish);
+            publish.setAvatarUrl(avatarUrl);
+            publishRepository.save(publish);
         }
     }
 
@@ -186,6 +221,12 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = questionMapper.selectByPrimaryKey(id);
         question.setViewCount(question.getViewCount() + 1);
         questionMapper.updateByPrimaryKey(question);
+        Optional<Publish> optional = publishRepository.findById(question.getId());
+        if (!optional.isPresent())
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        Publish publish = optional.get();
+        publish.setViewCount(question.getViewCount());
+        publishRepository.save(publish);
     }
 
     public QuestionDTO findById(Long questionId) {
@@ -205,5 +246,59 @@ public class QuestionServiceImpl implements QuestionService {
         dto.setTags(tags.substring(1, tags.length() - 1));
         dto.setUser(user);
         return dto;
+    }
+
+    @Override
+    public List<Question> relatedQuestion(QuestionDTO questionDTO) {
+        List<Question> questionList = extensionMapper.relatedQuestion(questionDTO.getId());
+        if (questionList == null || questionList.size() == 0)
+            return null;
+        return questionList;
+    }
+
+    @Override
+    public List<TagTypeDTO> getAllTags() {
+        List<Tag> tags = tagMapper.selectByExample(new TagExample());
+        List<String> types = tags.stream().map(Tag::getTagType).distinct().collect(Collectors.toList());
+        Map<String, List<Tag>> maps = tags.stream()
+                .collect(Collectors.groupingBy(Tag::getTagType));
+        List<TagTypeDTO> list = new ArrayList<>();
+        for (String type : types) {
+            TagTypeDTO dto = new TagTypeDTO();
+            dto.setType(type);
+            dto.setTags(maps.get(type).stream().map(Tag::getTagName).collect(Collectors.toList()));
+            list.add(dto);
+        }
+        return list;
+    }
+
+    @Override
+    public int deleteById(Long questionId) {
+        List<Tag> tagList = extensionMapper.listTagsByQuestion(questionId);
+        if(tagList == null || tagList.size() == 0)
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        for (Tag tag : tagList) {
+            tag.setCount(tag.getCount() - 1);
+            tagMapper.updateByPrimaryKey(tag);
+        }
+        return questionMapper.deleteByPrimaryKey(questionId);
+    }
+
+    @Override
+    public int top(Long questionId) {
+        Question question = questionMapper.selectByPrimaryKey(questionId);
+        if(question == null)
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        question.setIsTop(1);
+        return questionMapper.updateByPrimaryKey(question);
+    }
+
+    @Override
+    public int quality(Long questionId) {
+        Question question = questionMapper.selectByPrimaryKey(questionId);
+        if(question == null)
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        question.setIsQuality(1);
+        return questionMapper.updateByPrimaryKey(question);
     }
 }

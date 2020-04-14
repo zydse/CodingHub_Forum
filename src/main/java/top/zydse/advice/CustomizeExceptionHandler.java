@@ -27,27 +27,6 @@ import java.io.PrintWriter;
 @ControllerAdvice
 public class CustomizeExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    Object handle(Throwable ex, HttpServletRequest request, HttpServletResponse response) {
-        String accept = request.getHeader("Accept").split(",")[0];
-        ModelAndView error = new ModelAndView("error");
-        if ("application/json".equals(accept)) {
-            try {
-                response.setCharacterEncoding("UTF-8");
-                response.setContentType("application/json;charset=utf-8");
-                PrintWriter writer = response.getWriter();
-                writer.write(JSON.toJSONString(ResultDTO.errorOf(CustomizeErrorCode.SYSTEM_ERROR)));
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        } else {
-            error.addObject("message", CustomizeErrorCode.SYSTEM_ERROR.getMessage());
-            return error;
-        }
-    }
-
     @ExceptionHandler(CustomizeException.class)
     Object customizeHandler(Throwable ex, HttpServletRequest request, HttpServletResponse response) {
         ModelAndView error = new ModelAndView("error");
@@ -110,6 +89,27 @@ public class CustomizeExceptionHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @ExceptionHandler(Exception.class)
+    Object handle(Throwable ex, HttpServletRequest request, HttpServletResponse response) {
+        String accept = request.getHeader("Accept").split(",")[0];
+        ModelAndView error = new ModelAndView("error");
+        if ("application/json".equals(accept)) {
+            try {
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("application/json;charset=utf-8");
+                PrintWriter writer = response.getWriter();
+                writer.write(JSON.toJSONString(ResultDTO.errorOf(CustomizeErrorCode.SYSTEM_ERROR)));
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        } else {
+            error.addObject("message", CustomizeErrorCode.SYSTEM_ERROR.getMessage());
+            return error;
         }
     }
 

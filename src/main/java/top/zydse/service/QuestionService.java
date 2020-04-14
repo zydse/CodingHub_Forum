@@ -2,8 +2,11 @@ package top.zydse.service;
 
 import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.QuestionDTO;
+import top.zydse.dto.TagTypeDTO;
 import top.zydse.model.Question;
 import top.zydse.model.User;
+
+import java.util.List;
 
 /**
  * CreateBy: zydse
@@ -40,9 +43,43 @@ public interface QuestionService {
      */
     PaginationDTO<QuestionDTO> findAll(int page, int size, Long id);
 
-    QuestionDTO viewQuestion(Long questionId, User viewer, boolean viewed);
+    /**
+     * 点击问题后查看问题，记录浏览历史
+     * @param questionId
+     * @param viewer
+     * @return
+     */
+    QuestionDTO viewQuestion(Long questionId, User viewer);
 
-    void saveOrUpdate(Question question, String tag);
+    /**
+     * 新增或者修改一个提问
+     * @param question
+     * @param tags
+     * @param avatarUrl
+     */
+    void saveOrUpdate(Question question, String tags, String avatarUrl);
 
+    /**
+     * 根据id查询提问详情
+     * @param questionId
+     * @return
+     */
     QuestionDTO findById(Long questionId);
+
+
+    /**
+     * 根据传入的问题查询标签相同的问题
+     * @param questionDTO
+     * @return
+     */
+    List<Question> relatedQuestion(QuestionDTO questionDTO);
+
+    List<TagTypeDTO> getAllTags();
+
+    int deleteById(Long questionId);
+
+    int top(Long questionId);
+
+    int quality(Long questionId);
+
 }

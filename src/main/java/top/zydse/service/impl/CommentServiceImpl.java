@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import top.zydse.dto.CommentDTO;
 import top.zydse.dto.ResultDTO;
 import top.zydse.dto.SubCommentDTO;
+import top.zydse.elasticsearch.dao.PublishRepository;
+import top.zydse.elasticsearch.entity.Publish;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.enums.NotificationType;
 import top.zydse.exception.CustomizeException;
@@ -18,6 +20,7 @@ import top.zydse.service.CommentService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,14 +44,24 @@ public class CommentServiceImpl implements CommentService {
     private NotificationMapper notificationMapper;
     @Autowired
     private ThumbHistoryMapper thumbHistoryMapper;
+    @Autowired
+    private PublishRepository publishRepository;
 
     @Transactional
     public void insert(Comment comment, User user) {
         Question question = questionMapper.selectByPrimaryKey(comment.getQuestionId());
         if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        //增加问题回复数
         question.setCommentCount(question.getCommentCount() + 1);
         questionMapper.updateByPrimaryKey(question);
+        //更新elasticsearch
+        Optional<Publish> optional = publishRepository.findById(question.getId());
+        if (!optional.isPresent())
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        Publish publish = optional.get();
+        publish.setCommentCount(publish.getCommentCount() + 1);
+        publishRepository.save(publish);
         //评论插入评论表
         commentMapper.insertSelective(comment);
         //创建一个通知
@@ -61,11 +74,21 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null)
             throw new CustomizeException(CustomizeErrorCode.COMMENT_NOT_FOUND);
         Question question = questionMapper.selectByPrimaryKey(comment.getQuestionId());
-        //存储子回复
-        subCommentMapper.insertSelective(subComment);
         //增加子回复数
         comment.setSubCommentCount(comment.getSubCommentCount() + 1);
         commentMapper.updateByPrimaryKey(comment);
+        //增加问题的回复数
+        question.setCommentCount(question.getCommentCount() + 1);
+        questionMapper.updateByPrimaryKey(question);
+        //更新elasticsearch
+        Optional<Publish> optional = publishRepository.findById(question.getId());
+        if (!optional.isPresent())
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        Publish publish = optional.get();
+        publish.setCommentCount(publish.getCommentCount() + 1);
+        publishRepository.save(publish);
+        //存储子回复
+        subCommentMapper.insertSelective(subComment);
         //子评论的通知，可能是通知一级评论人和问题创建者
         createNotification(subComment, comment, question, user);
     }
@@ -167,7 +190,7 @@ public class CommentServiceImpl implements CommentService {
         CommentExample commentExample = new CommentExample();
         commentExample.createCriteria()
                 .andQuestionIdEqualTo(questionId);
-        commentExample.setOrderByClause("gmt_modified desc");
+        commentExample.setOrderByClause("thumb_count desc, gmt_modified desc");
         List<Comment> comments = commentMapper.selectByExample(commentExample);
         if (comments.size() == 0) {
             return new ArrayList<>();

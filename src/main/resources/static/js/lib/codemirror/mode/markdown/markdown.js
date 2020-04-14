@@ -620,7 +620,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
     // Check for link title
     if (stream.peek() === undefined) { // End of line, set flag to check next line
       state.linkTitle = true;
-    } else { // More content on line, check if link title
+    } else { // More description on line, check if link title
       stream.match(/^(?:\s+(?:"(?:[^"\\]|\\\\|\\.)+"|'(?:[^'\\]|\\\\|\\.)+'|\((?:[^)\\]|\\\\|\\.)+\)))?/, true);
     }
     state.f = state.inline = inlineNormal;

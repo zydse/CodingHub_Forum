@@ -1,46 +1,63 @@
-body{
-    background-color: #efefef;
+body {
     padding-top: 70px;
+    background:url('/images/bg.jpg') repeat;
 }
-.main{
+
+.main {
     margin: 20px 50px;
     background-color: #fff;
 }
-.btn_float_right{
+
+.btn_float_right {
     float: right;
     margin-bottom: 10px;
 }
+
 /*主要用于头像*/
-.media-object{
+.media-object {
     width: 38px;
     height: 38px;
 }
+.name_vertical_center{
+    padding-top: 10px;
+}
+
 /*灰色描述文本*/
-.text_desc{
+.text_desc {
     font-size: 12px;
     font-weight: normal;
     color: #999;
 }
 
-.comment_edit{
+.question_desc {
+    margin: 15px 20px;
+    font-weight: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.comment_edit {
     margin: 10px 0;
 }
 
-.comment_display{
+.comment_display {
     margin-top: 20px;
 }
-.comment_section{
+
+.comment_section {
     padding-bottom: 5px;
     margin-top: 20px;
     margin-bottom: 10px;
     border-bottom: #eee solid 1px;
 }
 
-.comment_operate{
+.comment_operate {
     margin-top: 10px;
 }
 
-.comment_operate .icon{
+.comment_operate .icon {
     font-size: 16px;
     vertical-align: middle;
     margin-right: 15px;
@@ -48,18 +65,19 @@ body{
     cursor: pointer;
 }
 
-.comment_operate .icon:hover{
-    color: #499ef3;
-}
-.comment_operate .icon.active{
+.comment_operate .icon:hover {
     color: #499ef3;
 }
 
-.question_title{
+.comment_operate .icon.active {
+    color: #499ef3;
+}
+
+.question_title {
     margin-top: 25px;
 }
 
-.sub_comment{
+.sub_comment {
     margin-top: 10px;
     padding: 20px 15px 10px;
     border: #eee solid 1px;
@@ -96,4 +114,9 @@ body{
     white-space: normal;
     margin: 5px 5px;
     display: inline-block;
+}
+
+.page_footer{
+    padding: 15px 0 35px;
+    text-align: center;
 }

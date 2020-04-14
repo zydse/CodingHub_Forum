@@ -1,5 +1,6 @@
 package top.zydse.controller;
 
+import com.google.code.kaptcha.impl.DefaultKaptcha;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -19,9 +20,13 @@ import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.model.User;
 import top.zydse.service.UserService;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 /**
  * CreateBy: zydse
@@ -37,17 +42,13 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private DefaultKaptcha captchaProducer;
 
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-        log.info("准备退出");
+        SecurityUtils.getSubject().logout();
         request.getSession().removeAttribute("user");
-        log.info("移除user");
-        Cookie cookie = new Cookie("token", null);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-        System.out.println(request.getSession());
         request.getSession().invalidate();
         return "redirect:/";
     }
@@ -55,27 +56,24 @@ public class UserController {
     @ResponseBody
     @PostMapping("/login")
     public ResultDTO login(@RequestParam(name = "username") String username,
-                        @RequestParam(name = "password") String password,
-                        @RequestParam(name = "isRemember", defaultValue = "0") Integer isRemember,
-                        HttpServletResponse response,
-                        HttpServletRequest request) {
-        log.info("username : {} password : {}",username, password);
+                           @RequestParam(name = "password") String password,
+                           @RequestParam(name = "captchaCode") String captchaCode,
+                           HttpServletRequest request) {
+        log.info("username : {} password : {}", username, password);
+        String sessionCaptcha = (String) request.getSession().getAttribute("captchaCode");
+        if(sessionCaptcha == null || !sessionCaptcha.equals(captchaCode)){
+            return ResultDTO.errorOf(CustomizeErrorCode.CAPTCHA_CODE_ERROR);
+        }
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         try {
             subject.login(token);
             SavedRequest savedRequest = WebUtils.getSavedRequest(request);
-            System.out.println(savedRequest != null);
             String url = savedRequest == null ? "/" : savedRequest.getRequestUrl();
             log.info("user request from :: " + url);
             User user = (User) subject.getPrincipal();
             log.info("login-ed user : " + user.getToken());
-            if (isRemember == 1) {
-                Cookie cookie = new Cookie("token", user.getToken());
-                cookie.setPath("/");
-                response.addCookie(cookie);
-            }
-            request.getSession().setAttribute("user",user);
+            request.getSession().setAttribute("user", user);
             return ResultDTO.successOf(url);
         } catch (UnknownAccountException e) {
             return ResultDTO.errorOf(CustomizeErrorCode.USERNAME_INCORRECT);
@@ -84,6 +82,35 @@ public class UserController {
         } catch (AuthenticationException e) {
             return ResultDTO.errorOf(CustomizeErrorCode.SYSTEM_ERROR);
         }
+    }
+
+    @RequestMapping("/defaultCaptcha")
+    public void code(@RequestParam(value = "d", required = false) Long timestamp,
+                     HttpServletResponse response,
+                     HttpServletRequest request) throws Exception {
+        byte[] captchaChallengeAsJpeg = null;
+        ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
+        try {
+            //生产验证码字符串并保存到session中
+            String createText = captchaProducer.createText();
+            request.getSession().setAttribute("captchaCode", createText);
+            //使用生产的验证码字符串返回一个BufferedImage对象并转为byte写入到byte数组中
+            BufferedImage challenge = captchaProducer.createImage(createText);
+            ImageIO.write(challenge, "jpg", jpegOutputStream);
+        } catch (IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        //定义response输出类型为image/jpeg类型，使用response输出流输出图片的byte数组
+        captchaChallengeAsJpeg = jpegOutputStream.toByteArray();
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+        response.setContentType("image/jpeg");
+        ServletOutputStream responseOutputStream = response.getOutputStream();
+        responseOutputStream.write(captchaChallengeAsJpeg);
+        responseOutputStream.flush();
+        responseOutputStream.close();
     }
 
     @ResponseBody
@@ -95,8 +122,10 @@ public class UserController {
             return resultDTO;
         UsernamePasswordToken token = new UsernamePasswordToken(registerDTO.getUsername(), registerDTO.getPassword());
         SecurityUtils.getSubject().login(token);
-        log.info("request url from {}", WebUtils.getSavedRequest(request).getRequestUrl());
-        return ResultDTO.successOf(WebUtils.getSavedRequest(request).getRequestUrl());
+        SavedRequest savedRequest = WebUtils.getSavedRequest(request);
+        String url = savedRequest == null ? "/" : savedRequest.getRequestUrl();
+        request.getSession().setAttribute("user", resultDTO.getData());
+        return ResultDTO.successOf(url);
     }
 
     @ResponseBody

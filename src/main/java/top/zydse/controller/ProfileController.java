@@ -2,10 +2,12 @@ package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import top.zydse.dto.*;
@@ -25,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @Controller
-@RequiresAuthentication
+@RequiresPermissions("profile:retrieve")
 @RequestMapping("/profile")
 public class ProfileController {
 
@@ -42,10 +44,6 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            model.addAttribute("error", "未登录");
-            return "redirect:/";
-        }
         model.addAttribute("section", "publish");
         model.addAttribute("sectionName", "我的提问");
         PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size, user.getId());
@@ -59,10 +57,6 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            model.addAttribute("error", "未登录");
-            return "redirect:/";
-        }
         model.addAttribute("section", "notification");
         model.addAttribute("sectionName", "我的通知");
         PaginationDTO<NotificationDTO> pagination = notificationService.list(page, size, user.getId());
@@ -76,10 +70,6 @@ public class ProfileController {
                        @RequestParam(name = "page", defaultValue = "1") Integer page,
                        @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            model.addAttribute("error", "未登录");
-            return "redirect:/";
-        }
         model.addAttribute("section", "view");
         model.addAttribute("sectionName", "浏览历史");
         PaginationDTO<ViewHistoryDTO> pagination = profileService.viewHistory(page, size, user.getId());
@@ -93,15 +83,18 @@ public class ProfileController {
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
                         @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            model.addAttribute("error", "未登录");
-            return "redirect:/";
-        }
         model.addAttribute("section", "thumb");
         model.addAttribute("sectionName", "我的赞");
         PaginationDTO<ThumbHistoryDTO> pagination = profileService.thumbHistory(page, size, user.getId());
-        log.info("pagination length:" + pagination.getPageCount());
         model.addAttribute("pagination", pagination);
         return "profile";
+    }
+
+    @GetMapping("/user/{userId}")
+    public String userProfile(@PathVariable("userId") Long id,
+                              Model model){
+        log.info("received a request for userId : {}", id);
+        model.addAttribute("userId", id);
+        return "user";
     }
 }

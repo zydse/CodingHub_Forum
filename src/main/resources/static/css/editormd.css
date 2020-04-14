@@ -3919,7 +3919,7 @@
     color: #080;
   }
 
-  /* string content */
+  /* string description */
   .kwd {
     color: #008;
   }
@@ -4362,7 +4362,7 @@ hr.editormd-page-break {
 
 @media screen {
   .editormd-preview-theme-dark {
-    /* string content */
+    /* string description */
     /* a keyword */
     /* a comment */
     /* a type name */

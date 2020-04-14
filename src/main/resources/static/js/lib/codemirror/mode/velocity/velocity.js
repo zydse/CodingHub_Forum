@@ -69,7 +69,7 @@ CodeMirror.defineMode("velocity", function() {
             state.lastTokenWasBuiltin = false;
             return chain(stream, state, tokenComment);
         }
-        // unparsed content?
+        // unparsed description?
         else if (ch == "#" && stream.match(/ *\[ *\[/)) {
             state.lastTokenWasBuiltin = false;
             return chain(stream, state, tokenUnparsed);

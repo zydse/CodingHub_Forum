@@ -82,7 +82,7 @@ CodeMirror.defineMode("smarty", function(config) {
       }
     },
 
-    // parsing Smarty content
+    // parsing Smarty description
     smarty: function(stream, state) {
       if (stream.match(settings.rightDelimiter, true)) {
         if (settings.smartyVersion === 3) {

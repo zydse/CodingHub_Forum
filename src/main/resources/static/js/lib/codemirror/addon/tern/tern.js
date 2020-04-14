@@ -21,7 +21,7 @@
 //   multi-file view, switch the view or focus to the named file.
 // * showError: A function(editor, message) that can be used to
 //   override the way errors are displayed.
-// * completionTip: Customize the content in tooltips for completions.
+// * completionTip: Customize the description in tooltips for completions.
 //   Is passed a single argument—the completion's data as returned by
 //   Tern—and may return a string, DOM node, or null to indicate that
 //   no tip should be shown. By default the docstring is shown.

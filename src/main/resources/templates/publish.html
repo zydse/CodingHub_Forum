@@ -19,12 +19,12 @@
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
             <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 提问</h2>
             <hr/>
-            <form action="/publish" method="post" id="questionForm">
-                <input type="hidden" name="id" th:value="${id}">
+            <form id="questionForm">
+                <input type="hidden" name="id" id="questionId" th:value="${id}">
                 <div class="form-group">
                     <label for="questionTitle">问题描述（简单扼要）：</label>
                     <input type="text" class="form-control" name="questionTitle" id="questionTitle"
-                           placeholder="问题标题" th:value="${title}">
+                           placeholder="问题标题" th:value="${title}" maxlength="49">
                 </div>
 
                 <label for="description">问题详细信息（必填项）：</label>
@@ -61,7 +61,8 @@
                            th:value="${tags}" onfocus="showSelectTag()" readonly>
                     <div id="select-tag" class="publish-tag-tab">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" th:class="${type.type == 'language' ? 'active' : ''}" th:each="type : ${typeList}">
+                            <li role="presentation" th:class="${type.type == 'language' ? 'active' : ''}"
+                                th:each="type : ${typeList}">
                                 <a th:href="${'#'+ type.getType()}" aria-controls="home" role="tab" data-toggle="tab"
                                    aria-expanded="false">[[${type.type}]]</a>
                             </li>
@@ -76,10 +77,7 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    <span class="alert alert-danger" th:if="${error}" th:text="${error}"></span>
-                    <button type="submit" class="btn btn-success btn_float_right">发布</button>
-                </div>
+                <button type="submit" class="btn btn-success btn_float_right">发布</button>
             </form>
         </div>
         <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
@@ -99,30 +97,51 @@
 <div th:replace="alert :: modal"></div>
 <script type="application/javascript">
     $("#questionForm").submit(function (e) {
+        e.preventDefault();
         var questionTitle = $("#questionTitle").val();
         if ('' === questionTitle) {
             $(".modal-body").text("请输入问题的标题");
             $('#notice').modal("show");
-            e.preventDefault();
             return;
         }
         var description = $("#description").val();
         if ('' === description) {
             $(".modal-body").text("请输入更多的信息来描述你的问题，这样才能获得更好的解答");
             $('#notice').modal("show");
-            e.preventDefault();
             return;
         }
         var tags = $("#tags").val();
         if ('' === tags) {
             $(".modal-body").text("请为问题选择标签，能更有效的获得解答");
             $('#notice').modal("show");
-            e.preventDefault();
+            return;
         }
+        $.ajax({
+            type: "POST",
+            url: "/question/publish",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                "title": questionTitle,
+                "description": description,
+                "tags": tags,
+                "id": $("#questionId").val()
+            }),
+            success: function (result) {
+                if (result.code !== 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    return false;
+                } else {
+                    window.location.href = result.data;
+                }
+            }
+        });
     });
 
     function showSelectTag() {
-        $("#select-tag").show();
+        if ($("#questionId").val() === null || "" === $("#questionId").val())
+            $("#select-tag").show();
     }
 
     function selectTag(e) {
@@ -142,5 +161,6 @@
         }
     }
 </script>
+<div th:replace="navigation :: footer"></div>
 </body>
 </html>

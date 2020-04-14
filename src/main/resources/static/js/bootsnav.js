@@ -84,7 +84,7 @@
                 //Selection Class
                 index.find('ul.navbar-nav > li').each(function(){ 
                     var dropDown = $("ul.dropdown-menu", this),
-                        megaMenu = $("ul.megamenu-content", this);
+                        megaMenu = $("ul.megamenu-description", this);
                     dropDown.closest("li").addClass("dropdown");
                     megaMenu.closest("li").addClass("megamenu-fw");
                 });
@@ -270,7 +270,7 @@
                             $(".content", this).stop().fadeOut();
                             $(".title", this).off("click");
                             $(".title", this).on("click", function(){
-                                $(this).closest(".col-menu").find(".content").stop().fadeToggle().addClass(getIn);
+                                $(this).closest(".col-menu").find(".description").stop().fadeToggle().addClass(getIn);
                                 $(this).closest(".col-menu").toggleClass("on");
                                 return false;
                             });
@@ -355,7 +355,7 @@
                         $(".col-menu").each(function(){
                             $(".content", this).addClass("animated");
                             $(".title", this).on("mouseenter", function(){
-                                $(this).closest(".col-menu").find(".content").stop().fadeIn().addClass(getIn);
+                                $(this).closest(".col-menu").find(".description").stop().fadeIn().addClass(getIn);
                                 $(this).closest(".col-menu").addClass("on");
                                 return false;
                             });
@@ -364,7 +364,7 @@
                         $(this).on("mouseleave", function(){
                             $(".dropdown-menu", this).stop().removeClass(getIn);
                             $(".dropdown-menu", this).stop().addClass(getOut).fadeOut();
-                            $(".col-menu", this).find(".content").stop().fadeOut().removeClass(getIn);
+                            $(".col-menu", this).find(".description").stop().fadeOut().removeClass(getIn);
                             $(".col-menu", this).removeClass("on");
                             $("li.dropdown", this).removeClass("on");
                             return false;
@@ -381,7 +381,7 @@
                         $(".megamenu-fw", this).each(function(){
                             $(".title", this).off("click");
                             $("a.dropdown-toggle", this).off("click");
-                            $(".content").removeClass("animated");
+                            $(".description").removeClass("animated");
                         });
 
                         $(".dropdown-menu", this).addClass("animated");

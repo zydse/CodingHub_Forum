@@ -9,7 +9,7 @@
                 <div class="media-body">
                     <p class="media-heading">
                         你浏览了
-                        <a th:href="@{/user/{userId}(userId = ${viewHistory.userId})}"
+                        <a th:href="@{/profile/user/{userId}(userId = ${viewHistory.userId})}"
                            th:text="${viewHistory.username}"></a>
                         的问题
                         <a th:href="@{/question/{questionId}(questionId = ${viewHistory.questionId})}"
@@ -31,7 +31,7 @@
                 <div class="media-body">
                     <p class="media-heading">
                         你点赞了
-                        <a th:href="@{/user/{userId}(userId = ${thumbHistory.userId})}"
+                        <a th:href="@{/profile/user/{userId}(userId = ${thumbHistory.userId})}"
                            th:text="${thumbHistory.username}"></a>
                         的回复
                         <a th:href="@{/question/{questionId}(questionId = ${thumbHistory.questionId})}"
@@ -52,7 +52,7 @@
             <div class="media">
                 <div class="media-body">
                     <p class="media-heading">
-                        <a th:href="@{/user/{userId}(userId = ${notification.notifier})}"
+                        <a th:href="@{/profile/user/{userId}(userId = ${notification.notifier})}"
                            th:text="${notification.notifierName}">用户</a>
                         <span th:text="${notification.typeName}">评论了</span>
                         <a th:href="@{/notification/{noticfication}(noticfication = ${notification.id})}"
@@ -71,8 +71,8 @@
 <div th:fragment="publish" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div class="media" th:each="question : ${pagination.pageData}">
         <div class="media-left">
-            <a th:href="@{/user/{userId}(userId = ${question.user.id})}">
-                <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="用户头像">
+            <a th:href="@{/profile/user/{userId}(userId = ${question.user.id})}">
+                <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="avatar">
             </a>
         </div>
         <div class="media-body">

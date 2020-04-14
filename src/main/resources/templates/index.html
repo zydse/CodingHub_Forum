@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,10 +19,10 @@
 <div class="container-fluid main">
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h2>
-                <span class="glyphicon glyphicon-list" aria-hidden="true" th:data-ids="${ids}" id="questionIds"></span>
+            <h3>
+                <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                 发现
-            </h2>
+            </h3>
             <ul class="nav nav-tabs">
                 <li role="presentation" class="active"><a th:href="@{/}">最新</a></li>
                 <li role="presentation"><a th:href="@{/}">七天最热</a></li>
@@ -30,7 +30,7 @@
             </ul>
             <div class="media" th:each="question : ${pagination.pageData}">
                 <div class="media-left">
-                    <a th:href="@{/profile/{userId}(userId = ${question.creator})}">
+                    <a th:href="@{/profile/user/{userId}(userId = ${question.creator})}">
                         <img class="media-object img-rounded" th:src="${question.user.avatarUrl}"
                              src="https://avatars0.githubusercontent.com/u/35904985?v=4" alt="avatar">
                     </a>
@@ -39,39 +39,38 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">
-                                <span>[[${question.title}]]</span>
+                                <div th:if="${question.isTop == 1}">
+                                    <span class="glyphicon glyphicon-flag" style="color: #f00;"></span>
+                                    <span th:text="${'[置顶]' + question.title}"></span>
+                                </div>
+
+                                <div th:if="${question.isQuality == 1 and question.isTop == 0}">
+                                    <span class="glyphicon glyphicon-fire" style="color: #f00;"></span>
+                                    <span th:text="${'[精品帖]' + question.title}"></span>
+                                </div>
+
+                                <div th:if="${question.isQuality == 0 and question.isTop == 0}">
+                                    <span>[[${question.title}]]</span>
+                                </div>
                             </h3>
                         </div>
-                        <div class="panel-body" style="padding: 5px;">
-                            <div id="markdown-preview" th:attrappend="id=${question.id}"
-                                 style="background-color: rgb(242,242,245); border-radius: 10px;">
-                                <textarea style="display:none;">[[${question.description}]]</textarea>
-                            </div>
-
-
+                        <div class="panel-body" style="padding: 0; background-color: rgb(242, 242, 245);">
+                            <div class="question_desc">[[${question.description}]]</div>
                         </div>
                         <div class="panel-footer">
-                                <span class="text_desc">
-                                    <span>[[${question.commentCount}]]</span> 个回复 •
-                                    <span>[[${question.viewCount}]]</span> 次浏览 •
-                                    <span>[[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span>
-                                </span>
-                            <a class="pull-right" th:href="@{/question/{questionId}(questionId = ${question.id})}">
+                            <a th:href="@{/question/{questionId}(questionId = ${question.id})}">
                                 查看全文
                             </a>
+                            <span class="text_desc pull-right">
+                                <span>[[${question.commentCount}]]</span> 个回复 •
+                                <span>[[${question.viewCount}]]</span> 次浏览 •
+                                <span>[[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span>
+                            </span>
+
                         </div>
                     </div>
                 </div>
             </div>
-            <script type="text/javascript">
-                $(function () {
-                    var str = $("#questionIds").data('ids').toString();
-                    var ids = str.split(",");
-                    $.each(ids, function (index, element) {
-                        editormd.markdownToHTML("markdown-preview" + element, {});
-                    });
-                });
-            </script>
             <div th:if="${search == null}" th:insert="pageNav :: index"></div>
             <div th:if="${search != null}" th:insert="pageNav :: search"></div>
         </div>
@@ -81,5 +80,6 @@
         </div>
     </div>
 </div>
+<div th:replace="navigation :: footer"></div>
 </body>
 </html>

@@ -24,7 +24,7 @@ import java.util.UUID;
  */
 @Controller
 @Slf4j
-public class AuthorizeController {
+public class OAuthController {
 
     @Autowired
     private GithubProvider githubProvider;

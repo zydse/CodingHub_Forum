@@ -30,17 +30,8 @@ public class IndexController {
                         @RequestParam(name = "size", defaultValue = "5") Integer size) {
         PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size);
         List<QuestionDTO> pageData = pagination.getPageData();
-        List<Long> idList = pageData.stream().map(QuestionDTO::getId).collect(Collectors.toList());
-        String ids = idList.toString().replace(" ", "");
         model.addAttribute("pagination", pagination);
-//        model.addAttribute("search", "ggg");
-        model.addAttribute("ids", ids.substring(1, ids.length() - 1));
         return "index";
-    }
-
-    @RequestMapping("/401")
-    public String unauthorized(){
-        return "401";
     }
 
 }

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 //@Configuration
 public class EhCacheManagerConfig {
     //设置为共享模式
-    @Bean
+//    @Bean
     public EhCacheManagerFactoryBean ehCacheManagerFactoryBean() {
         EhCacheManagerFactoryBean cacheManagerFactoryBean = new EhCacheManagerFactoryBean();
         cacheManagerFactoryBean.setShared(true);

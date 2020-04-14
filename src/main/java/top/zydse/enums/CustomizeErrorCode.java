@@ -25,11 +25,13 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     SENSITIVE_WORD_FOUND_IN_DESCRIPTION(3010, "你的提问描述中包含了敏感词汇，为了共同建立更良好的社区环境，请修改你的提问描述"),
     DUPLICATE_THUMB_UP(3011, "这条回复你已经点赞过了"),
     THUMB_UP_SELF(3012, "你不可以点赞自己的回复"),
+    QUESTION_INFO_ERROR(3013, "你输入的问题信息可能有问题，请仔细检查是否符合要求"),
     DUPLICATE_USERNAME(4001, "用户名已经被注册过了，请你换个名字试试"),
     VERIFICATION_CODE_ERROR(4002, "验证码有点问题，请重试"),
-    VERIFICATION_CODE_INACTIVE(4003, "你输入的验证码错误，或者你太长时间没有操作，验证码已经失效了"),
+    VERIFICATION_CODE_INACTIVE(4003, "你输入短信验证码错误，或者你太长时间没有操作，验证码已经失效了"),
     USERNAME_INCORRECT(4004, "你看起来好像还没有注册过，请先注册后再登录"),
-    PASSWORD_INCORRECT(4005, "你输入的密码错了，请重新输入后登录");
+    PASSWORD_INCORRECT(4005, "你输入的密码错了，请重新输入后登录"),
+    CAPTCHA_CODE_ERROR(4006, "你的登录验证码似乎错了呢");
 
     private String message;
     private Integer code;

@@ -35,6 +35,19 @@
                                     <input type="password" class="form-control" id="password" name="password"
                                            required placeholder="请输入你的密码">
                                 </div><!--/.form-group -->
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="captchaCode">验证码</label>
+                                        <input type="text" class="form-control" id="captchaCode" name="captchaCode"
+                                               required placeholder="请输入验证码">
+                                    </div>
+                                </div>
+                                <div class="form-col1">
+                                    <div class="form-group">
+                                        <img alt="验证码" onclick="this.src='/user/defaultCaptcha'" title="点击刷新"
+                                             th:src="@{/user/defaultCaptcha}" style="margin-top: 37px">
+                                    </div>
+                                </div>
                             </div><!--/.signin-form -->
                         </div><!--/.col -->
                     </div><!--/.row -->
@@ -44,14 +57,13 @@
                                 <div class="awesome-checkbox-list">
                                     <ul class="unstyled centered">
                                         <li>
-                                            <input class="styled-checkbox" id="isRemember" type="checkbox"
-                                                   name="isRemember" value="1">
-                                            <label for="isRemember">记住我</label>
+                                            <input class="styled-checkbox" id="rememberMe" type="checkbox"
+                                                   name="rememberMe">
+                                            <label for="rememberMe">记住我</label>
                                         </li>
                                         <li>
                                             <a th:href="@{/user/forget}">忘记了你的账户或密码 ?</a>
                                         </li>
-
                                     </ul>
                                 </div><!--/.awesome-checkbox-list -->
                             </div><!--/.signin-password -->
@@ -76,7 +88,7 @@
                     </div><!--/.row -->
                 </form><!--/form -->
             </div>
-        </div><!--/.sign-content -->
+        </div><!--/.sign-description -->
     </div><!--/.container -->
 </section><!--/.signin -->
 <div th:insert="alert :: modal"></div>
@@ -93,6 +105,7 @@
         e.preventDefault();
         var username = $("input#username").val();
         var password = $("input#password").val();
+        var captchaCode = $("input#captchaCode").val();
         var isRemember = $("input#isRemember").prop("checked") ? 1 : 0;
         $.ajax({
             type: "POST",
@@ -101,7 +114,8 @@
             data: {
                 "username": username,
                 "password": $.md5(password),
-                "isRemember": isRemember
+                "isRemember": isRemember,
+                "captchaCode": captchaCode
             },
             success: function (result) {
                 if (result.code != 200) {

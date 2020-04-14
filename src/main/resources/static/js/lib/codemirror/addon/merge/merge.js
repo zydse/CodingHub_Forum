@@ -187,7 +187,7 @@
     dv.lockButton.innerHTML = val ? "\u21db\u21da" : "\u21db&nbsp;&nbsp;\u21da";
   }
 
-  // Updating the marks for editor content
+  // Updating the marks for editor description
 
   function clearMarks(editor, arr, classes) {
     for (var i = 0; i < arr.length; ++i) {

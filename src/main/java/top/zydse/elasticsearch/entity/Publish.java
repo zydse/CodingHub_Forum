@@ -14,7 +14,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * @Date: 2020/4/2
  */
 @Data
-@Document(indexName = "index_article", type = "publish")
+@Document(indexName = "index_publish", type = "publish")
 public class Publish {
 
     @Id
@@ -25,7 +25,7 @@ public class Publish {
     private String title;
 
     @Field(type = FieldType.Text, store = true, analyzer = "ik_smart")
-    private String content;
+    private String description;
 
     @Field(type = FieldType.Text, store = true, index = false)
     private String avatarUrl;

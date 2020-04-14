@@ -59,7 +59,7 @@
      "[tag <out>]{[def&variable 'http://www.example.com/ns/my':fn]([atom 12])}[tag </out>]");
 
   MT("testProcessingInstructions",
-     "[def&variable data]([title&meta <?target content?>]) [keyword instance] [keyword of] [atom xs:string]");
+     "[def&variable data]([title&meta <?target description?>]) [keyword instance] [keyword of] [atom xs:string]");
 
   MT("testQuoteEscapeDouble",
      "[keyword let] [variable $rootfolder] [keyword :=] [string \"c:\\builds\\winnt\\HEAD\\qa\\scripts\\\"]",
