@@ -2,6 +2,7 @@ package top.zydse.service;
 
 import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.ThumbHistoryDTO;
+import top.zydse.dto.UserProfileDTO;
 import top.zydse.dto.ViewHistoryDTO;
 
 /**
@@ -15,4 +16,6 @@ public interface ProfileService {
     PaginationDTO<ViewHistoryDTO> viewHistory(Integer page, Integer size, Long userId);
 
     PaginationDTO<ThumbHistoryDTO> thumbHistory(Integer page, Integer size, Long userId);
+
+    UserProfileDTO findUserById(Long id);
 }

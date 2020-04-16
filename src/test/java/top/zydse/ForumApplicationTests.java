@@ -1,18 +1,13 @@
 package top.zydse;
 
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.elasticsearch.client.IndicesClient;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import top.zydse.elasticsearch.dao.PublishRepository;
 import top.zydse.elasticsearch.entity.Publish;
 import top.zydse.provider.SensitiveWordFilter;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -41,7 +36,6 @@ class ForumApplicationTests {
 //    @Test
     void testAdd(){
         Md5Hash hash = new Md5Hash("sdfa", "sdfa" ,1);
-
         Instant start = Instant.now();
         long reduce = LongStream.rangeClosed(0, 10000000000L)
                 .reduce(0, Long::sum);

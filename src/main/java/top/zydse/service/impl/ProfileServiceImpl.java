@@ -1,18 +1,22 @@
 package top.zydse.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.ThumbHistoryDTO;
+import top.zydse.dto.UserProfileDTO;
 import top.zydse.dto.ViewHistoryDTO;
-import top.zydse.mapper.CommonExtensionMapper;
-import top.zydse.mapper.ThumbHistoryMapper;
-import top.zydse.mapper.ViewHistoryMapper;
-import top.zydse.model.ThumbHistoryExample;
-import top.zydse.model.ViewHistoryExample;
+import top.zydse.enums.CustomizeErrorCode;
+import top.zydse.exception.CustomizeException;
+import top.zydse.mapper.*;
+import top.zydse.model.*;
 import top.zydse.service.ProfileService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CreateBy: zydse
@@ -22,6 +26,7 @@ import java.util.List;
  * @Date: 2020/3/29
  */
 @Service
+@Slf4j
 public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private CommonExtensionMapper commonExtensionMapper;
@@ -29,6 +34,14 @@ public class ProfileServiceImpl implements ProfileService {
     private ViewHistoryMapper viewHistoryMapper;
     @Autowired
     private ThumbHistoryMapper thumbHistoryMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private QuestionMapper questionMapper;
+    @Autowired
+    private CommentMapper commentMapper;
+    @Autowired
+    private SubCommentMapper subCommentMapper;
 
     public PaginationDTO<ViewHistoryDTO> viewHistory(Integer page, Integer size, Long userId) {
         PaginationDTO<ViewHistoryDTO> paginationDTO = new PaginationDTO<>();
@@ -62,5 +75,35 @@ public class ProfileServiceImpl implements ProfileService {
         List<ThumbHistoryDTO> thumbHistoryDTOS = commonExtensionMapper.listThumbHistory(userId, offset, size);
         paginationDTO.setPageData(thumbHistoryDTOS);
         return paginationDTO;
+    }
+
+    @Override
+    public UserProfileDTO findUserById(Long id) {
+        User user = userMapper.selectByPrimaryKey(id);
+        if (user == null)
+            throw new CustomizeException(CustomizeErrorCode.BAD_REQUEST);
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        BeanUtils.copyProperties(user, userProfileDTO);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria().andCreatorEqualTo(id);
+        long publishNum = questionMapper.countByExample(questionExample);
+        userProfileDTO.setPublishNum(publishNum);
+        CommentExample commentExample = new CommentExample();
+        commentExample.createCriteria().andReviewerEqualTo(id);
+        List<Comment> commentList = commentMapper.selectByExample(commentExample);
+        SubCommentExample subCommentExample = new SubCommentExample();
+        subCommentExample.createCriteria().andReviewerEqualTo(id);
+        long subCommentNum = subCommentMapper.countByExample(subCommentExample);
+        userProfileDTO.setCommentNum(commentList.size() + subCommentNum);
+        if(commentList.size() == 0)
+            userProfileDTO.setThumbedNum(0);
+        else {
+            Integer thumbedNum = commentList.stream()
+                    .map(Comment::getThumbCount)
+                    .reduce(Integer::sum)
+                    .get();
+            userProfileDTO.setThumbedNum(thumbedNum);
+        }
+        return userProfileDTO;
     }
 }

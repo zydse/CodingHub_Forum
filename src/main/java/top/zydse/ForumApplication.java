@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @MapperScan({"top.zydse.mapper"})
-//@EnableScheduling
+@EnableScheduling
 public class ForumApplication {
 
     public static void main(String[] args) {

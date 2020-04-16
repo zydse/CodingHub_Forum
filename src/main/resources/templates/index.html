@@ -5,81 +5,132 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CodingHub</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/editormd.preview.min.css}"/>
-    <link rel="stylesheet" th:href="@{/css/forum.css}">
-    <script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
-    <script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
-    <script th:src="@{/js/editormd.min.js}"></script>
-    <script th:src="@{/js/lib/marked.min.js}"></script>
-    <script th:src="@{/js/lib/prettify.min.js}"></script>
+    <head th:insert="import :: head"></head>
 </head>
 <body>
-<div th:replace="navigation :: nav"></div>
-<div class="container-fluid main">
-    <div class="row">
-        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h3>
-                <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                发现
-            </h3>
-            <ul class="nav nav-tabs">
-                <li role="presentation" class="active"><a th:href="@{/}">最新</a></li>
-                <li role="presentation"><a th:href="@{/}">七天最热</a></li>
-                <li role="presentation"><a th:href="@{/}" class="text-danger">消灭零回复</a></li>
-            </ul>
-            <div class="media" th:each="question : ${pagination.pageData}">
-                <div class="media-left">
-                    <a th:href="@{/profile/user/{userId}(userId = ${question.creator})}">
-                        <img class="media-object img-rounded" th:src="${question.user.avatarUrl}"
-                             src="https://avatars0.githubusercontent.com/u/35904985?v=4" alt="avatar">
-                    </a>
+<div th:replace="navigation :: navigation"></div>
+<div class="wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 col-xs-12 side-left">
+                <h3>
+                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                    发现
+                </h3>
+                <div class="posts">
+                    <ul class="posts-list" th:each="question : ${pagination.pageData}">
+                        <li class="content">
+                            <div class="content-box posts-aside">
+                                <div class="posts-item">
+                                    <div class="item-title">
+                                        <h2>
+                                            <a th:href="@{/question/{questionId}(questionId = ${question.id})}">
+                                                <span th:if="${question.isTop == 1}" class="glyphicon glyphicon-flag"
+                                                      style="color: #f00;">[置顶]</span>
+                                                <span th:if="${question.isQuality == 1}"
+                                                      class="glyphicon glyphicon-fire" style="color: #f00;">[精品帖]</span>
+                                                [[${question.title}]]
+                                            </a>
+                                        </h2>
+                                    </div>
+                                    <div class="item-text question_desc">[[${question.description}]]</div>
+                                    <div class="item-info">
+                                        <ul>
+                                            <li class="post-author hidden-xs">
+                                                <div class="avatar">
+                                                    <img th:src="${question.user.avatarUrl}" alt="avatar"
+                                                         class="lazy avatar avatar-50 photo" height="50" width="50">
+                                                </div>
+                                                <a th:href="@{/profile/user/{userId}(userId = ${question.creator})}"
+                                                   target="_blank">
+                                                    [[${question.user.name}]]
+                                                </a>
+                                            </li>
+                                            <li class="ico-time">
+                                                <i class="icon-clock"></i>
+                                                [[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                                            </li>
+                                            <li class="ico-eye hidden-xs">
+                                                <i class="icon-book-open"></i>
+                                                [[${question.viewCount}]]
+                                            </li>
+                                            <li class="ico-like hidden-xs">
+                                                <i class="icon-bubble"></i>
+                                                [[${question.commentCount}]]
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="media-body">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
-                                <div th:if="${question.isTop == 1}">
-                                    <span class="glyphicon glyphicon-flag" style="color: #f00;"></span>
-                                    <span th:text="${'[置顶]' + question.title}"></span>
-                                </div>
-
-                                <div th:if="${question.isQuality == 1 and question.isTop == 0}">
-                                    <span class="glyphicon glyphicon-fire" style="color: #f00;"></span>
-                                    <span th:text="${'[精品帖]' + question.title}"></span>
-                                </div>
-
-                                <div th:if="${question.isQuality == 0 and question.isTop == 0}">
-                                    <span>[[${question.title}]]</span>
-                                </div>
-                            </h3>
-                        </div>
-                        <div class="panel-body" style="padding: 0; background-color: rgb(242, 242, 245);">
-                            <div class="question_desc">[[${question.description}]]</div>
-                        </div>
-                        <div class="panel-footer">
-                            <a th:href="@{/question/{questionId}(questionId = ${question.id})}">
-                                查看全文
-                            </a>
-                            <span class="text_desc pull-right">
-                                <span>[[${question.commentCount}]]</span> 个回复 •
-                                <span>[[${question.viewCount}]]</span> 次浏览 •
-                                <span>[[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span>
-                            </span>
-
-                        </div>
+                <div class="text-center" th:if="${showType == 1}" th:insert="pageNav :: index"></div>
+                <div class="text-center" th:if="${showType  == 2}" th:insert="pageNav :: search"></div>
+                <div class="text-center" th:if="${showType == 3}" th:insert="pageNav :: tag"></div>
+                <div class="text-center" th:if="${showType == 4}" th:insert="pageNav :: emptyComment"></div>
+                <div class="text-center" th:if="${showType == 5}" th:insert="pageNav :: trend"></div>
+            </div>
+            <div class="col-md-3 col-xs-12 side-right">
+                <div class="panel panel-default widget">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <i class="glyphicon glyphicon-send"></i>
+                            热门标签
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="list">
+                            <li class="text_desc" th:each="hotTag : ${hotTags}">
+                                <a class="community-tag" th:href="@{/question/tags/{tagId}(tagId = ${hotTag.id})}">
+                                    <span class="glyphicon glyphicon-tag"></span>
+                                    <span>[[${hotTag.tagName}]]</span>
+                                </a>
+                                <span th:text="${hotTag.questionCount + '个问题,'+hotTag.commentCount + '个回复'}"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel panel-default widget">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <i class="glyphicon glyphicon-usd"></i>
+                            资助站长
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <img class="img-rounded img-responsive" th:src="@{/images/alipay.jpg}">
                     </div>
                 </div>
             </div>
-            <div th:if="${search == null}" th:insert="pageNav :: index"></div>
-            <div th:if="${search != null}" th:insert="pageNav :: search"></div>
-        </div>
-        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
-            <h3>热门话题</h3>
-            这里会展示一些热门话题
         </div>
     </div>
 </div>
+<a class="back_top" title="返回顶部">
+    <span class="glyphicon glyphicon-arrow-up" style="font-size: 18px"></span>
+</a>
+<script type="application/javascript">
+    $(function () {
+        //先将#back-top隐藏
+        var $backTop = $('.back_top');
+        $backTop.hide();
+        //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > 200) {
+                $backTop.fadeIn(200);
+            } else {
+                $backTop.fadeOut(200);
+            }
+        });
+        //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
+        $backTop.on("click", function () {
+            $('html').animate({
+                scrollTop: 0
+            }, 400);
+            return false;
+        });
+    });
+</script>
 <div th:replace="navigation :: footer"></div>
 </body>
 </html>

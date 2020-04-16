@@ -1,6 +1,7 @@
 package top.zydse.mapper;
 
 import org.apache.ibatis.annotations.Param;
+import top.zydse.dto.HotTagDTO;
 import top.zydse.dto.QuestionQueryDTO;
 import top.zydse.dto.ThumbHistoryDTO;
 import top.zydse.dto.ViewHistoryDTO;
@@ -34,7 +35,15 @@ public interface CommonExtensionMapper {
 
     List<String> getPermCodeByUser(Long userId);
 
-    void getTagPriority();
+    List<HotTagDTO> getTagPriority();
 
     List<Question> relatedQuestion(Long questionId);
+
+    int readAllNotification(Long id);
+
+    int countQuestionByTagId(Integer tagId);
+
+    List<Question> findQuestionByTagId(@Param("tagId") Integer tagId,
+                                       @Param("offset") int offset,
+                                       @Param("size") Integer size);
 }

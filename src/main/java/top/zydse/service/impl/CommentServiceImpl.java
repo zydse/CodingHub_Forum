@@ -1,11 +1,13 @@
 package top.zydse.service.impl;
 
+import org.apache.ibatis.session.RowBounds;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.zydse.dto.CommentDTO;
+import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.ResultDTO;
 import top.zydse.dto.SubCommentDTO;
 import top.zydse.elasticsearch.dao.PublishRepository;
@@ -95,8 +97,9 @@ public class CommentServiceImpl implements CommentService {
 
     //此方法用于子回复时，通知一级回复者
     private void createNotification(SubComment subcomment, Comment comment, Question question, User user) {
+        //通知一级评论人
         //如果二级回复人跟一级回复人不同创建通知
-        if (!subcomment.getReviewer().equals(comment.getReviewer())){
+        if (!subcomment.getReviewer().equals(comment.getReviewer())) {
             Notification notification = new Notification();
             //消息发送者
             notification.setNotifier(subcomment.getReviewer());
@@ -114,7 +117,8 @@ public class CommentServiceImpl implements CommentService {
             //通知插入通知表
             notificationMapper.insertSelective(notification);
         }
-        if(!subcomment.getReviewer().equals(question.getCreator())){
+        //通知问题创建者
+        if (!subcomment.getReviewer().equals(question.getCreator())) {
             Notification notification = new Notification();
             //消息发送者
             notification.setNotifier(subcomment.getReviewer());
@@ -122,19 +126,15 @@ public class CommentServiceImpl implements CommentService {
             notification.setReceiver(question.getCreator());
             notification.setOuterId(question.getId());
             notification.setNotifierName(user.getName());
-            notification.setType(NotificationType.ANSWER_COMMENT.getType());
-            if (comment.getContent().length() < 15) {
-                notification.setOuterTitle(comment.getContent());
-            } else {
-                notification.setOuterTitle(comment.getContent().substring(0, 15) + "...");
-            }
+            notification.setType(NotificationType.ANSWER_QUESTION.getType());
+            notification.setOuterTitle(question.getTitle());
             notification.setGmtCreate(System.currentTimeMillis());
             //通知插入通知表
             notificationMapper.insertSelective(notification);
         }
     }
 
-    //创建回复提问的通知
+    //创建一级回复通知提问者
     private void createNotification(Comment comment, Question question, User user) {
         if (comment.getReviewer().equals(question.getCreator()))
             return;
@@ -223,7 +223,7 @@ public class CommentServiceImpl implements CommentService {
         //查找要点赞的评论
         Comment comment = commentMapper.selectByPrimaryKey(commentId);
         //自己点赞自己
-        if(comment.getReviewer().equals(user.getId())){
+        if (comment.getReviewer().equals(user.getId())) {
             return ResultDTO.errorOf(CustomizeErrorCode.THUMB_UP_SELF);
         }
         //查询用户的点赞历史
@@ -260,6 +260,27 @@ public class CommentServiceImpl implements CommentService {
         comment.setThumbCount(comment.getThumbCount() + 1);
         commentMapper.updateByPrimaryKeySelective(comment);
         return ResultDTO.successOf(comment.getThumbCount());
+    }
+
+    @Override
+    public PaginationDTO<CommentDTO> findAllByUser(Long id, Integer page, Integer size) {
+        CommentExample example = new CommentExample();
+        example.createCriteria().andReviewerEqualTo(id);
+        int totalCount = (int) commentMapper.countByExample(example);
+        PaginationDTO<CommentDTO> paginationDTO = new PaginationDTO<>();
+        if (totalCount == 0)
+            return paginationDTO;
+        paginationDTO.setPagination(totalCount, page, size);
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        List<Comment> commentList = commentMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
+        List<CommentDTO> dtoList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            CommentDTO dto = new CommentDTO();
+            BeanUtils.copyProperties(comment, dto);
+            dtoList.add(dto);
+        }
+        paginationDTO.setPageData(dtoList);
+        return paginationDTO;
     }
 
     @NotNull

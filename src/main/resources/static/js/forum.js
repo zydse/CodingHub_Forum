@@ -93,10 +93,10 @@ function collapseComment(e) {
                     class: "media-left"
                 });
                 var $a = $("<a/>", {
-                    href: "#"
+                    href: "/profile/user/" + subComment.user.id
                 });
                 var $avatar = $("<img/>", {
-                    class: "media-object",
+                    class: "media-object img-rounded",
                     src: subComment.user.avatarUrl
                 });
                 var $mediaBody = $("<div/>", {

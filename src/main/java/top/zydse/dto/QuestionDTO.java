@@ -1,9 +1,11 @@
 package top.zydse.dto;
 
 import lombok.Data;
+import top.zydse.model.Tag;
 import top.zydse.model.User;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * CreateBy: zydse
@@ -17,14 +19,13 @@ public class QuestionDTO implements Serializable {
     private Long id;
     private String title;
     private String description;
-    private String tags;
     private Long gmtCreate;
     private Long gmtModified;
     private Long creator;
     private Integer viewCount;
     private Integer commentCount;
-    private Integer thumbCount;
     private Integer isTop;
     private Integer isQuality;
     private User user;
+    private List<Tag> tags;
 }

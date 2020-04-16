@@ -59,7 +59,6 @@ public class UserController {
                            @RequestParam(name = "password") String password,
                            @RequestParam(name = "captchaCode") String captchaCode,
                            HttpServletRequest request) {
-        log.info("username : {} password : {}", username, password);
         String sessionCaptcha = (String) request.getSession().getAttribute("captchaCode");
         if(sessionCaptcha == null || !sessionCaptcha.equals(captchaCode)){
             return ResultDTO.errorOf(CustomizeErrorCode.CAPTCHA_CODE_ERROR);

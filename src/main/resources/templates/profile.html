@@ -5,20 +5,63 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${sectionName + ' | CodingHub'}">个人中心</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/forum.css}">
+    <head th:insert="import :: head"></head>
 </head>
 <body>
-<script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
-<script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
-
-<div th:replace="navigation :: nav"></div>
-
-<div class="container-fluid main">
-    <div class="row">
-        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h2>[[${sectionName}]]</h2>
+<div th:replace="navigation :: navigation"></div>
+<div class="row">
+    <div class="col-sm-3 col-xs-offset-1 col-xs-10 margin_bottom_20">
+        <div class="col-xs-12 white">
+            <div class="list-group margin_top_20">
+                <a th:href="@{/profile/info}"
+                   th:class="${section == 'info'}? 'list-group-item active' : 'list-group-item'">
+                    <span class="glyphicon glyphicon-user"></span>
+                    我的资料
+                </a>
+                <a th:href="@{/profile/notification}"
+                   th:class="${section == 'notification'}? 'list-group-item active' : 'list-group-item'">
+                    <span class="glyphicon glyphicon-bullhorn"></span>
+                    我的通知
+                    <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
+                </a>
+                <a th:href="@{/profile/thumb}"
+                   th:class="${section == 'thumb'}? 'list-group-item active' : 'list-group-item'">
+                    <span class="glyphicon glyphicon-heart-empty"></span>
+                    我的赞
+                </a>
+                <a th:href="@{/profile/view}"
+                   th:class="${section == 'view'}? 'list-group-item active' : 'list-group-item'">
+                    <span class="glyphicon glyphicon-eye-open"></span>
+                    我看过的
+                </a>
+                <a th:href="@{/profile/publish}"
+                   th:class="${section == 'publish'}? 'list-group-item active' : 'list-group-item'">
+                    <span class="glyphicon glyphicon-th"></span>
+                    我的提问
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-offset-0 col-sm-6 col-xs-offset-1 col-xs-10">
+        <div class="col-xs-12 white">
+            <div class="pull-right margin_top_20" th:if="${section == 'notification'}">
+                <a th:href="@{/notification/all}" th:if="${unreadCount > 0}" class="btn btn-default">
+                    <span class="glyphicon glyphicon-envelope"></span>
+                    全部已读
+                </a>
+            </div>
+            <h3>
+                <span class="glyphicon glyphicon-th" th:if="${section == 'publish'}"></span>
+                <span class="glyphicon glyphicon-eye-open" th:if="${section == 'view'}"></span>
+                <span class="glyphicon glyphicon-heart-empty" th:if="${section == 'thumb'}"></span>
+                <span class="glyphicon glyphicon-bullhorn" th:if="${section == 'notification'}"></span>
+                <span class="glyphicon glyphicon-user" th:if="${section == 'info'}"></span>
+                [[${sectionName}]]
+            </h3>
             <hr/>
+            <div th:if="${section == 'info'}">
+                <div th:replace="section :: info"></div>
+            </div>
             <div th:if="${section == 'publish'}">
                 <div th:replace="section :: publish"></div>
             </div>
@@ -31,36 +74,43 @@
             <div th:if="${section == 'view'}">
                 <div th:replace="section :: view"></div>
             </div>
-            <div th:if="${pagination.pageCount == null}">
+            <div th:if="${section != 'info' and pagination.pageCount == null}">
                 <div class="jumbotron" style="background-color: #fff;">
                     <p class="text_desc">看起来你还没有这些历史呢.....</p>
                 </div>
             </div>
-            <div th:if="${pagination.pageCount != null}" th:replace="pageNav :: profile"></div>
-        </div>
-        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
-            <div class="list-group" style="margin-top: 20px">
-                <a th:href="@{/profile/notification}"
-                   th:class="${section == 'notification'}? 'list-group-item active' : 'list-group-item'">
-                    我的通知
-                    <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
-                </a>
-                <a th:href="@{/profile/thumb}"
-                   th:class="${section == 'thumb'}? 'list-group-item active' : 'list-group-item'">
-                    我的赞
-                </a>
-                <a th:href="@{/profile/view}"
-                   th:class="${section == 'view'}? 'list-group-item active' : 'list-group-item'">
-                    我看过的
-                </a>
-                <a th:href="@{/profile/publish}"
-                   th:class="${section == 'publish'}? 'list-group-item active' : 'list-group-item'">
-                    我的提问
-                </a>
+            <div th:if="${section != 'info'}">
+                <div th:if="${pagination.pageCount != null}" th:replace="pageNav :: profile"></div>
             </div>
         </div>
     </div>
+
 </div>
+<a class="back_top" title="返回顶部">
+    <span class="glyphicon glyphicon-arrow-up" style="font-size: 18px"></span>
+</a>
+<script type="application/javascript">
+    $(function() {
+        //先将#back-top隐藏
+        var $backTop = $('.back_top');
+        $backTop.hide();
+        //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
+        $(window).scroll(function() {
+            if ($(window).scrollTop() > 200) {
+                $backTop.fadeIn(200);
+            } else {
+                $backTop.fadeOut(200);
+            }
+        });
+        //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
+        $backTop.on("click", function() {
+            $('html').animate({
+                scrollTop: 0
+            }, 400);
+            return false;
+        });
+    });
+</script>
 <div th:replace="navigation :: footer"></div>
 </body>
 </html>

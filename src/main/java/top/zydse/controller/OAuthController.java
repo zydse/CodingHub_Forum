@@ -1,6 +1,9 @@
 package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -12,7 +15,9 @@ import top.zydse.provider.GithubProvider;
 import top.zydse.service.UserService;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -39,7 +44,9 @@ public class OAuthController {
     private String redirectUri;
 
     @GetMapping("/callback")
-    public String callback(String code, Integer state,
+    public String callback(String code,
+                           Integer state,
+                           HttpServletRequest request,
                            HttpServletResponse response) {
         log.info("进入回调 code {} state {}", code, state);
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
@@ -60,11 +67,13 @@ public class OAuthController {
             user.setBio(githubUser.getBio());
             user.setAvatarUrl(githubUser.getAvatarUrl());
             userService.saveGithubUser(user);
-            response.addCookie(new Cookie("token", user.getToken()));
+            Md5Hash password = new Md5Hash(user.getToken());
+            UsernamePasswordToken loginToken = new UsernamePasswordToken(user.getName(), password.toString());
+            SecurityUtils.getSubject().login(loginToken);
+            request.getSession().setAttribute("user", user);
             return "redirect:/";
         } else {
             //重新登录
-            log.error("Fail to get message from github {}",githubUser);
             return "redirect:/";
         }
     }

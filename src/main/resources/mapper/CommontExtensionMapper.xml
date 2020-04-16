@@ -2,16 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.zydse.mapper.CommonExtensionMapper">
     <resultMap id="BaseResultMap" type="top.zydse.model.Question">
-        <id column="ID" jdbcType="BIGINT" property="id"/>
-        <result column="TITLE" jdbcType="VARCHAR" property="title"/>
+        <id column="ID" jdbcType="BIGINT" property="id" />
+        <result column="TITLE" jdbcType="VARCHAR" property="title" />
         <result column="DESCRIPTION" jdbcType="CLOB" property="description"/>
-        <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate"/>
-        <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified"/>
-        <result column="CREATOR" jdbcType="BIGINT" property="creator"/>
-        <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount"/>
-        <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount"/>
-        <result column="THUMB_COUNT" jdbcType="INTEGER" property="thumbCount"/>
-        <result column="TAGS" jdbcType="VARCHAR" property="tags"/>
+        <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate" />
+        <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified" />
+        <result column="CREATOR" jdbcType="BIGINT" property="creator" />
+        <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount" />
+        <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount" />
+        <result column="IS_TOP" jdbcType="INTEGER" property="isTop" />
+        <result column="IS_QUALITY" jdbcType="INTEGER" property="isQuality" />
     </resultMap>
 
     <select id="listViewHistory" resultType="top.zydse.dto.ViewHistoryDTO">
@@ -20,6 +20,7 @@
         JOIN QUESTION q ON vh.QUESTION_ID = q.ID
         JOIN USER u ON q.CREATOR = u.ID
         where vh.viewer = #{userId}
+        ORDER BY vh.gmt_modified DESC
         limit #{offset},#{size};
     </select>
 
@@ -31,6 +32,7 @@
         JOIN USER u ON c.reviewer = u.ID
         JOIN QUESTION q on q.id = c.question_id
         where th.thumb_user = #{userId}
+        ORDER BY th.gmt_create DESC
         limit #{offset},#{size};
     </select>
 
@@ -145,9 +147,9 @@
         #{gmtCreate,jdbcType=BIGINT})
     </insert>
 
-    <select id="getTagPriority" resultType="java.lang.Integer">
+    <select id="getTagPriority" resultType="top.zydse.dto.HotTagDTO">
         SELECT t.ID id, t.TAG_NAME tagName, t.COUNT questionCount,
-         tc.comment_count commentCount,t.COUNT + tc.comment_count AS priority
+         tc.comment_count commentCount,t.COUNT * 3 + tc.comment_count AS priority
         FROM TAG t,(
             SELECT qt.TAG_ID, SUM(q.COMMENT_COUNT) comment_count
             FROM QUESTION_TAG qt, QUESTION q
@@ -155,6 +157,7 @@
             GROUP BY qt.tag_id) tc
         WHERE t.id = tc.tag_id
         ORDER BY priority DESC
+        LIMIT 0,6
     </select>
 
     <select id="relatedQuestion" parameterType="java.lang.Long" resultType="top.zydse.model.Question">
@@ -169,6 +172,30 @@
                 FROM QUESTION_TAG qt1
                 WHERE qt1.QUESTION_ID = #{questionId}))
         ORDER BY gmt_modified
+        LIMIT 0,8;
+    </select>
+
+    <update id="readAllNotification" parameterType="java.lang.Long">
+        UPDATE NOTIFICATION
+        SET status = 1
+        WHERE receiver = #{id} AND status = 0
+    </update>
+
+    <select id="countQuestionByTagId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM QUESTION_TAG
+        WHERE tag_id = #{tagId}
+    </select>
+
+    <select id="findQuestionByTagId" resultMap="BaseResultMap">
+        SELECT *
+        FROM QUESTION
+        WHERE id IN (
+        SELECT question_id
+        FROM QUESTION_TAG
+        WHERE tag_id = #{tagId})
+        ORDER BY gmt_modified DESC
+        LIMIT #{offset},#{size};
     </select>
 
 </mapper>

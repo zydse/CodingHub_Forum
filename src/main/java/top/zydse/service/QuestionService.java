@@ -4,6 +4,7 @@ import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.QuestionDTO;
 import top.zydse.dto.TagTypeDTO;
 import top.zydse.model.Question;
+import top.zydse.model.Tag;
 import top.zydse.model.User;
 
 import java.util.List;
@@ -74,12 +75,62 @@ public interface QuestionService {
      */
     List<Question> relatedQuestion(QuestionDTO questionDTO);
 
+    /**
+     * 获取所有的tag，用于发布问题时选择
+     * @return
+     */
     List<TagTypeDTO> getAllTags();
 
+    /**
+     * 删除一个问题
+     * @param questionId
+     * @return
+     */
     int deleteById(Long questionId);
 
+    /**
+     * 置顶或取消置顶
+     * @param questionId
+     * @return
+     */
     int top(Long questionId);
 
+    /**
+     * 加精或取消加精
+     * @param questionId
+     * @return
+     */
     int quality(Long questionId);
 
+    /**
+     * 根据一个tagId，查找所有该tag下的问题
+     * @param tagId
+     * @param page
+     * @param size
+     * @return
+     */
+    PaginationDTO<QuestionDTO> findByTagId(Integer tagId, Integer page, Integer size);
+
+    /**
+     * 根据tagId查找tag
+     * @param tagId
+     * @return
+     */
+    Tag findTag(Integer tagId);
+
+    /**
+     * 列出所有没有人回复的问题
+     * @return
+     * @param page
+     * @param size
+     */
+    PaginationDTO<QuestionDTO> listEmptyComment(Integer page, Integer size);
+
+    /**
+     * 列出近七天讨论最热烈的问题
+     * @param page
+     * @param size
+     * @return
+     */
+    PaginationDTO<QuestionDTO> listRecentlyTrend(Integer page, Integer size);
 }

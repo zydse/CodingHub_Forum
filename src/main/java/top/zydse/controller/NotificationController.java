@@ -1,5 +1,6 @@
 package top.zydse.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
  * @Date: 2020/3/22
  */
 @Controller
+@Slf4j
 public class NotificationController {
     @Autowired
     private NotificationService notificationService;
@@ -35,5 +37,14 @@ public class NotificationController {
             throw new CustomizeException(CustomizeErrorCode.NO_LOGIN);
         NotificationDTO notificationDTO = notificationService.read(id, user);
         return "redirect:/question/" + notificationDTO.getOuterId();
+    }
+
+    @RequiresAuthentication
+    @RequestMapping("/notification/all")
+    public String readAll(HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        int result = notificationService.readAll(user);
+        log.info("{} read {} notifications ", user.getName(), result);
+        return "redirect:/profile/notification";
     }
 }

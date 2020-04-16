@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import top.zydse.cache.HotTagCache;
 import top.zydse.dto.*;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.model.Question;
+import top.zydse.model.Tag;
 import top.zydse.model.User;
 import top.zydse.provider.SensitiveWordFilter;
 import top.zydse.service.CommentService;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @Slf4j
+@RequestMapping("/question")
 public class QuestionController {
     @Autowired
     private QuestionService questionService;
@@ -37,54 +40,68 @@ public class QuestionController {
     private CommentService commentService;
     @Autowired
     private SensitiveWordFilter wordFilter;
+    @Autowired
+    private HotTagCache hotTagCache;
 
-    @PostMapping("/question/quality/{id}")
-    public String quality(@PathVariable(name = "id") Long questionId){
+    @RequestMapping("/quality/{id}")
+    public String quality(@PathVariable(name = "id") Long questionId) {
         int result = questionService.quality(questionId);
         return "redirect:/";
     }
 
-    @PostMapping("/question/top/{id}")
-    public String top(@PathVariable(name = "id") Long questionId){
+    @RequestMapping("/top/{id}")
+    public String top(@PathVariable(name = "id") Long questionId) {
         int result = questionService.top(questionId);
         return "redirect:/";
     }
 
     @RequiresPermissions({"question:delete"})
-    @DeleteMapping("/question/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable(name = "id") Long questionId) {
         int result = questionService.deleteById(questionId);
         return "redirect:/";
     }
 
-    @GetMapping("/question/{id}")
+    @GetMapping("/{id}")
     public String get(@PathVariable(name = "id") Long questionId,
                       HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         QuestionDTO questionDTO = questionService.viewQuestion(questionId, user);
         List<CommentDTO> commentDTOList = commentService.listComment(questionId, user);
+        CommentDTO excellentComment = null;
+        if (commentDTOList.size() > 0)
+            excellentComment = commentDTOList.remove(0);
         List<Question> relatedQuestion = questionService.relatedQuestion(questionDTO);
         request.setAttribute("question", questionDTO);
+        request.setAttribute("excellent", excellentComment);
         request.setAttribute("comments", commentDTOList);
         request.setAttribute("related", relatedQuestion);
         return "question";
     }
 
     @RequiresPermissions({"question:update"})
-    @PutMapping("/question/{id}")
+    @PutMapping("/{id}")
     public String update(@PathVariable(name = "id") Long questionId, Model model) {
         QuestionDTO question = questionService.findById(questionId);
         List<TagTypeDTO> list = questionService.getAllTags();
         model.addAttribute("title", question.getTitle());
         model.addAttribute("description", question.getDescription());
-        model.addAttribute("tags", question.getTags());
         model.addAttribute("id", question.getId());
         model.addAttribute("typeList", list);
+        List<String> tagNames = question.getTags()
+                .stream()
+                .map(Tag::getTagName)
+                .collect(Collectors.toList());
+        StringBuilder tags = new StringBuilder();
+        for (String tagName : tagNames) {
+            tags.append(tagName).append(",");
+        }
+        model.addAttribute("tags", tags.substring(0, tags.length() - 1));
         return "publish";
     }
 
     @RequiresPermissions("question:create")
-    @PostMapping("/question/publish")
+    @PostMapping("/publish")
     @ResponseBody
     public ResultDTO saveQuestion(@RequestBody QuestionCreateDTO createDTO,
                                   HttpServletRequest request) {
@@ -116,14 +133,14 @@ public class QuestionController {
     }
 
     @RequiresPermissions("question:create")
-    @GetMapping("/question/publish")
+    @GetMapping("/publish")
     public String getPublishPage(Model model) {
         List<TagTypeDTO> list = questionService.getAllTags();
         model.addAttribute("typeList", list);
         return "publish";
     }
 
-    @GetMapping("/question/search")
+    @GetMapping("/search")
     public String search(@RequestParam(name = "page", defaultValue = "1") Integer page,
                          @RequestParam(name = "size", defaultValue = "5") Integer size,
                          @RequestParam(name = "search", required = false) String search,
@@ -133,14 +150,53 @@ public class QuestionController {
             return "redirect:/";
         }
         PaginationDTO<QuestionDTO> paginationDTO = questionService.findAll(search, page, size);
-        List<Long> idList = paginationDTO.getPageData()
-                .stream()
-                .map(QuestionDTO::getId)
-                .collect(Collectors.toList());
-        String ids = idList.toString().replace(" ", "");
+        List<HotTagDTO> tags = hotTagCache.getHots();
         model.addAttribute("pagination", paginationDTO);
+        model.addAttribute("hotTags", tags);
         model.addAttribute("search", search);
-        model.addAttribute("ids", ids.substring(1, ids.length() - 1));
+        model.addAttribute("showType", 2);
+        return "index";
+    }
+
+    @GetMapping("/tags/{tagId}")
+    public String findByTag(@RequestParam(name = "page", defaultValue = "1") Integer page,
+                            @RequestParam(name = "size", defaultValue = "5") Integer size,
+                            @PathVariable("tagId") Integer tagId,
+                            Model model) {
+        Tag tag = questionService.findTag(tagId);
+        if (tag == null)
+            throw new CustomizeException(CustomizeErrorCode.BAD_REQUEST);
+        PaginationDTO<QuestionDTO> paginationDTO = questionService.findByTagId(tagId, page, size);
+        List<HotTagDTO> tags = hotTagCache.getHots();
+        model.addAttribute("pagination", paginationDTO);
+        model.addAttribute("hotTags", tags);
+        model.addAttribute("byTag", tag.getTagName());
+        model.addAttribute("tagId", tagId);
+        model.addAttribute("showType", 3);
+        return "index";
+    }
+
+    @GetMapping("/emptyComment")
+    public String emptyComment(Model model,
+                               @RequestParam(name = "page", defaultValue = "1") Integer page,
+                               @RequestParam(name = "size", defaultValue = "5") Integer size) {
+        PaginationDTO<QuestionDTO> paginationDTO = questionService.listEmptyComment(page, size);
+        List<HotTagDTO> tags = hotTagCache.getHots();
+        model.addAttribute("hotTags", tags);
+        model.addAttribute("pagination", paginationDTO);
+        model.addAttribute("showType", 4);
+        return "index";
+    }
+
+    @GetMapping("/trend")
+    public String recentlyTrend(Model model,
+                                @RequestParam(name = "page", defaultValue = "1") Integer page,
+                                @RequestParam(name = "size", defaultValue = "5") Integer size) {
+        PaginationDTO<QuestionDTO> paginationDTO = questionService.listRecentlyTrend(page, size);
+        List<HotTagDTO> tags = hotTagCache.getHots();
+        model.addAttribute("hotTags", tags);
+        model.addAttribute("pagination", paginationDTO);
+        model.addAttribute("showType", 5);
         return "index";
     }
 

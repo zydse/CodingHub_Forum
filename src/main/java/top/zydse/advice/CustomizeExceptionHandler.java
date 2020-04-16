@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
+import org.apache.shiro.web.util.SavedRequest;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -63,6 +64,7 @@ public class CustomizeExceptionHandler {
             }
         } else {
             try {
+                request.getSession().setAttribute("shiroSavedRequest", new SavedRequest(request));
                 response.sendRedirect("/user/toLogin");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -71,7 +73,7 @@ public class CustomizeExceptionHandler {
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    void unauthorized(HttpServletRequest request, HttpServletResponse response){
+    void unauthorized(HttpServletRequest request, HttpServletResponse response) {
         String accept = request.getHeader("Accept").split(",")[0];
         if ("application/json".equals(accept)) {
             try {
@@ -85,6 +87,7 @@ public class CustomizeExceptionHandler {
             }
         } else {
             try {
+                request.getSession().setAttribute("shiroSavedRequest", new SavedRequest(request));
                 response.sendRedirect("/401");
             } catch (IOException e) {
                 e.printStackTrace();

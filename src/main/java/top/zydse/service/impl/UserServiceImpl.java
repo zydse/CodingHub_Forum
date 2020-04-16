@@ -14,7 +14,9 @@ import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.CommonExtensionMapper;
 import top.zydse.mapper.UserMapper;
 import top.zydse.mapper.UserRoleMapper;
-import top.zydse.model.*;
+import top.zydse.model.User;
+import top.zydse.model.UserExample;
+import top.zydse.model.UserRole;
 import top.zydse.provider.AliMessageProvider;
 import top.zydse.service.UserService;
 
@@ -42,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private UserRoleMapper userRoleMapper;
 
     //保存一个github用户的资料
+    @Transactional
     public void saveGithubUser(User user) {
         UserExample userExample = new UserExample();
         userExample.createCriteria().
@@ -54,22 +57,32 @@ public class UserServiceImpl implements UserService {
         List<User> users = userMapper.selectByExample(userExample);
         if(users.size() != 0){
             throw new CustomizeException(CustomizeErrorCode.DUPLICATE_USERNAME);
-        } else if (githubUsers.size() == 0) {
+        }
+        else if (githubUsers.size() == 0) {
             //新增用户
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
-            userMapper.insertSelective(user);
+            user.setSalt(user.getGmtCreate());
+            Md5Hash password = new Md5Hash(user.getToken());
+            Md5Hash hash = new Md5Hash(password.toString(), Long.toString(user.getSalt()), 1);
+            user.setPassword(hash.toString());
+            extensionMapper.saveUser(user);
+            UserRole record = new UserRole();
+            record.setUserId(user.getId());
+            record.setGmtCreate(System.currentTimeMillis());
+            //注册后默认是初级用户
+            record.setRoleId(3);
+            userRoleMapper.insert(record);
         } else {
             //更新用户资料
-            User u = new User();
-            u.setGmtModified(System.currentTimeMillis());
-            u.setBio(user.getBio());
-            u.setAvatarUrl(user.getAvatarUrl());
-            u.setToken(user.getToken());
-            u.setName(user.getName());
-            UserExample example = new UserExample();
-            example.createCriteria().andIdEqualTo(githubUsers.get(0).getId());
-            userMapper.updateByExampleSelective(u, example);
+            user.setSalt(githubUsers.get(0).getSalt());
+            user.setId(githubUsers.get(0).getId());
+            user.setCredit(githubUsers.get(0).getCredit());
+            user.setGmtModified(System.currentTimeMillis());
+            Md5Hash password = new Md5Hash(user.getToken());
+            Md5Hash hash = new Md5Hash(password.toString(), Long.toString(user.getSalt()), 1);
+            user.setPassword(hash.toString());
+            userMapper.updateByPrimaryKeySelective(user);
         }
     }
 

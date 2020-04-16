@@ -57,6 +57,10 @@ sensitiveWord:
   path: classpath:SensitiveWord.txt
   encoding: utf-8
   matchType: 1
+
+
+server:
+  port: 8087
 ---
 
 spring:

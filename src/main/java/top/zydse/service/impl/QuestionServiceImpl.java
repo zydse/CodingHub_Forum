@@ -125,7 +125,6 @@ public class QuestionServiceImpl implements QuestionService {
             dtoList.add(questionDTO);
         }
         paginationDTO.setPageData(dtoList);
-
         return paginationDTO;
     }
 
@@ -163,12 +162,8 @@ public class QuestionServiceImpl implements QuestionService {
             increaseViewCount(questionId);
         QuestionDTO dto = new QuestionDTO();
         BeanUtils.copyProperties(question, dto);
-        String tags = extensionMapper.listTagsByQuestion(questionId)
-                .stream()
-                .map(Tag::getTagName)
-                .collect(Collectors.toList())
-                .toString().replace(" ", "");
-        dto.setTags(tags.substring(1, tags.length() - 1));
+        List<Tag> tagList = extensionMapper.listTagsByQuestion(questionId);
+        dto.setTags(tagList);
         dto.setUser(creator);
         return dto;
     }
@@ -231,11 +226,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     public QuestionDTO findById(Long questionId) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
-        String tags = extensionMapper.listTagsByQuestion(questionId)
-                .stream()
-                .map(Tag::getTagName)
-                .collect(Collectors.toList())
-                .toString().replace(" ", "");
+        List<Tag> tags = extensionMapper.listTagsByQuestion(questionId);
         if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
@@ -243,7 +234,7 @@ public class QuestionServiceImpl implements QuestionService {
         user.setToken(null);
         QuestionDTO dto = new QuestionDTO();
         BeanUtils.copyProperties(question, dto);
-        dto.setTags(tags.substring(1, tags.length() - 1));
+        dto.setTags(tags);
         dto.setUser(user);
         return dto;
     }
@@ -259,7 +250,11 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<TagTypeDTO> getAllTags() {
         List<Tag> tags = tagMapper.selectByExample(new TagExample());
-        List<String> types = tags.stream().map(Tag::getTagType).distinct().collect(Collectors.toList());
+        //拿到所有的标签类型language、database、、、
+        List<String> types = tags.stream()
+                .map(Tag::getTagType)
+                .distinct()
+                .collect(Collectors.toList());
         Map<String, List<Tag>> maps = tags.stream()
                 .collect(Collectors.groupingBy(Tag::getTagType));
         List<TagTypeDTO> list = new ArrayList<>();
@@ -275,30 +270,88 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public int deleteById(Long questionId) {
         List<Tag> tagList = extensionMapper.listTagsByQuestion(questionId);
-        if(tagList == null || tagList.size() == 0)
+        if (tagList == null || tagList.size() == 0)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         for (Tag tag : tagList) {
             tag.setCount(tag.getCount() - 1);
             tagMapper.updateByPrimaryKey(tag);
         }
+        publishRepository.deleteById(questionId);
         return questionMapper.deleteByPrimaryKey(questionId);
     }
 
     @Override
+    @Transactional
     public int top(Long questionId) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
-        if(question == null)
+        if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
-        question.setIsTop(1);
+        Integer isTop = question.getIsTop();
+        question.setIsTop(1 == isTop ? 0 : 1);
         return questionMapper.updateByPrimaryKey(question);
     }
 
     @Override
+    @Transactional
     public int quality(Long questionId) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
-        if(question == null)
+        if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
-        question.setIsQuality(1);
+        Integer isQuality = question.getIsQuality();
+        question.setIsQuality(1 == isQuality ? 0 : 1);
         return questionMapper.updateByPrimaryKey(question);
+    }
+
+    @Override
+    public PaginationDTO<QuestionDTO> findByTagId(Integer tagId, Integer page, Integer size) {
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
+        int totalCount = extensionMapper.countQuestionByTagId(tagId);
+        if (totalCount == 0) {
+            return paginationDTO;
+        }
+        paginationDTO.setPagination(totalCount, page, size);
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        List<Question> questionList = extensionMapper.findQuestionByTagId(tagId, offset, size);
+        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+    }
+
+    @Override
+    public Tag findTag(Integer tagId) {
+        return tagMapper.selectByPrimaryKey(tagId);
+    }
+
+    @Override
+    public PaginationDTO<QuestionDTO> listEmptyComment(Integer page, Integer size) {
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria().andCommentCountEqualTo(0);
+        int totalCount = (int) questionMapper.countByExample(questionExample);
+        if (totalCount == 0) {
+            return paginationDTO;
+        }
+        paginationDTO.setPagination(totalCount, page, size);
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        questionExample.setOrderByClause("gmt_modified desc");
+        List<Question> questionList = questionMapper.
+                selectByExampleWithBLOBsWithRowbounds(questionExample, new RowBounds(offset, size));
+        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+    }
+
+    @Override
+    public PaginationDTO<QuestionDTO> listRecentlyTrend(Integer page, Integer size) {
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
+        QuestionExample questionExample = new QuestionExample();
+        long start = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 7;
+        questionExample.createCriteria().andGmtCreateGreaterThan(start);
+        int totalCount = (int) questionMapper.countByExample(questionExample);
+        if (totalCount == 0) {
+            return paginationDTO;
+        }
+        paginationDTO.setPagination(totalCount, page, size);
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        questionExample.setOrderByClause("comment_count desc, gmt_modified desc");
+        List<Question> questionList = questionMapper.
+                selectByExampleWithBLOBsWithRowbounds(questionExample, new RowBounds(offset, size));
+        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
     }
 }

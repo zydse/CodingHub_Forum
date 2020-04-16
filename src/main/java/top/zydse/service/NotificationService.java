@@ -17,4 +17,6 @@ public interface NotificationService {
     long unreadCount(Long id);
 
     NotificationDTO read(Long id, User user);
+
+    int readAll(User user);
 }

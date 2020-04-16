@@ -5,29 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>发布 | CodingHub</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/forum.css}">
-    <link rel="stylesheet" th:href="@{/css/editormd.css}"/>
+    <head th:insert="import :: head"></head>
 </head>
 <body>
-<script th:src="@{/js/jquery-1.12.4.min.js}" type="application/javascript"></script>
-<script th:src="@{/js/bootstrap.min.js}" type="application/javascript"></script>
-<script th:src="@{/js/editormd.min.js}"></script>
-<div th:replace="navigation :: nav"></div>
-<div class="container-fluid main">
-    <div class="row">
-        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+<div th:replace="navigation :: navigation"></div>
+<div class="row">
+    <div class="col-xs-offset-1 col-xs-10">
+        <div class="col-xs-12 white">
             <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 提问</h2>
             <hr/>
             <form id="questionForm">
                 <input type="hidden" name="id" id="questionId" th:value="${id}">
                 <div class="form-group">
-                    <label for="questionTitle">问题描述（简单扼要）：</label>
+                    <label for="questionTitle">问题描述(简单扼要):</label>
                     <input type="text" class="form-control" name="questionTitle" id="questionTitle"
                            placeholder="问题标题" th:value="${title}" maxlength="49">
                 </div>
-
-                <label for="description">问题详细信息（必填项）：</label>
+                <label for="description">问题详细信息(必填项):</label>
                 <div class="form-group" id="description-editor">
                     <textarea class="form-control" name="description" id="description" cols="30"
                               rows="10" style="display:none;">[[${description}]]</textarea>
@@ -37,26 +31,30 @@
                                 width: "100%",
                                 height: "700px",
                                 delay: 0,
-                                placeholder: "请输入问题的详细描述...",
+                                placeholder: "提问指南\n" +
+                                    "问题标题:请用精简的语言描述您发布的问题，不超过40个字\n" +
+                                    "问题描述:详细补充你的问题内容，并确保问题描述的清晰直观，最好提供一些问题的资料\n" +
+                                    "选择标签:至少选择一个或者多个合适的标签\n" +
+                                    "关于积分:......",
                                 imageUpload: true,
                                 imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                                 imageUploadURL: "/file/upload",
                                 path: "/js/lib/",
-                                watch: false,
+                                watch: true,
                                 toolbarAutoFixed: false,
                                 toolbarIcons: function () {
                                     return ["undo", "redo", "|",
                                         "bold", "del", "italic", "ucwords", "uppercase", "lowercase", "|",
-                                        "link", "reference-link", "image", "code", "code-block", "table", "datetime", "html-entities", "pagebreak", "|",
-                                        "watch", "preview", "clear"];
+                                        "link", "reference-link", "image", "code", "code-block",
+                                        "table", "datetime", "html-entities", "|", "goto-line",
+                                        "watch", "preview", "clear", "fullscreen", "|", "help", "info"];
                                 }
                             });
                         });
                     </script>
                 </div>
-
                 <div class="form-group">
-                    <label for="tags">添加标签：</label>
+                    <label for="tags">添加标签:</label>
                     <input type="text" class="form-control" name="tags" id="tags" placeholder="创建或者搜索添加新话题..."
                            th:value="${tags}" onfocus="showSelectTag()" readonly>
                     <div id="select-tag" class="publish-tag-tab">
@@ -79,18 +77,6 @@
                 </div>
                 <button type="submit" class="btn btn-success btn_float_right">发布</button>
             </form>
-        </div>
-        <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
-            <h3>提问指南</h3>
-            这里是一些提问的帮助信息
-            <br>
-            问题标题：请用精简的语言描述您发布的问题，不超过25个字
-            <br>
-            问题描述：详细补充你的问题内容，并确保问题描述的清晰直观，最好提供一些问题的资料
-            <br>
-            选择标签：选择一个或者多个合适的标签，用逗号隔开，每个标签不超过10个字
-            <br>
-            关于积分：。。。。。。
         </div>
     </div>
 </div>

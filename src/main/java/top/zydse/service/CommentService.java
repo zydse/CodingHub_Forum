@@ -1,6 +1,7 @@
 package top.zydse.service;
 
 import top.zydse.dto.CommentDTO;
+import top.zydse.dto.PaginationDTO;
 import top.zydse.dto.ResultDTO;
 import top.zydse.dto.SubCommentDTO;
 import top.zydse.model.Comment;
@@ -26,4 +27,6 @@ public interface CommentService {
     List<CommentDTO> listComment(Long questionId, User user);
 
     ResultDTO thumbUpComment(Long commentId, User user);
+
+    PaginationDTO<CommentDTO> findAllByUser(Long id, Integer page, Integer size);
 }

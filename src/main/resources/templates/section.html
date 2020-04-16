@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <!--我的浏览历史-->
-<div th:fragment="view" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<div th:fragment="view">
     <div class="panel panel-default" th:each="viewHistory : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
@@ -24,7 +24,7 @@
     </div>
 </div>
 <!--我的点赞-->
-<div th:fragment="thumb" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<div th:fragment="thumb">
     <div class="panel panel-default" th:each="thumbHistory : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
@@ -46,7 +46,7 @@
     </div>
 </div>
 <!--我的通知-->
-<div th:fragment="notification" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<div th:fragment="notification">
     <div class="panel panel-default" th:each="notification : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
@@ -68,12 +68,10 @@
     </div>
 </div>
 <!--我的提问-->
-<div th:fragment="publish" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<div th:fragment="publish">
     <div class="media" th:each="question : ${pagination.pageData}">
         <div class="media-left">
-            <a th:href="@{/profile/user/{userId}(userId = ${question.user.id})}">
-                <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="avatar">
-            </a>
+            <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="avatar">
         </div>
         <div class="media-body">
             <h4 class="media-heading">
@@ -88,6 +86,41 @@
         </div>
     </div>
 </div>
-
+<div th:fragment="info">
+    <div class="media">
+        <div class="media-left">
+            <img class="media-object img-rounded" th:src="${userProfile.avatarUrl}" alt="avatar">
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading name_vertical_center">[[${userProfile.name}]]</h4>
+        </div>
+    </div>
+    <hr/>
+    <span class="glyphicon glyphicon-th text_desc profile_badge">发布:<span>[[${userProfile.publishNum}]]</span>
+    </span>
+    <span class="glyphicon glyphicon-comment text_desc profile_badge">评论:<span>[[${userProfile.commentNum}]]</span>
+    </span>
+    <span class="glyphicon glyphicon-heart text_desc profile_badge">被赞:<span>[[${userProfile.thumbedNum}]]</span>
+    </span>
+    <hr/>
+</div>
+<div th:fragment="comment">
+    <div class="panel panel-default" th:each="comment : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading">
+                        <a>用户</a>
+                        <span>发表了回复</span>
+                        <a th:href="@{/question/{questionId}(questionId = ${comment.questionId})}">[[${comment.content}]]</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span>[[${#dates.format(comment.gmtCreate, 'yyyy-MM-dd HH:mm')}]]</span>
+        </div>
+    </div>
+</div>
 </body>
 </html>
