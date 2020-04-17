@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CodingHub</title>
+    <title>发现 - CodingHub</title>
     <head th:insert="import :: head"></head>
 </head>
 <body>
@@ -14,21 +14,52 @@
         <div class="row">
             <div class="col-md-9 col-xs-12 side-left">
                 <h3>
-                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                    发现
+                    <span th:if="${showType == 1}" class="icon icon-home"> 最新</span>
+                    <span th:if="${showType == 2}" class="icon icon-magnifier"> 可能</span>
+                    <span th:if="${showType == 3}" class="icon icon-tag"> [[${byTag}]]</span>
+                    <span th:if="${showType == 4}" class="icon icon-feed"> 等你来答</span>
+                    <span th:if="${showType == 5}" class="icon icon-calendar"> 七日最热</span>
+                    <span th:if="${showType == 6}" class="icon icon-tag"> 所有标签</span>
                 </h3>
-                <div class="posts">
+                <!--展示所有标签-->
+                <div th:if="${showType == 6}">
+                    <div class="panel panel-default">
+                        <div class="panel-body streams-tags">
+                            <div class="col-sm-6 row-item" th:each="tagType : ${allTags}">
+                                <h2 class="title">
+                                    <span><i class="icon icon-grid"></i>[[${tagType.type}]]</span>
+                                    <span class="label label-default">[[${tagType.tags.size()}]]</span>
+                                </h2>
+                                <div class="media">
+                                    <div class="media-body">
+                                        <a th:each="tag : ${tagType.tags}"
+                                           th:href="@{/question/tags/{tagId}(tagId = ${tag.id})}">
+                                            <span class="community-tag">
+                                                <i class="icon-tag"> [[${tag.tagName}]]</i>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--主题内容-->
+                <div class="posts" th:if="${showType != 6}">
+                    <div th:if="${pagination.pageCount == null}" class="jumbotron" style="background-color: #fff;">
+                        <p class="text_desc">看起来还没有相关问题呢.....</p>
+                    </div>
                     <ul class="posts-list" th:each="question : ${pagination.pageData}">
                         <li class="content">
                             <div class="content-box posts-aside">
                                 <div class="posts-item">
                                     <div class="item-title">
                                         <h2>
+                                            <span th:if="${question.isTop == 1}" class="icon-pin"
+                                                  style="color: #f00;">[置顶]</span>
+                                            <span th:if="${question.isQuality == 1}"
+                                                  class="icon-fire" style="color: #f00;">[精品帖]</span>
                                             <a th:href="@{/question/{questionId}(questionId = ${question.id})}">
-                                                <span th:if="${question.isTop == 1}" class="glyphicon glyphicon-flag"
-                                                      style="color: #f00;">[置顶]</span>
-                                                <span th:if="${question.isQuality == 1}"
-                                                      class="glyphicon glyphicon-fire" style="color: #f00;">[精品帖]</span>
                                                 [[${question.title}]]
                                             </a>
                                         </h2>
@@ -41,8 +72,7 @@
                                                     <img th:src="${question.user.avatarUrl}" alt="avatar"
                                                          class="lazy avatar avatar-50 photo" height="50" width="50">
                                                 </div>
-                                                <a th:href="@{/profile/user/{userId}(userId = ${question.creator})}"
-                                                   target="_blank">
+                                                <a th:href="@{/profile/user/{userId}(userId = ${question.creator})}">
                                                     [[${question.user.name}]]
                                                 </a>
                                             </li>
@@ -55,7 +85,7 @@
                                                 [[${question.viewCount}]]
                                             </li>
                                             <li class="ico-like hidden-xs">
-                                                <i class="icon-bubble"></i>
+                                                <i class="icon-speech"></i>
                                                 [[${question.commentCount}]]
                                             </li>
                                         </ul>
@@ -65,11 +95,15 @@
                         </li>
                     </ul>
                 </div>
-                <div class="text-center" th:if="${showType == 1}" th:insert="pageNav :: index"></div>
-                <div class="text-center" th:if="${showType  == 2}" th:insert="pageNav :: search"></div>
-                <div class="text-center" th:if="${showType == 3}" th:insert="pageNav :: tag"></div>
-                <div class="text-center" th:if="${showType == 4}" th:insert="pageNav :: emptyComment"></div>
-                <div class="text-center" th:if="${showType == 5}" th:insert="pageNav :: trend"></div>
+                <!--分页-->
+                <div class="text-center"
+                     th:if="${showType != 6 and pagination.pageCount != null and pagination.pageCount > 1}">
+                    <div th:if="${showType == 1}" th:insert="pageNav :: index"></div>
+                    <div th:if="${showType  == 2}" th:insert="pageNav :: search"></div>
+                    <div th:if="${showType == 3}" th:insert="pageNav :: tag"></div>
+                    <div th:if="${showType == 4}" th:insert="pageNav :: emptyComment"></div>
+                    <div th:if="${showType == 5}" th:insert="pageNav :: trend"></div>
+                </div>
             </div>
             <div class="col-md-3 col-xs-12 side-right">
                 <div class="panel panel-default widget">
@@ -83,7 +117,7 @@
                         <ul class="list">
                             <li class="text_desc" th:each="hotTag : ${hotTags}">
                                 <a class="community-tag" th:href="@{/question/tags/{tagId}(tagId = ${hotTag.id})}">
-                                    <span class="glyphicon glyphicon-tag"></span>
+                                    <span class="icon-tag"></span>
                                     <span>[[${hotTag.tagName}]]</span>
                                 </a>
                                 <span th:text="${hotTag.questionCount + '个问题,'+hotTag.commentCount + '个回复'}"></span>
@@ -106,15 +140,13 @@
         </div>
     </div>
 </div>
-<a class="back_top" title="返回顶部">
-    <span class="glyphicon glyphicon-arrow-up" style="font-size: 18px"></span>
+<a class="site-scroll-top" title="返回顶部">
+    <i class="icon-arrow-up"></i>
 </a>
 <script type="application/javascript">
     $(function () {
-        //先将#back-top隐藏
-        var $backTop = $('.back_top');
+        var $backTop = $('.site-scroll-top');
         $backTop.hide();
-        //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
         $(window).scroll(function () {
             if ($(window).scrollTop() > 200) {
                 $backTop.fadeIn(200);
@@ -122,12 +154,18 @@
                 $backTop.fadeOut(200);
             }
         });
-        //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
         $backTop.on("click", function () {
             $('html').animate({
                 scrollTop: 0
             }, 400);
             return false;
+        });
+        $("#searchForm").on("submit", function (e) {
+            var searchTxt = $("[name=search]").val();
+            if (searchTxt === '' || searchTxt === null) {
+                e.preventDefault();
+                return false;
+            }
         });
     });
 </script>

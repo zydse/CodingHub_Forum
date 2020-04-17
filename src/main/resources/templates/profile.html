@@ -9,93 +9,138 @@
 </head>
 <body>
 <div th:replace="navigation :: navigation"></div>
-<div class="row">
-    <div class="col-sm-3 col-xs-offset-1 col-xs-10 margin_bottom_20">
-        <div class="col-xs-12 white">
-            <div class="list-group margin_top_20">
-                <a th:href="@{/profile/info}"
-                   th:class="${section == 'info'}? 'list-group-item active' : 'list-group-item'">
-                    <span class="glyphicon glyphicon-user"></span>
-                    我的资料
-                </a>
-                <a th:href="@{/profile/notification}"
-                   th:class="${section == 'notification'}? 'list-group-item active' : 'list-group-item'">
-                    <span class="glyphicon glyphicon-bullhorn"></span>
-                    我的通知
-                    <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
-                </a>
-                <a th:href="@{/profile/thumb}"
-                   th:class="${section == 'thumb'}? 'list-group-item active' : 'list-group-item'">
-                    <span class="glyphicon glyphicon-heart-empty"></span>
-                    我的赞
-                </a>
-                <a th:href="@{/profile/view}"
-                   th:class="${section == 'view'}? 'list-group-item active' : 'list-group-item'">
-                    <span class="glyphicon glyphicon-eye-open"></span>
-                    我看过的
-                </a>
-                <a th:href="@{/profile/publish}"
-                   th:class="${section == 'publish'}? 'list-group-item active' : 'list-group-item'">
-                    <span class="glyphicon glyphicon-th"></span>
-                    我的提问
-                </a>
+<div class="wrap">
+    <div class="container">
+        <div class="row users-show">
+            <div class="col-xs-12 col-md-3 side-left">
+                <ul class="list-group about-user">
+                    <li class="list-group-item user-card">
+                        <div class="user-avatar">
+                            <img class="img-circle" th:src="${userProfile.avatarUrl}"/>
+                        </div>
+                        <div class="user-name">
+                            <span>[[${userProfile.name}]]</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="user-datas">
+                            <ul>
+                                <li><strong>[[${userProfile.publishNum}]]</strong><span>发布</span></li>
+                                <li class="noborder"><strong>[[${userProfile.commentNum}]]</strong><span>评论</span></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+                <nav class="navbar navbar-default shadow-box background-white">
+                    <div class="container-fluid">
+                        <div class="navbar-header visible-xs">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                    data-target="#home-navbar" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <span class="navbar-brand">导航</span>
+                        </div>
+                    </div>
+                    <div id="home-navbar" class="collapse navbar-collapse">
+                        <div class="list-group user-nav first">
+                            <a th:href="@{/profile/info}" class="list-group-item" th:if="${section != 'info'}">
+                                <i class="icon icon-list"></i>我的资料
+                            </a>
+                            <span th:if="${section == 'info'}" class="list-group-item active">
+                                <i class="icon icon-list"></i>我的资料
+                            </span>
+                            <a th:href="@{/profile/notification}" class="list-group-item"
+                               th:if="${section != 'notification'}">
+                                <i class="icon icon-bell"></i>我的通知
+                                <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
+                            </a>
+                            <span th:if="${section == 'notification'}" class="list-group-item active">
+                                <i class="icon icon-bell"></i>我的通知
+                                <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
+                            </span>
+                            <a th:href="@{/profile/thumb}" class="list-group-item" th:if="${section != 'thumb'}">
+                                <i class="icon icon-heart"></i>我的赞
+                            </a>
+                            <span th:if="${section == 'thumb'}" class="list-group-item active">
+                                <i class="icon icon-heart"></i>我的赞
+                            </span>
+                            <a th:href="@{/profile/view}" class="list-group-item" th:if="${section != 'view'}">
+                                <i class="icon icon-book-open"></i>我看过的
+                            </a>
+                            <span th:if="${section == 'view'}" class="list-group-item active">
+                                <i class="icon icon-book-open"></i>我看过的
+                            </span>
+                            <a th:href="@{/profile/publish}" class="list-group-item" th:if="${section != 'publish'}">
+                                <i class="icon icon-puzzle"></i>我的提问
+                            </a>
+                            <span th:if="${section == 'publish'}" class="list-group-item active">
+                                <i class="icon icon-puzzle"></i>我的提问
+                            </span>
+                        </div>
+                    </div>
+                </nav>
             </div>
-        </div>
-    </div>
-    <div class="col-sm-offset-0 col-sm-6 col-xs-offset-1 col-xs-10">
-        <div class="col-xs-12 white">
-            <div class="pull-right margin_top_20" th:if="${section == 'notification'}">
-                <a th:href="@{/notification/all}" th:if="${unreadCount > 0}" class="btn btn-default">
-                    <span class="glyphicon glyphicon-envelope"></span>
-                    全部已读
-                </a>
-            </div>
-            <h3>
-                <span class="glyphicon glyphicon-th" th:if="${section == 'publish'}"></span>
-                <span class="glyphicon glyphicon-eye-open" th:if="${section == 'view'}"></span>
-                <span class="glyphicon glyphicon-heart-empty" th:if="${section == 'thumb'}"></span>
-                <span class="glyphicon glyphicon-bullhorn" th:if="${section == 'notification'}"></span>
-                <span class="glyphicon glyphicon-user" th:if="${section == 'info'}"></span>
-                [[${sectionName}]]
-            </h3>
-            <hr/>
-            <div th:if="${section == 'info'}">
-                <div th:replace="section :: info"></div>
-            </div>
-            <div th:if="${section == 'publish'}">
-                <div th:replace="section :: publish"></div>
-            </div>
-            <div th:if="${section == 'notification'}">
-                <div th:replace="section :: notification"></div>
-            </div>
-            <div th:if="${section == 'thumb'}">
-                <div th:replace="section :: thumb"></div>
-            </div>
-            <div th:if="${section == 'view'}">
-                <div th:replace="section :: view"></div>
-            </div>
-            <div th:if="${section != 'info' and pagination.pageCount == null}">
-                <div class="jumbotron" style="background-color: #fff;">
-                    <p class="text_desc">看起来你还没有这些历史呢.....</p>
+            <div class="col-xs-12 col-md-9 side-right">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="pull-right" th:if="${section == 'notification'}">
+                            <a th:href="@{/notification/all}" th:if="${unreadCount > 0}" class="btn btn-default">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                                全部已读
+                            </a>
+                        </div>
+                        <h3>
+                            <span class="glyphicon glyphicon-th" th:if="${section == 'publish'}"></span>
+                            <span class="glyphicon glyphicon-eye-open" th:if="${section == 'view'}"></span>
+                            <span class="glyphicon glyphicon-heart-empty" th:if="${section == 'thumb'}"></span>
+                            <span class="glyphicon glyphicon-bullhorn" th:if="${section == 'notification'}"></span>
+                            <span class="icon icon-list" th:if="${section == 'info'}"></span>
+                            [[${sectionName}]]
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div th:if="${section == 'info'}">
+                            <div th:replace="section :: info"></div>
+                        </div>
+                        <div th:if="${section == 'publish'}">
+                            <div th:replace="section :: publish"></div>
+                        </div>
+                        <div th:if="${section == 'notification'}">
+                            <div th:replace="section :: notification"></div>
+                        </div>
+                        <div th:if="${section == 'thumb'}">
+                            <div th:replace="section :: thumb"></div>
+                        </div>
+                        <div th:if="${section == 'view'}">
+                            <div th:replace="section :: view"></div>
+                        </div>
+                        <div th:if="${section != 'info' and pagination.pageCount == null}" class="jumbotron"
+                             style="background-color: #fff;">
+                            <p class="text_desc">看起来你还没有这些历史呢.....</p>
+                        </div>
+                    </div>
+                    <div class="panel-footer text-center"
+                         th:if="${section != 'info' and pagination.pageCount != null and pagination.pageCount > 1}">
+                        <div th:replace="pageNav :: profile"></div>
+                    </div>
                 </div>
             </div>
-            <div th:if="${section != 'info'}">
-                <div th:if="${pagination.pageCount != null}" th:replace="pageNav :: profile"></div>
-            </div>
         </div>
     </div>
-
 </div>
-<a class="back_top" title="返回顶部">
-    <span class="glyphicon glyphicon-arrow-up" style="font-size: 18px"></span>
+<a class="site-scroll-top" title="返回顶部">
+    <i class="icon-arrow-up"></i>
 </a>
 <script type="application/javascript">
-    $(function() {
+    $(function () {
         //先将#back-top隐藏
-        var $backTop = $('.back_top');
+        var $backTop = $('.site-scroll-top');
         $backTop.hide();
         //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
-        $(window).scroll(function() {
+        $(window).scroll(function () {
             if ($(window).scrollTop() > 200) {
                 $backTop.fadeIn(200);
             } else {
@@ -103,7 +148,7 @@
             }
         });
         //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
-        $backTop.on("click", function() {
+        $backTop.on("click", function () {
             $('html').animate({
                 scrollTop: 0
             }, 400);

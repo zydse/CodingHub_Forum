@@ -24,30 +24,14 @@ import java.util.List;
 public class IndexController {
     @Autowired
     private QuestionService questionService;
-    @Autowired
-    private HotTagCache hotTagCache;
 
     @RequestMapping("/")
     public String index(Model model,
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
                         @RequestParam(name = "size", defaultValue = "5") Integer size) {
         PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size);
-        List<HotTagDTO> tags = hotTagCache.getHots();
-        model.addAttribute("hotTags", tags);
         model.addAttribute("pagination", pagination);
         model.addAttribute("showType",1);
         return "index";
     }
-    @RequestMapping("/index2")
-    public String index2(Model model,
-                        @RequestParam(name = "page", defaultValue = "1") Integer page,
-                        @RequestParam(name = "size", defaultValue = "5") Integer size) {
-        PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size);
-        List<HotTagDTO> tags = hotTagCache.getHots();
-        model.addAttribute("hotTags", tags);
-        model.addAttribute("pagination", pagination);
-        model.addAttribute("showType",1);
-        return "index2";
-    }
-
 }

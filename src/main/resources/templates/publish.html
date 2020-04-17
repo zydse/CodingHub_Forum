@@ -9,9 +9,10 @@
 </head>
 <body>
 <div th:replace="navigation :: navigation"></div>
-<div class="row">
-    <div class="col-xs-offset-1 col-xs-10">
-        <div class="col-xs-12 white">
+<div class="wrap">
+    <!-- Main -->
+    <div class="container">
+        <div class="col-xs-12 side-left background-white">
             <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 提问</h2>
             <hr/>
             <form id="questionForm">
@@ -68,16 +69,23 @@
                         <div class="tab-content">
                             <div role="tabpanel" th:id="${type.type}" th:each="type : ${typeList}"
                                  th:class="${type.type == 'language'? 'active tab-pane' : 'tab-pane'}">
-                                <span th:each="tag : ${type.tags}" th:text="${tag}" class="community-tag"
-                                      onclick="selectTag(this)" th:data-tag="${tag}">
+                                <span th:each="tag : ${type.tags}" class="community-tag" onclick="selectTag(this)"
+                                      th:data-tag="${tag.tagName}">
+                                    [[${tag.tagName}]]
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success btn_float_right">发布</button>
+                <button type="submit" class="btn btn-success btn-lg btn_float_right">发布</button>
             </form>
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-offset-1 col-xs-10">
+
     </div>
 </div>
 <div th:replace="alert :: modal"></div>
@@ -126,8 +134,10 @@
     });
 
     function showSelectTag() {
-        if ($("#questionId").val() === null || "" === $("#questionId").val())
-            $("#select-tag").show();
+        var $questionId = $("#questionId");
+        var $selectTag = $("#select-tag");
+        if ($questionId.val() === null || "" === $questionId.val())
+            $selectTag.show(500);
     }
 
     function selectTag(e) {

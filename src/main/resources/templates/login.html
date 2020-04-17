@@ -118,7 +118,7 @@
                 "captchaCode": captchaCode
             },
             success: function (result) {
-                if (result.code != 200) {
+                if (result.code !== 200) {
                     $(".modal-body").text(result.message);
                     $('#notice').modal('show');
                     return false;

@@ -93,6 +93,12 @@
         </div>
         <div class="media-body">
             <h4 class="media-heading name_vertical_center">[[${userProfile.name}]]</h4>
+            <div th:if="${userProfile.bio == null}" class="jumbotron" style="background-color: #fff;">
+                <p class="text_desc">神秘到没有留下只言片语.....</p>
+            </div>
+            <div th:if="${userProfile.bio != null}" class="jumbotron" style="background-color: #fff;">
+                <p class="text_desc">[[${userProfile.bio}]]</p>
+            </div>
         </div>
     </div>
     <hr/>

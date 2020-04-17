@@ -1,6 +1,7 @@
 package top.zydse.dto;
 
 import lombok.Data;
+import top.zydse.model.Tag;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,5 +16,5 @@ import java.util.List;
 @Data
 public class TagTypeDTO implements Serializable {
     String type;
-    List<String> tags;
+    List<Tag> tags;
 }

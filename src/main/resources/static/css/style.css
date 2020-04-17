@@ -14,8 +14,8 @@ html, body {
 body {
     margin: 0;
     padding-top: 50px;
-    background: url('/images/bg.jpg') repeat;
-    /*background: #f6f6f6;*/
+    /*background: url('/images/bg.jpg') repeat;*/
+    background: #f6f6f6;
     font-family: 'Helvetica Neue', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-y: scroll;
@@ -26,7 +26,7 @@ ul, ol, h1, h2, h3 {
 }
 
 a {
-    /*color: #333;*/
+    color: #333;
     text-decoration: none;
 }
 
@@ -289,12 +289,18 @@ abbr[data-original-title], abbr[title] {
     min-height: 50px;
     border-bottom: 1px solid #f0f0f0;
     background: #fff;
-    opacity: .97;
+    /*opacity: .97;*/
 }
 
 .site-header .navbar-brand {
     padding: 9px 0;
     line-height: 32px;
+}
+
+.site-header .navbar-brand img {
+    border-radius: 5px;
+    opacity: .72;
+    height: 32px;
 }
 
 .site-header .navbar {
@@ -396,7 +402,8 @@ abbr[data-original-title], abbr[title] {
 }
 
 .site-header .navbar-form .mac-style {
-    width: 80px;
+    width: 180px;
+    background-color: #fafafa;
     transition: width 1s ease-in-out;
 }
 
@@ -422,8 +429,8 @@ abbr[data-original-title], abbr[title] {
 }
 
 .site-header .navbar-form .mac-style:focus {
-    width: 160px;
-    background-color: #fafafa;
+    width: 260px;
+    border: #66afe9 solid 1px;
 }
 
 .site-header .navbar-collapse {
@@ -718,7 +725,7 @@ abbr[data-original-title], abbr[title] {
 }
 
 .posts-item .item-info ul li {
-    font-size: 12px;
+    font-size: 15px;
     letter-spacing: -0.2px;
     float: left;
     padding: 0;
@@ -1156,7 +1163,7 @@ abbr[data-original-title], abbr[title] {
 }
 
 .markdown-body {
-    min-height: 202px;
+    /*min-height: 202px;*/
     line-height: 1.8;
     font-size: 14px;
     word-wrap: break-word;

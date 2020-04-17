@@ -25,33 +25,14 @@ import java.util.List;
 @Slf4j
 public class SessionInterceptor implements HandlerInterceptor {
     @Autowired
-    private UserMapper userMapper;
-    @Autowired
     private NotificationServiceImpl notificationService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {
             long count = notificationService.unreadCount(user.getId());
             request.setAttribute("unreadCount", count);
-            return true;
-        }
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("token".equals(cookie.getName())) {
-                    UserExample userExample = new UserExample();
-                    userExample.createCriteria().andTokenEqualTo(cookie.getValue());
-                    List<User> users = userMapper.selectByExample(userExample);
-                    if (users.size() != 0) {
-                        request.getSession().setAttribute("user", users.get(0));
-                        long count = notificationService.unreadCount(users.get(0).getId());
-                        request.setAttribute("unreadCount", count);
-                    }
-                    break;
-                }
-            }
         }
         return true;
     }

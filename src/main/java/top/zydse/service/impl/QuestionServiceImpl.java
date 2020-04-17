@@ -261,7 +261,7 @@ public class QuestionServiceImpl implements QuestionService {
         for (String type : types) {
             TagTypeDTO dto = new TagTypeDTO();
             dto.setType(type);
-            dto.setTags(maps.get(type).stream().map(Tag::getTagName).collect(Collectors.toList()));
+            dto.setTags(maps.get(type));
             list.add(dto);
         }
         return list;

@@ -40,8 +40,6 @@ public class QuestionController {
     private CommentService commentService;
     @Autowired
     private SensitiveWordFilter wordFilter;
-    @Autowired
-    private HotTagCache hotTagCache;
 
     @RequestMapping("/quality/{id}")
     public String quality(@PathVariable(name = "id") Long questionId) {
@@ -150,9 +148,7 @@ public class QuestionController {
             return "redirect:/";
         }
         PaginationDTO<QuestionDTO> paginationDTO = questionService.findAll(search, page, size);
-        List<HotTagDTO> tags = hotTagCache.getHots();
         model.addAttribute("pagination", paginationDTO);
-        model.addAttribute("hotTags", tags);
         model.addAttribute("search", search);
         model.addAttribute("showType", 2);
         return "index";
@@ -167,9 +163,7 @@ public class QuestionController {
         if (tag == null)
             throw new CustomizeException(CustomizeErrorCode.BAD_REQUEST);
         PaginationDTO<QuestionDTO> paginationDTO = questionService.findByTagId(tagId, page, size);
-        List<HotTagDTO> tags = hotTagCache.getHots();
         model.addAttribute("pagination", paginationDTO);
-        model.addAttribute("hotTags", tags);
         model.addAttribute("byTag", tag.getTagName());
         model.addAttribute("tagId", tagId);
         model.addAttribute("showType", 3);
@@ -181,8 +175,6 @@ public class QuestionController {
                                @RequestParam(name = "page", defaultValue = "1") Integer page,
                                @RequestParam(name = "size", defaultValue = "5") Integer size) {
         PaginationDTO<QuestionDTO> paginationDTO = questionService.listEmptyComment(page, size);
-        List<HotTagDTO> tags = hotTagCache.getHots();
-        model.addAttribute("hotTags", tags);
         model.addAttribute("pagination", paginationDTO);
         model.addAttribute("showType", 4);
         return "index";
@@ -193,10 +185,16 @@ public class QuestionController {
                                 @RequestParam(name = "page", defaultValue = "1") Integer page,
                                 @RequestParam(name = "size", defaultValue = "5") Integer size) {
         PaginationDTO<QuestionDTO> paginationDTO = questionService.listRecentlyTrend(page, size);
-        List<HotTagDTO> tags = hotTagCache.getHots();
-        model.addAttribute("hotTags", tags);
         model.addAttribute("pagination", paginationDTO);
         model.addAttribute("showType", 5);
+        return "index";
+    }
+
+    @GetMapping("/allTags")
+    public String allTag(Model model){
+        List<TagTypeDTO> allTags = questionService.getAllTags();
+        model.addAttribute("allTags", allTags);
+        model.addAttribute("showType", 6);
         return "index";
     }
 

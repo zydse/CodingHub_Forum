@@ -49,8 +49,10 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
+        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "publish");
         model.addAttribute("sectionName", "我的提问");
+        request.setAttribute("userProfile", dto);
         PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -63,8 +65,10 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
+        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "notification");
         model.addAttribute("sectionName", "我的通知");
+        request.setAttribute("userProfile", dto);
         PaginationDTO<NotificationDTO> pagination = notificationService.list(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -77,8 +81,10 @@ public class ProfileController {
                        @RequestParam(name = "page", defaultValue = "1") Integer page,
                        @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
+        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "view");
         model.addAttribute("sectionName", "浏览历史");
+        request.setAttribute("userProfile", dto);
         PaginationDTO<ViewHistoryDTO> pagination = profileService.viewHistory(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -91,8 +97,10 @@ public class ProfileController {
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
                         @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
+        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "thumb");
         model.addAttribute("sectionName", "我的赞");
+        request.setAttribute("userProfile", dto);
         PaginationDTO<ThumbHistoryDTO> pagination = profileService.thumbHistory(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -118,9 +126,9 @@ public class ProfileController {
         User user = (User) request.getSession().getAttribute("user");
         if (user != null && user.getId().equals(id))
             return "redirect:/profile/info";
+        UserProfileDTO dto = profileService.findUserById(id);
+        request.setAttribute("userProfile", dto);
         if (section == null) {
-            UserProfileDTO dto = profileService.findUserById(id);
-            request.setAttribute("userProfile", dto);
             request.setAttribute("section", "info");
             request.setAttribute("sectionName", "用户资料");
         }
