@@ -77,7 +77,7 @@ public class QuestionController {
         question.setTitle(createDTO.getTitle());
         question.setDescription(createDTO.getDescription());
         question.setCreator(user.getId());
-        questionService.saveOrUpdate(question, createDTO.getTags(), user.getAvatarUrl());
+        questionService.saveOrUpdate(question, createDTO.getTags(), user.getAvatarUrl(), user.getName());
         return ResultDTO.successOf("/question/" + question.getId());
     }
 

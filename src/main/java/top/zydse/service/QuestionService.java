@@ -57,8 +57,9 @@ public interface QuestionService {
      * @param question
      * @param tags
      * @param avatarUrl
+     * @param name
      */
-    void saveOrUpdate(Question question, String tags, String avatarUrl);
+    void saveOrUpdate(Question question, String tags, String avatarUrl, String name);
 
     /**
      * 根据id查询提问详情

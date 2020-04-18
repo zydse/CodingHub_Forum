@@ -63,7 +63,8 @@ public class CommentServiceImpl implements CommentService {
         if (!optional.isPresent())
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         Publish publish = optional.get();
-        BeanUtils.copyProperties(question, publish);
+        publish.setCommentCount(question.getCommentCount());
+        publish.setGmtLastComment(question.getGmtLastComment());
         publishRepository.save(publish);
         //评论插入评论表
         commentMapper.insertSelective(comment);
@@ -89,7 +90,8 @@ public class CommentServiceImpl implements CommentService {
         if (!optional.isPresent())
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         Publish publish = optional.get();
-        BeanUtils.copyProperties(question, publish);
+        publish.setCommentCount(question.getCommentCount());
+        publish.setGmtLastComment(question.getGmtLastComment());
         publishRepository.save(publish);
         //存储子回复
         subCommentMapper.insertSelective(subComment);

@@ -74,13 +74,14 @@ public class QuestionServiceImpl implements QuestionService {
         NativeSearchQuery resultQuery = new NativeSearchQueryBuilder()
                 .withQuery(queryBuilder)
                 .withPageable(PageRequest.of(paginationDTO.getCurrentPage() - 1, size))
-                .withSort(SortBuilders.fieldSort("gmtModified").order(SortOrder.DESC))
+                .withSort(SortBuilders.fieldSort("gmtLastComment").order(SortOrder.DESC))
                 .build();
         List<Publish> publishes = elasticsearchTemplate.queryForList(resultQuery, Publish.class);
         List<QuestionDTO> dtoList = new ArrayList<>();
         for (Publish publish : publishes) {
             User user = new User();
             user.setAvatarUrl(publish.getAvatarUrl());
+            user.setName(publish.getName());
             QuestionDTO questionDTO = new QuestionDTO();
             BeanUtils.copyProperties(publish, questionDTO);
             questionDTO.setUser(user);
@@ -180,7 +181,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Transactional
-    public void saveOrUpdate(Question question, String tag, String avatarUrl) {
+    public void saveOrUpdate(Question question, String tag, String avatarUrl, String name) {
         String[] tags = tag.split(",");
         TagExample tagExample = new TagExample();
         tagExample.createCriteria().andTagNameIn(Arrays.asList(tags));
@@ -198,6 +199,7 @@ public class QuestionServiceImpl implements QuestionService {
             //保存到es
             Publish publish = new Publish();
             BeanUtils.copyProperties(question, publish);
+            publish.setName(name);
             publish.setAvatarUrl(avatarUrl);
             publish.setCommentCount(0);
             publish.setViewCount(0);
@@ -220,9 +222,12 @@ public class QuestionServiceImpl implements QuestionService {
             int count = questionMapper.updateByPrimaryKeySelective(question);
             if (count != 1)
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_ALREADY_DELETED);
-            Publish publish = new Publish();
-            BeanUtils.copyProperties(question, publish);
-            publish.setAvatarUrl(avatarUrl);
+            Optional<Publish> optional = publishRepository.findById(question.getId());
+            if(!optional.isPresent())
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            Publish publish = optional.get();
+            publish.setTitle(question.getTitle());
+            publish.setDescription(question.getDescription());
             publishRepository.save(publish);
         }
     }

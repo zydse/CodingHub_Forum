@@ -30,6 +30,9 @@ public class Publish {
     @Field(type = FieldType.Text, store = true, index = false)
     private String avatarUrl;
 
+    @Field(type = FieldType.Text, store = true, index = false)
+    private String name;
+
     @Field(type = FieldType.Long, store = true, index = false)
     private Long creator;
 
@@ -38,9 +41,6 @@ public class Publish {
 
     @Field(type = FieldType.Integer, store = true, index = false)
     private Integer viewCount;
-
-    @Field(type = FieldType.Long, store = true, index = false)
-    private Long gmtModified;
 
     @Field(type = FieldType.Long, store = true, index = false)
     private Long gmtLastComment;
