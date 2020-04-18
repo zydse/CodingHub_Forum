@@ -24,6 +24,7 @@ import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.*;
 import top.zydse.model.*;
+import top.zydse.model.Collection;
 import top.zydse.service.QuestionService;
 
 import java.util.*;
@@ -53,6 +54,8 @@ public class QuestionServiceImpl implements QuestionService {
     private ElasticsearchTemplate elasticsearchTemplate;
     @Autowired
     private PublishRepository publishRepository;
+    @Autowired
+    private CollectionMapper collectionMapper;
 
     //有查询条件的方法
     public PaginationDTO<QuestionDTO> findAll(String search, Integer page, Integer size) {
@@ -93,7 +96,7 @@ public class QuestionServiceImpl implements QuestionService {
         int totalCount = (int) questionMapper.countByExample(new QuestionExample());
         paginationDTO.setPagination(totalCount, page, size);
         QuestionExample example = new QuestionExample();
-        example.setOrderByClause("is_top desc, is_quality desc, gmt_create desc");
+        example.setOrderByClause("is_top desc, is_quality desc, gmt_last_comment desc");
         int offset = (paginationDTO.getCurrentPage() - 1) * size;
         List<Question> questionList = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset, size));
         return getQuestionDTOPaginationDTO(paginationDTO, questionList);
@@ -163,6 +166,14 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionDTO dto = new QuestionDTO();
         BeanUtils.copyProperties(question, dto);
         List<Tag> tagList = extensionMapper.listTagsByQuestion(questionId);
+        if (viewer != null){
+            CollectionExample collectionExample = new CollectionExample();
+            collectionExample.createCriteria()
+                    .andQuestionIdEqualTo(questionId)
+                    .andUserIdEqualTo(viewer.getId());
+            List<Collection> collectionList = collectionMapper.selectByExample(collectionExample);
+            dto.setIsCollect(collectionList.size() == 0 ? 0 : 1);
+        }
         dto.setTags(tagList);
         dto.setUser(creator);
         return dto;
@@ -182,12 +193,16 @@ public class QuestionServiceImpl implements QuestionService {
             //创建一个问题
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
+            question.setGmtLastComment(question.getGmtCreate());
             extensionMapper.savePublish(question);
+            //保存到es
             Publish publish = new Publish();
             BeanUtils.copyProperties(question, publish);
             publish.setAvatarUrl(avatarUrl);
             publish.setCommentCount(0);
             publish.setViewCount(0);
+            publish.setIsQuality(0);
+            publish.setIsTop(0);
             publishRepository.save(publish);
             for (String t : tags) {
                 Tag tagObj = tagMap.get(t);
@@ -268,6 +283,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public int deleteById(Long questionId) {
         List<Tag> tagList = extensionMapper.listTagsByQuestion(questionId);
         if (tagList == null || tagList.size() == 0)
@@ -349,9 +365,34 @@ public class QuestionServiceImpl implements QuestionService {
         }
         paginationDTO.setPagination(totalCount, page, size);
         int offset = (paginationDTO.getCurrentPage() - 1) * size;
-        questionExample.setOrderByClause("comment_count desc, gmt_modified desc");
+        questionExample.setOrderByClause("comment_count desc, gmt_last_comment desc");
         List<Question> questionList = questionMapper.
                 selectByExampleWithBLOBsWithRowbounds(questionExample, new RowBounds(offset, size));
         return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+    }
+
+    @Override
+    @Transactional
+    public int collect(User user, Long questionId) {
+        CollectionExample example = new CollectionExample();
+        example.createCriteria()
+                .andUserIdEqualTo(user.getId())
+                .andQuestionIdEqualTo(questionId);
+        List<Collection> list = collectionMapper.selectByExample(example);
+        Question question = questionMapper.selectByPrimaryKey(questionId);
+        if(list.size() != 0){
+            collectionMapper.deleteByPrimaryKey(list.get(0).getId());
+            question.setCollectionCount(question.getCollectionCount() - 1);
+            questionMapper.updateByPrimaryKeySelective(question);
+            return question.getCollectionCount();
+        }
+        Collection collection = new Collection();
+        collection.setUserId(user.getId());
+        collection.setQuestionId(questionId);
+        collection.setGmtCreate(System.currentTimeMillis());
+        collectionMapper.insertSelective(collection);
+        question.setCollectionCount(question.getCollectionCount() + 1);
+        questionMapper.updateByPrimaryKeySelective(question);
+        return question.getCollectionCount();
     }
 }

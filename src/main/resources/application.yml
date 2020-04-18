@@ -48,7 +48,7 @@ mybatis:
   # 配置mapper的xml文件位置
   mapper-locations: classpath:mapper/*.xml
   # 配置MyBatis实体类的别名，resultType可以不用使用全类名
-  type-aliases-package: top.zydse.model
+#  type-aliases-package: top.zydse.model
   configuration:
     # 配置MyBatis的数据库列使用下划线映射Pojo属性大写字母
     map-underscore-to-camel-case: true
@@ -65,9 +65,8 @@ sensitiveWord:
   encoding: utf-8
   matchType: 1
 
-
 server:
-  port: 8087
+  port: 8080
 ---
 
 spring:

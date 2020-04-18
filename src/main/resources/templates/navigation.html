@@ -50,10 +50,10 @@
                     </ul>
                     <ul class="navbar-button list-inline" id="header_user" shiro:guest="">
                         <li>
-                            <a class="btn btn-sm"
-                               th:href="@{https://github.com/login/oauth/authorize(client_id='6f77efebf08b5cde324b', redirect_uri=${#httpServletRequest.getRequestURL()}+'callback',scope='user',state=1)}">
-                                <img alt="github oAuth" title="使用GitHub账户登录本站" height="20" width="20"
-                                     th:src="@{/images/GitHubMarkDark.png}">
+                            <a class="btn" style="padding: 0" title="使用GitHub账户登录本站"
+                               th:href="@{https://github.com/login/oauth/authorize(client_id='6f77efebf08b5cde324b',
+                                redirect_uri=${#httpServletRequest.getRequestURL()}+'callback',scope='user',state=1)}">
+                                <i class="fa fa-github fa-2x"></i>
                             </a>
                         </li>
                         <li>
@@ -69,7 +69,7 @@
                         </li>
                         <li>
                             <a th:href="@{/profile/notification}">
-                                <span class="icon-bell"></span>
+                                <i class="fa fa-bell"></i>
                                 <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
                             </a>
                         </li>

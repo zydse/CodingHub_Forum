@@ -2,12 +2,12 @@ package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import top.zydse.cache.HotTagCache;
 import top.zydse.dto.*;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
@@ -41,23 +41,44 @@ public class QuestionController {
     @Autowired
     private SensitiveWordFilter wordFilter;
 
-    @RequestMapping("/quality/{id}")
-    public String quality(@PathVariable(name = "id") Long questionId) {
-        int result = questionService.quality(questionId);
-        return "redirect:/";
+    @RequiresPermissions("question:create")
+    @GetMapping("/publish")
+    public String getPublishPage(Model model) {
+        List<TagTypeDTO> list = questionService.getAllTags();
+        model.addAttribute("typeList", list);
+        return "publish";
     }
 
-    @RequestMapping("/top/{id}")
-    public String top(@PathVariable(name = "id") Long questionId) {
-        int result = questionService.top(questionId);
-        return "redirect:/";
-    }
-
-    @RequiresPermissions({"question:delete"})
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable(name = "id") Long questionId) {
-        int result = questionService.deleteById(questionId);
-        return "redirect:/";
+    @RequiresPermissions("question:create")
+    @PostMapping("/publish")
+    @ResponseBody
+    public ResultDTO saveQuestion(@RequestBody QuestionCreateDTO createDTO,
+                                  HttpServletRequest request) {
+        if (createDTO.getTitle() == null || "".equals(createDTO.getTitle())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
+        }
+        if (createDTO.getDescription() == null || "".equals(createDTO.getDescription())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
+        }
+        if (createDTO.getTags() == null || "".equals(createDTO.getTags())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
+        }
+        Set<String> sensitiveTitle = wordFilter.getSensitiveWord(createDTO.getTitle());
+        if (sensitiveTitle.size() != 0) {
+            throw new CustomizeException(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_TITLE);
+        }
+        Set<String> sensitiveDescription = wordFilter.getSensitiveWord(createDTO.getDescription());
+        if (sensitiveDescription.size() != 0) {
+            throw new CustomizeException(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_DESCRIPTION);
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        Question question = new Question();
+        question.setId(createDTO.getId());
+        question.setTitle(createDTO.getTitle());
+        question.setDescription(createDTO.getDescription());
+        question.setCreator(user.getId());
+        questionService.saveOrUpdate(question, createDTO.getTags(), user.getAvatarUrl());
+        return ResultDTO.successOf("/question/" + question.getId());
     }
 
     @GetMapping("/{id}")
@@ -98,49 +119,28 @@ public class QuestionController {
         return "publish";
     }
 
-    @RequiresPermissions("question:create")
-    @PostMapping("/publish")
-    @ResponseBody
-    public ResultDTO saveQuestion(@RequestBody QuestionCreateDTO createDTO,
-                                  HttpServletRequest request) {
-        if (createDTO.getTitle() == null || "".equals(createDTO.getTitle())) {
-            return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
-        }
-        if (createDTO.getDescription() == null || "".equals(createDTO.getDescription())) {
-            return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
-        }
-        if (createDTO.getTags() == null || "".equals(createDTO.getTags())) {
-            return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
-        }
-        Set<String> sensitiveTitle = wordFilter.getSensitiveWord(createDTO.getTitle());
-        if (sensitiveTitle.size() != 0) {
-            throw new CustomizeException(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_TITLE);
-        }
-        Set<String> sensitiveDescription = wordFilter.getSensitiveWord(createDTO.getDescription());
-        if (sensitiveDescription.size() != 0) {
-            throw new CustomizeException(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_DESCRIPTION);
-        }
-        User user = (User) request.getSession().getAttribute("user");
-        Question question = new Question();
-        question.setId(createDTO.getId());
-        question.setTitle(createDTO.getTitle());
-        question.setDescription(createDTO.getDescription());
-        question.setCreator(user.getId());
-        questionService.saveOrUpdate(question, createDTO.getTags(), user.getAvatarUrl());
-        return ResultDTO.successOf("/question/" + question.getId());
+    @RequestMapping("/quality/{id}")
+    public String quality(@PathVariable(name = "id") Long questionId) {
+        int result = questionService.quality(questionId);
+        return "redirect:/";
     }
 
-    @RequiresPermissions("question:create")
-    @GetMapping("/publish")
-    public String getPublishPage(Model model) {
-        List<TagTypeDTO> list = questionService.getAllTags();
-        model.addAttribute("typeList", list);
-        return "publish";
+    @RequestMapping("/top/{id}")
+    public String top(@PathVariable(name = "id") Long questionId) {
+        int result = questionService.top(questionId);
+        return "redirect:/";
+    }
+
+    @RequiresPermissions({"question:delete"})
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable(name = "id") Long questionId) {
+        int result = questionService.deleteById(questionId);
+        return "redirect:/";
     }
 
     @GetMapping("/search")
     public String search(@RequestParam(name = "page", defaultValue = "1") Integer page,
-                         @RequestParam(name = "size", defaultValue = "5") Integer size,
+                         @RequestParam(name = "size", defaultValue = "8") Integer size,
                          @RequestParam(name = "search", required = false) String search,
                          Model model) {
         search = search.trim();
@@ -156,7 +156,7 @@ public class QuestionController {
 
     @GetMapping("/tags/{tagId}")
     public String findByTag(@RequestParam(name = "page", defaultValue = "1") Integer page,
-                            @RequestParam(name = "size", defaultValue = "5") Integer size,
+                            @RequestParam(name = "size", defaultValue = "8") Integer size,
                             @PathVariable("tagId") Integer tagId,
                             Model model) {
         Tag tag = questionService.findTag(tagId);
@@ -173,7 +173,7 @@ public class QuestionController {
     @GetMapping("/emptyComment")
     public String emptyComment(Model model,
                                @RequestParam(name = "page", defaultValue = "1") Integer page,
-                               @RequestParam(name = "size", defaultValue = "5") Integer size) {
+                               @RequestParam(name = "size", defaultValue = "8") Integer size) {
         PaginationDTO<QuestionDTO> paginationDTO = questionService.listEmptyComment(page, size);
         model.addAttribute("pagination", paginationDTO);
         model.addAttribute("showType", 4);
@@ -183,7 +183,7 @@ public class QuestionController {
     @GetMapping("/trend")
     public String recentlyTrend(Model model,
                                 @RequestParam(name = "page", defaultValue = "1") Integer page,
-                                @RequestParam(name = "size", defaultValue = "5") Integer size) {
+                                @RequestParam(name = "size", defaultValue = "8") Integer size) {
         PaginationDTO<QuestionDTO> paginationDTO = questionService.listRecentlyTrend(page, size);
         model.addAttribute("pagination", paginationDTO);
         model.addAttribute("showType", 5);
@@ -191,11 +191,23 @@ public class QuestionController {
     }
 
     @GetMapping("/allTags")
-    public String allTag(Model model){
+    public String allTag(Model model) {
         List<TagTypeDTO> allTags = questionService.getAllTags();
         model.addAttribute("allTags", allTags);
         model.addAttribute("showType", 6);
         return "index";
+    }
+
+    @RequiresAuthentication
+    @PostMapping("/collect")
+    @ResponseBody
+    public ResultDTO collect(@RequestParam("questionId") Long questionId,
+                             HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        int result = questionService.collect(user, questionId);
+        log.info("userId : {}, username : {}", user.getId(), user.getName());
+        log.info("want to collect the question : {}", questionId);
+        return ResultDTO.successOf(result);
     }
 
 }

@@ -10,10 +10,11 @@
 <body>
 <div th:replace="navigation :: navigation"></div>
 <div class="wrap">
-    <!-- Main -->
     <div class="container">
         <div class="col-xs-12 side-left background-white">
-            <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 提问</h2>
+            <h2>
+                <i class="fa fa-pencil-square" aria-hidden="true"></i> 提问
+            </h2>
             <hr/>
             <form id="questionForm">
                 <input type="hidden" name="id" id="questionId" th:value="${id}">
@@ -56,8 +57,10 @@
                 </div>
                 <div class="form-group">
                     <label for="tags">添加标签:</label>
-                    <input type="text" class="form-control" name="tags" id="tags" placeholder="创建或者搜索添加新话题..."
-                           th:value="${tags}" onfocus="showSelectTag()" readonly>
+                    <input type="text" class="form-control" name="tags" id="tags"
+                           th:attr="disabled = ${id != null ? '' : 'false'}"
+                           placeholder="创建或者搜索添加新话题..."
+                           th:value="${tags}" onclick="showSelectTag()" readonly>
                     <div id="select-tag" class="publish-tag-tab">
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" th:class="${type.type == 'language' ? 'active' : ''}"
@@ -82,32 +85,26 @@
         </div>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-xs-offset-1 col-xs-10">
-
-    </div>
-</div>
-<div th:replace="alert :: modal"></div>
+<div th:replace="alert :: original"></div>
 <script type="application/javascript">
     $("#questionForm").submit(function (e) {
         e.preventDefault();
         var questionTitle = $("#questionTitle").val();
         if ('' === questionTitle) {
             $(".modal-body").text("请输入问题的标题");
-            $('#notice').modal("show");
+            $('#error_notice').modal("show");
             return;
         }
         var description = $("#description").val();
         if ('' === description) {
             $(".modal-body").text("请输入更多的信息来描述你的问题，这样才能获得更好的解答");
-            $('#notice').modal("show");
+            $('#error_notice').modal("show");
             return;
         }
         var tags = $("#tags").val();
         if ('' === tags) {
             $(".modal-body").text("请为问题选择标签，能更有效的获得解答");
-            $('#notice').modal("show");
+            $('#error_notice').modal("show");
             return;
         }
         $.ajax({
@@ -124,7 +121,7 @@
             success: function (result) {
                 if (result.code !== 200) {
                     $(".modal-body").text(result.message);
-                    $('#notice').modal('show');
+                    $('#error_notice').modal('show');
                     return false;
                 } else {
                     window.location.href = result.data;
@@ -136,8 +133,13 @@
     function showSelectTag() {
         var $questionId = $("#questionId");
         var $selectTag = $("#select-tag");
-        if ($questionId.val() === null || "" === $questionId.val())
-            $selectTag.show(500);
+        if ("" !== $questionId.val())
+            return;
+        if ($selectTag.css("display") === "block") {
+            $selectTag.hide(500);
+            return;
+        }
+        $selectTag.show(500);
     }
 
     function selectTag(e) {

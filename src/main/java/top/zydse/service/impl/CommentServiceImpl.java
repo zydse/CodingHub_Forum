@@ -54,15 +54,16 @@ public class CommentServiceImpl implements CommentService {
         Question question = questionMapper.selectByPrimaryKey(comment.getQuestionId());
         if (question == null)
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
-        //增加问题回复数
+        //更新问题信息
         question.setCommentCount(question.getCommentCount() + 1);
+        question.setGmtLastComment(System.currentTimeMillis());
         questionMapper.updateByPrimaryKey(question);
         //更新elasticsearch
         Optional<Publish> optional = publishRepository.findById(question.getId());
         if (!optional.isPresent())
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         Publish publish = optional.get();
-        publish.setCommentCount(publish.getCommentCount() + 1);
+        BeanUtils.copyProperties(question, publish);
         publishRepository.save(publish);
         //评论插入评论表
         commentMapper.insertSelective(comment);
@@ -79,18 +80,24 @@ public class CommentServiceImpl implements CommentService {
         //增加子回复数
         comment.setSubCommentCount(comment.getSubCommentCount() + 1);
         commentMapper.updateByPrimaryKey(comment);
-        //增加问题的回复数
+        //更新问题信息
         question.setCommentCount(question.getCommentCount() + 1);
+        question.setGmtLastComment(System.currentTimeMillis());
         questionMapper.updateByPrimaryKey(question);
         //更新elasticsearch
         Optional<Publish> optional = publishRepository.findById(question.getId());
         if (!optional.isPresent())
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         Publish publish = optional.get();
-        publish.setCommentCount(publish.getCommentCount() + 1);
+        BeanUtils.copyProperties(question, publish);
         publishRepository.save(publish);
         //存储子回复
         subCommentMapper.insertSelective(subComment);
+        //如果不是自己回复自己，更新用户的积分，二级评论无法提升贡献值
+        if (!user.getId().equals(question.getCreator())) {
+            user.setCredit(user.getCredit() + 2);
+            userMapper.updateByPrimaryKeySelective(user);
+        }
         //子评论的通知，可能是通知一级评论人和问题创建者
         createNotification(subComment, comment, question, user);
     }
@@ -259,6 +266,10 @@ public class CommentServiceImpl implements CommentService {
         //点赞数加一
         comment.setThumbCount(comment.getThumbCount() + 1);
         commentMapper.updateByPrimaryKeySelective(comment);
+        //更新被点赞用户的积分
+        User reviewer = userMapper.selectByPrimaryKey(comment.getReviewer());
+        reviewer.setCredit(reviewer.getCredit() + 20);
+        userMapper.updateByPrimaryKeySelective(reviewer);
         return ResultDTO.successOf(comment.getThumbCount());
     }
 

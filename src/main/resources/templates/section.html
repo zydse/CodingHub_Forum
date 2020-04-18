@@ -71,30 +71,43 @@
 <div th:fragment="publish">
     <div class="media" th:each="question : ${pagination.pageData}">
         <div class="media-left">
-            <img class="media-object img-rounded" th:src="${question.user.avatarUrl}" alt="avatar">
+            <img class="media-object img-circle" th:src="${question.user.avatarUrl}" alt="avatar">
         </div>
         <div class="media-body">
-            <h4 class="media-heading">
-                <a th:href="@{/question/{questionId}(questionId = ${question.id})}"
-                   th:text="${question.title}"></a>
-            </h4>
-            <span class="text_desc">
-                <span th:text="${question.commentCount}">00</span> 个回复 •
-                <span th:text="${question.viewCount}">00</span> 次浏览 •
-                <span th:text="${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}">刚刚</span>
-            </span>
+            <div class="posts-item">
+                <h4 class="item-title" style="margin-bottom: 10px">
+                    <a th:href="@{/question/{questionId}(questionId = ${question.id})}"
+                       th:text="${question.title}"></a>
+                </h4>
+                <div class="item-info">
+                    <ul>
+                        <li class="ico-time"  style="font-size: 12px">
+                            <i class="icon-clock"></i>
+                            [[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                        </li>
+                        <li class="ico-eye hidden-xs"  style="font-size: 12px">
+                            <i class="icon-book-open"></i>
+                            [[${question.commentCount}]]
+                        </li>
+                        <li class="ico-like hidden-xs"  style="font-size: 12px">
+                            <i class="icon-speech"></i>
+                            [[${question.viewCount}]]
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <div th:fragment="info">
     <div class="media">
         <div class="media-left">
-            <img class="media-object img-rounded" th:src="${userProfile.avatarUrl}" alt="avatar">
+            <img class="media-object img-circle" th:src="${userProfile.avatarUrl}" alt="avatar">
         </div>
         <div class="media-body">
             <h4 class="media-heading name_vertical_center">[[${userProfile.name}]]</h4>
             <div th:if="${userProfile.bio == null}" class="jumbotron" style="background-color: #fff;">
-                <p class="text_desc">神秘到没有留下只言片语.....</p>
+                <p class="text_desc text-center">神秘到没有留下只言片语.....</p>
             </div>
             <div th:if="${userProfile.bio != null}" class="jumbotron" style="background-color: #fff;">
                 <p class="text_desc">[[${userProfile.bio}]]</p>

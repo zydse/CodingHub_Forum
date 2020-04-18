@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&amp;subset=devanagari,latin-ext"
           rel="stylesheet">
-    <title>注册 | CodingHub</title>
+    <title>注册 - CodingHub</title>
     <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
     <link rel="stylesheet" th:href="@{/css/animate.css}">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
@@ -55,16 +55,14 @@
 
                                 <div class="form-col1">
                                     <div class="form-group">
-                                        <button type="button" id="code-btn" class="btn"
-                                                style="height: 46px;background: #5a84fd; color: #fff; margin-top: 37px">
+                                        <button type="button" id="code-btn" class="btn btn_get pull-right">
                                             获取验证码
                                         </button>
                                     </div>
                                 </div>
-                            </div><!--/.signin-form -->
-                        </div><!--/.col -->
-                    </div><!--/.row -->
-
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-sm-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="signin-footer">
@@ -78,14 +76,14 @@
                                 <p>
                                     <a th:href="@{/}">返回首页</a>
                                 </p>
-                            </div><!--/.signin-footer -->
-                        </div><!--/.col-->
-                    </div><!--/.row -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form><!--/form -->
-        </div><!--/.sign-description -->
-    </div><!--/.container -->
-</section><!--/.signin -->
+            </form>
+        </div>
+    </div>
+</section>
 
 <div th:insert="alert :: modal"></div>
 <script th:src="@{/js/jquery.js}"></script>
@@ -94,7 +92,6 @@
 <script th:src="@{/js/bootsnav.js}"></script>
 <script th:src="@{/js/jquery.sticky.js}"></script>
 <script th:src="@{/js/jquery.easing.min.js}"></script>
-<script th:src="@{/js/custom.js}"></script>
 <script th:src="@{/js/forum.js}"></script>
 <script th:src="@{/js/jquery.md5.js}"></script>
 <script>

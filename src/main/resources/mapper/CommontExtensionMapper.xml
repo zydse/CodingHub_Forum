@@ -7,11 +7,13 @@
         <result column="DESCRIPTION" jdbcType="CLOB" property="description"/>
         <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate" />
         <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified" />
+        <result column="GMT_LAST_COMMENT" jdbcType="BIGINT" property="gmtLastComment" />
         <result column="CREATOR" jdbcType="BIGINT" property="creator" />
         <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount" />
         <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount" />
         <result column="IS_TOP" jdbcType="INTEGER" property="isTop" />
         <result column="IS_QUALITY" jdbcType="INTEGER" property="isQuality" />
+        <result column="COLLECTION_COUNT" jdbcType="INTEGER" property="collectionCount" />
     </resultMap>
 
     <select id="listViewHistory" resultType="top.zydse.dto.ViewHistoryDTO">
@@ -37,8 +39,83 @@
     </select>
 
     <insert id="savePublish" parameterType="top.zydse.model.Question">
-        insert into QUESTION (title,description,creator,gmt_create,gmt_modified)
-        values (#{title},#{description},#{creator},#{gmtCreate},#{gmtModified});
+        insert into QUESTION
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="title != null">
+                TITLE,
+            </if>
+            <if test="gmtCreate != null">
+                GMT_CREATE,
+            </if>
+            <if test="gmtModified != null">
+                GMT_MODIFIED,
+            </if>
+            <if test="gmtLastComment != null">
+                GMT_LAST_COMMENT,
+            </if>
+            <if test="creator != null">
+                CREATOR,
+            </if>
+            <if test="commentCount != null">
+                COMMENT_COUNT,
+            </if>
+            <if test="viewCount != null">
+                VIEW_COUNT,
+            </if>
+            <if test="isTop != null">
+                IS_TOP,
+            </if>
+            <if test="isQuality != null">
+                IS_QUALITY,
+            </if>
+            <if test="collectionCount != null">
+                COLLECTION_COUNT,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=BIGINT},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=BIGINT},
+            </if>
+            <if test="gmtLastComment != null">
+                #{gmtLastComment,jdbcType=BIGINT},
+            </if>
+            <if test="creator != null">
+                #{creator,jdbcType=BIGINT},
+            </if>
+            <if test="commentCount != null">
+                #{commentCount,jdbcType=INTEGER},
+            </if>
+            <if test="viewCount != null">
+                #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="isTop != null">
+                #{isTop,jdbcType=INTEGER},
+            </if>
+            <if test="isQuality != null">
+                #{isQuality,jdbcType=INTEGER},
+            </if>
+            <if test="collectionCount != null">
+                #{collectionCount,jdbcType=INTEGER},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
         <selectKey resultType="java.lang.Long" keyColumn="id" keyProperty="id" order="AFTER">
             select last_insert_id();
         </selectKey>
@@ -160,9 +237,8 @@
         LIMIT 0,6
     </select>
 
-    <select id="relatedQuestion" parameterType="java.lang.Long" resultType="top.zydse.model.Question">
-        SELECT id, title, description, creator, comment_count commentCount,
-         view_count viewCount,is_top isTop, is_quality isQuality, gmt_modified gmtModified, gmt_create gmtCreate
+    <select id="relatedQuestion" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT *
         FROM QUESTION
         WHERE ID IN(
             SELECT DISTINCT qt2.QUESTION_ID
@@ -171,7 +247,7 @@
                 SELECT qt1.TAG_ID
                 FROM QUESTION_TAG qt1
                 WHERE qt1.QUESTION_ID = #{questionId}))
-        ORDER BY gmt_modified
+        ORDER BY gmt_last_comment
         LIMIT 0,8;
     </select>
 
@@ -194,7 +270,7 @@
         SELECT question_id
         FROM QUESTION_TAG
         WHERE tag_id = #{tagId})
-        ORDER BY gmt_modified DESC
+        ORDER BY gmt_last_comment DESC
         LIMIT #{offset},#{size};
     </select>
 

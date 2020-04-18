@@ -9,18 +9,19 @@
 </head>
 <body>
 <div th:replace="navigation :: navigation"></div>
+<!--<div class="fore-wrapper">-->
 <div class="wrap">
     <div class="container">
         <div class="row">
             <div class="col-md-9 col-xs-12 side-left">
-                <h3>
+                <div class="show-type background-white">
                     <span th:if="${showType == 1}" class="icon icon-home"> 最新</span>
-                    <span th:if="${showType == 2}" class="icon icon-magnifier"> 可能</span>
+                    <span th:if="${showType == 2}" class="icon icon-magnifier"> 搜索结果</span>
                     <span th:if="${showType == 3}" class="icon icon-tag"> [[${byTag}]]</span>
                     <span th:if="${showType == 4}" class="icon icon-feed"> 等你来答</span>
                     <span th:if="${showType == 5}" class="icon icon-calendar"> 七日最热</span>
                     <span th:if="${showType == 6}" class="icon icon-tag"> 所有标签</span>
-                </h3>
+                </div>
                 <!--展示所有标签-->
                 <div th:if="${showType == 6}">
                     <div class="panel panel-default">
@@ -70,7 +71,7 @@
                                             <li class="post-author hidden-xs">
                                                 <div class="avatar">
                                                     <img th:src="${question.user.avatarUrl}" alt="avatar"
-                                                         class="lazy avatar avatar-50 photo" height="50" width="50">
+                                                         class="avatar" height="50" width="50">
                                                 </div>
                                                 <a th:href="@{/profile/user/{userId}(userId = ${question.creator})}">
                                                     [[${question.user.name}]]
@@ -78,7 +79,7 @@
                                             </li>
                                             <li class="ico-time">
                                                 <i class="icon-clock"></i>
-                                                [[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                                                [[${#dates.format(question.gmtLastComment, 'yyyy-MM-dd HH:mm')}]]
                                             </li>
                                             <li class="ico-eye hidden-xs">
                                                 <i class="icon-book-open"></i>
@@ -109,7 +110,7 @@
                 <div class="panel panel-default widget">
                     <div class="panel-heading">
                         <h3 class="panel-title">
-                            <i class="glyphicon glyphicon-send"></i>
+                            <i class="fa fa-paper-plane"></i>
                             热门标签
                         </h3>
                     </div>
@@ -120,7 +121,7 @@
                                     <span class="icon-tag"></span>
                                     <span>[[${hotTag.tagName}]]</span>
                                 </a>
-                                <span th:text="${hotTag.questionCount + '个问题,'+hotTag.commentCount + '个回复'}"></span>
+                                <span th:text="${hotTag.questionCount + '个问题,'+ hotTag.commentCount + '个回复'}"></span>
                             </li>
                         </ul>
                     </div>
@@ -128,21 +129,24 @@
                 <div class="panel panel-default widget">
                     <div class="panel-heading">
                         <h3 class="panel-title">
-                            <i class="glyphicon glyphicon-usd"></i>
+                            <i class="fa fa-rmb"></i>
                             资助站长
                         </h3>
                     </div>
-                    <div class="panel-body">
-                        <img class="img-rounded img-responsive" th:src="@{/images/alipay.jpg}">
+                    <div class="panel-body text-center">
+                        <img style="width: 50%; height: auto;" th:src="@{/images/alipay.jpg}">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <a class="site-scroll-top" title="返回顶部">
-    <i class="icon-arrow-up"></i>
+    <i class="fa fa-angle-double-up fa-2x"></i>
 </a>
+<div th:replace="navigation :: footer"></div>
+<!--</div>-->
 <script type="application/javascript">
     $(function () {
         var $backTop = $('.site-scroll-top');
@@ -169,6 +173,5 @@
         });
     });
 </script>
-<div th:replace="navigation :: footer"></div>
 </body>
 </html>

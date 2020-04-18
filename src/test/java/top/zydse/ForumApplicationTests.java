@@ -68,7 +68,7 @@ class ForumApplicationTests {
     }
 
     @Test
-    public void testEs(){
+    public void createIndex(){
         template.createIndex(Publish.class);
 //        template.putMapping(Publish.class);//对已建但未设置mapping信息的索引创建mapping
 //        System.out.println(client);

@@ -133,4 +133,12 @@ public interface QuestionService {
      * @return
      */
     PaginationDTO<QuestionDTO> listRecentlyTrend(Integer page, Integer size);
+
+    /**
+     * 收藏问题
+     * @param user
+     * @param questionId
+     * @return
+     */
+    int collect(User user, Long questionId);
 }

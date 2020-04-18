@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${question.title} + ' | CodingHub'">问题</title>
+    <title th:text="${question.title} + ' - CodingHub'">问题</title>
     <head th:insert="import :: head"></head>
 </head>
 <body>
 <div th:replace="navigation :: navigation"></div>
 <div class="wrap">
     <div class="container">
-        <div class="row main">
+        <div class="row">
             <div class="col-xs-12 col-md-9 side-left topics-show">
                 <div class="topic panel panel-default">
                     <div class="infos panel-heading">
@@ -84,6 +84,7 @@
                         </div>
                     </div>
                     <div class="col-xs-12" id="comments" th:data-active="${session.user == null ? 0 : 1}">
+                        <!--最佳答案-->
                         <div class="panel panel-danger" th:if="${excellent != null}">
                             <div class="panel-heading">
                                 <h4 class="panel-title">最佳答案</h4>
@@ -92,7 +93,8 @@
                                 <div class="media">
                                     <div class="media-left">
                                         <a th:href="@{/profile/user/{userId}(userId = ${excellent.user.id})}">
-                                            <img class="media-object img-rounded" th:src="${excellent.user.avatarUrl}"
+                                            <img class="media-object img-circle"
+                                                 th:src="${excellent.user.avatarUrl}"
                                                  alt="avatar">
                                         </a>
                                     </div>
@@ -100,21 +102,22 @@
                                         <h5 class="media-heading text_desc">[[${excellent.user.name}]]</h5>
                                         <div>[[${excellent.content}]]</div>
                                         <div class="comment_operate">
-                                        <span th:class="${excellent.isThumbUp == 1 ? 'icon active' : 'icon'}"
-                                              onclick="thumbComment(this)" th:data-id="${excellent.id}"
-                                              th:data-active="${session.user == null ? 0 : 1}"
-                                              th:id="${'thumb-' + excellent.id}">
-                                            <span class="glyphicon glyphicon-thumbs-up"></span>
-                                            <span th:id="${'thumbCount-' + excellent.id}">[[${excellent.thumbCount}]]</span>
-                                        </span>
-                                            <span class="icon" onclick="collapseComment(this)"
+                                            <span th:class="${excellent.isThumbUp == 1 ? 'icon-my active' : 'icon-my'}"
+                                                  onclick="thumbComment(this)" th:data-id="${excellent.id}"
+                                                  th:data-active="${session.user == null ? 0 : 1}"
+                                                  th:id="${'thumb-' + excellent.id}">
+                                                <span class="fa fa-thumbs-up"></span>
+                                                <span th:id="${'thumbCount-' + excellent.id}">[[${excellent.thumbCount}]]</span>
+                                            </span>
+                                            <span class="icon-my" onclick="collapseComment(this)"
                                                   th:data-id="${excellent.id}"
                                                   th:id="${'collapse-' + excellent.id}">
-                                            <span class="glyphicon glyphicon-comment"></span>
-                                            <span th:id="${'subCount-' + excellent.id}">[[${excellent.subCommentCount}]]</span>
-                                        </span>
-                                            <span class="text_desc pull-right">
-                                            [[${#dates.format(excellent.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span>
+                                                <span class="fa fa-comments"></span>
+                                                <span th:id="${'subCount-' + excellent.id}">[[${excellent.subCommentCount}]]</span>
+                                            </span>
+                                            <span class="icon text_desc pull-right">
+                                                [[${#dates.format(excellent.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                                            </span>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 collapse sub_comment"
                                              th:id="'comment-' + ${excellent.id}">
@@ -132,16 +135,19 @@
                                 </div>
                             </div>
                         </div>
+                        <!--更多回复-->
                         <div class="panel panel-default" th:if="${comments.size() > 0}">
                             <div class="panel-heading">
                                 <h4 class="panel-title" th:text="${comments.size()} + '个回复'"></h4>
                             </div>
                             <ul class="list-group">
-                                <li class="list-group-item" th:each="comment : ${comments}" style="padding: 20px 15px">
+                                <li class="list-group-item" th:each="comment : ${comments}"
+                                    style="padding: 20px 15px">
                                     <div class="media">
                                         <div class="media-left">
                                             <a th:href="@{/profile/user/{userId}(userId = ${comment.user.id})}">
-                                                <img class="media-object img-rounded" th:src="${comment.user.avatarUrl}"
+                                                <img class="media-object img-circle"
+                                                     th:src="${comment.user.avatarUrl}"
                                                      alt="avatar">
                                             </a>
                                         </div>
@@ -149,25 +155,26 @@
                                             <h5 class="media-heading text_desc">[[${comment.user.name}]]</h5>
                                             <div>[[${comment.content}]]</div>
                                             <div class="comment_operate">
-                                        <span th:class="${comment.isThumbUp == 1 ? 'icon active' : 'icon'}"
-                                              onclick="thumbComment(this)" th:data-id="${comment.id}"
-                                              th:data-active="${session.user == null ? 0 : 1}"
-                                              th:id="${'thumb-' + comment.id}">
-                                            <span class="glyphicon glyphicon-thumbs-up"></span>
-                                            <span th:id="${'thumbCount-' + comment.id}">[[${comment.thumbCount}]]</span>
-                                        </span>
-                                                <span class="icon" onclick="collapseComment(this)"
+                                                <span th:class="${comment.isThumbUp == 1 ? 'icon-my active' : 'icon-my'}"
+                                                      onclick="thumbComment(this)" th:data-id="${comment.id}"
+                                                      th:data-active="${session.user == null ? 0 : 1}"
+                                                      th:id="${'thumb-' + comment.id}">
+                                                    <span class="fa fa-thumbs-up"></span>
+                                                    <span th:id="${'thumbCount-' + comment.id}">[[${comment.thumbCount}]]</span>
+                                                </span>
+                                                <span class="icon-my" onclick="collapseComment(this)"
                                                       th:data-id="${comment.id}"
                                                       th:id="${'collapse-' + comment.id}">
-                                            <span class="glyphicon glyphicon-comment"></span>
-                                            <span th:id="${'subCount-' + comment.id}">[[${comment.subCommentCount}]]</span>
-                                        </span>
+                                                    <span class="fa fa-comments"></span>
+                                                    <span th:id="${'subCount-' + comment.id}">[[${comment.subCommentCount}]]</span>
+                                                </span>
                                                 <span class="text_desc pull-right">
-                                            [[${#dates.format(comment.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span>
+                                                    [[${#dates.format(comment.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                                                </span>
                                             </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 collapse sub_comment"
+                                            <div class="col-xs-12 collapse sub_comment"
                                                  th:id="'comment-' + ${comment.id}">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="col-xs-12">
                                                     <input type="text" class="form-control"
                                                            th:name="${'input-' + comment.id}"
                                                            placeholder="评论一下...">
@@ -184,7 +191,7 @@
                         </div>
                         <div th:if="${excellent == null}" class="jumbotron"
                              style="background-color: #fff">
-                            <p>这个问题可能太复杂了，还没人回答......</p>
+                            <p class="text-center text_desc">这个问题可能太复杂了，还没人回答......</p>
                         </div>
                     </div>
                 </div>
@@ -197,7 +204,7 @@
                         <hr/>
                         <div class="media margin_bottom_20">
                             <div class="media-left">
-                                <img class="media-object img-rounded"
+                                <img class="media-object img-circle"
                                      th:src="${session.user == null ? '/images/default-avatar.jpg' : session.user.avatarUrl}"
                                      alt="avatar"/>
                             </div>
@@ -209,23 +216,20 @@
                         </div>
                         <div class="text-center text_desc" style="font-size: 15px" th:if="${session.user == null}">
                             评论功能需要登录后才可以使用，点击
-                            <a class="blue" href="#">登录</a>
+                            <a class="blue" th:href="@{/user/toLogin}">登录</a>
                             或
-                            <a class="blue" href="#">注册</a>
+                            <a class="blue" th:href="@{/user/toRegister}">注册</a>
                         </div>
                         <div th:if="${session.user != null}" class="cbox-post">
                             <div class="cbox-input">
-                                <textarea id="chat_text" rows="6" placeholder="请输入回复内容"></textarea>
+                                <textarea id="comment_content" rows="6" placeholder="请输入回复内容"></textarea>
                                 <input type="hidden" id="question_id" th:value="${question.id}"/>
                             </div>
                             <div class="cbox-ats clearfix">
                                 <div class="ats-issue">
-                                    <button id="btn-chat" class="btn btn-success btn-sm bt" onclick="comment()">回复</button>
+                                    <button class="btn btn-success btn-sm bt" onclick="comment()">回复</button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="phiz-box" id="c-phiz" style="display:none">
-                            <div class="phiz-list" view="c-phizs"></div>
                         </div>
                     </div>
                 </div>
@@ -245,24 +249,31 @@
                     </li>
                     <li class="list-group-item">
                         <div class="user-datas">
-                            <ul>
-                                <li><strong>14</strong><span>发布</span></li>
-                                <li class="noborder"><strong>6</strong><span>评论</span></li>
-                            </ul>
+                            <div class="text_desc text-center"
+                                 th:text="${question.user.bio == null ? '太神秘.没有签名...' : question.user.bio}">
+                            </div>
                         </div>
                     </li>
                     <li class="list-group-item">
                         <div class="text-center">
-                            <a class="btn btn-default btn-sm" href="javascript:void(0);" data-id="20" rel="favor">
-                                <i class="icon icon-star"></i> 收藏 <strong id="favors">1</strong>
+                            <a shiro:authenticated="" id="collect" th:data-id="${question.id}" rel="favor"
+                               th:class="${question.isCollect == 0 ? 'btn btn-default btn-sm' : 'btn btn-success btn-sm'}">
+                                <span th:class="${question.isCollect == 0 ? 'fa fa-star' : 'icon-star'}"
+                                      th:text="${question.isCollect == 0 ? ' 收藏 ' : ' 取消 '}"
+                                      id="isCollect"></span>
+                                <strong id="favors">[[${question.collectionCount}]]</strong>
                             </a>
+                            <span shiro:guest="" style="font-size: 12px">
+                                <i class="icon-star"></i>
+                                收藏 <strong>[[${question.collectionCount}]]</strong>
+                            </span>
                         </div>
                     </li>
                 </ul>
 
                 <div class="panel panel-default widget">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-comments"></i> 相关问题</h3>
+                        <h3 class="panel-title"><i class="icon icon-link"></i> 相关问题</h3>
                     </div>
                     <div class="panel-body">
                         <div class="text_desc" th:if="${related == null}">
@@ -281,7 +292,7 @@
 </div>
 <div th:replace="alert :: original"></div>
 <a class="site-scroll-top" title="返回顶部">
-    <i class="icon-arrow-up"></i>
+    <i class="fa fa-angle-double-up fa-2x"></i>
 </a>
 <div th:replace="navigation :: footer"></div>
 <form id="updateForm" method="post">
@@ -310,15 +321,47 @@
             }, 400);
             return false;
         });
+
+        $("#collect").on("click", function (e) {
+            var id = $(this).data("id");
+            $.ajax({
+                type: 'POST',
+                url: '/question/collect',
+                dataType: 'json',
+                data: {
+                    questionId: id
+                },
+                success: function (result) {
+                    if (result.code !== 200) {
+                        $(".modal-body").html("<p>" + result.message + "&hellip;</p>");
+                        $('#error_notice').modal('show');
+                    } else {
+                        var $isCollect = $("#isCollect");
+                        $("#favors").text(result.data);
+                        if ($isCollect.hasClass("fa-star")) {
+                            $isCollect.removeClass();
+                            $isCollect.addClass("icon-star");
+                            $("#collect").removeClass("btn-default");
+                            $("#collect").addClass("btn-success");
+                            $isCollect.text(" 取消 ");
+                            return;
+                        }
+                        $isCollect.removeClass();
+                        $isCollect.addClass("fa fa-star");
+                        $("#collect").removeClass("btn-success");
+                        $("#collect").addClass("btn-default");
+                        $isCollect.text(" 收藏 ");
+                    }
+                }
+            });
+        });
     });
     $("#updateQuestion").on("click", function () {
         $("#updateForm").attr("action", $(this).attr("uri")).submit();
-        return;
     });
 
     $("#deleteQuestion").on("click", function () {
         $("#deleteForm").attr("action", $(this).attr("uri")).submit();
-        return;
     });
 </script>
 </body>

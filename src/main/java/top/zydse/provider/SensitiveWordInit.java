@@ -1,12 +1,13 @@
 package top.zydse.provider;
 
-import org.apache.ibatis.javassist.ClassClassPath;
+import io.netty.util.internal.ResourcesUtil;
 import org.apache.shiro.io.ResourceUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -79,6 +80,7 @@ public class SensitiveWordInit {
         Set<String> set = null;
         InputStreamReader read = null;
         try {
+
             InputStream file = ResourceUtils.getInputStreamForPath(filePath);
             if (file != null) {      //文件流是否存在
                 read = new InputStreamReader(file, encoding);

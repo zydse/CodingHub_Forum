@@ -21,11 +21,14 @@ public class QuestionDTO implements Serializable {
     private String description;
     private Long gmtCreate;
     private Long gmtModified;
+    private Long gmtLastComment;
     private Long creator;
     private Integer viewCount;
     private Integer commentCount;
+    private Integer collectionCount;
     private Integer isTop;
     private Integer isQuality;
+    private Integer isCollect;
     private User user;
     private List<Tag> tags;
 }

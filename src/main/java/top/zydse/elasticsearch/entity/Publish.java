@@ -41,4 +41,13 @@ public class Publish {
 
     @Field(type = FieldType.Long, store = true, index = false)
     private Long gmtModified;
+
+    @Field(type = FieldType.Long, store = true, index = false)
+    private Long gmtLastComment;
+
+    @Field(type = FieldType.Integer, store = true, index = false)
+    private Integer isQuality;
+
+    @Field(type = FieldType.Integer, store = true, index = false)
+    private Integer isTop;
 }

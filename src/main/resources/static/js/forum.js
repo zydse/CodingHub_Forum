@@ -63,7 +63,8 @@ function sendComment(parentId, content, commentType) {
                 $subCount.text(count + 1);
                 $collapse.click();
             } else {
-                alert(result.message);
+                $(".modal-body").html("<p>" + result.message + "&hellip;</p>");
+                $('#error_notice').modal('show');
             }
         }
     });
@@ -96,7 +97,7 @@ function collapseComment(e) {
                     href: "/profile/user/" + subComment.user.id
                 });
                 var $avatar = $("<img/>", {
-                    class: "media-object img-rounded",
+                    class: "media-object img-circle",
                     src: subComment.user.avatarUrl
                 });
                 var $mediaBody = $("<div/>", {

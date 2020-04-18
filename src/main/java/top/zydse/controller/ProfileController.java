@@ -47,7 +47,7 @@ public class ProfileController {
     public String publish(Model model,
                           HttpServletRequest request,
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
-                          @RequestParam(name = "size", defaultValue = "5") Integer size) {
+                          @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
         UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "publish");
@@ -63,7 +63,7 @@ public class ProfileController {
     public String replies(Model model,
                           HttpServletRequest request,
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
-                          @RequestParam(name = "size", defaultValue = "5") Integer size) {
+                          @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
         UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "notification");
@@ -79,7 +79,7 @@ public class ProfileController {
     public String view(Model model,
                        HttpServletRequest request,
                        @RequestParam(name = "page", defaultValue = "1") Integer page,
-                       @RequestParam(name = "size", defaultValue = "5") Integer size) {
+                       @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
         UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "view");
@@ -95,7 +95,7 @@ public class ProfileController {
     public String thumb(Model model,
                         HttpServletRequest request,
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
-                        @RequestParam(name = "size", defaultValue = "5") Integer size) {
+                        @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
         UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "thumb");
@@ -121,7 +121,7 @@ public class ProfileController {
     public String userProfile(@PathVariable("userId") Long id,
                               @RequestParam(value = "s", required = false) String section,
                               @RequestParam(value = "page", defaultValue = "1") Integer page,
-                              @RequestParam(value = "size", defaultValue = "5") Integer size,
+                              @RequestParam(value = "size", defaultValue = "8") Integer size,
                               HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         if (user != null && user.getId().equals(id))

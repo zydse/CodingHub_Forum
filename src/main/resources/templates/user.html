@@ -2,7 +2,7 @@
 <html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>用户信息</title>
+    <title th:text="${userProfile.name + ' - 用户资料'}"></title>
     <head th:insert="import :: head"></head>
 </head>
 <body>
@@ -74,8 +74,8 @@
                     <div class="panel-heading">
                         <h3>
                             <span class="icon icon-list" th:if="${section == 'info'}"></span>
-                            <span class="glyphicon glyphicon-th" th:if="${section == 'publish'}"></span>
-                            <span class="glyphicon glyphicon-comment" th:if="${section == 'comment'}"></span>
+                            <span class="icon icon-puzzle" th:if="${section == 'publish'}"></span>
+                            <span class="fa fa-comments-o" th:if="${section == 'comment'}"></span>
                             [[${sectionName}]]
                         </h3>
                     </div>
@@ -104,7 +104,7 @@
     </div>
 </div>
 <a class="site-scroll-top" title="返回顶部">
-    <i class="icon-arrow-up"></i>
+    <i class="fa fa-angle-double-up fa-2x"></i>
 </a>
 <script type="application/javascript">
     $(function () {

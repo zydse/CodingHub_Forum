@@ -43,6 +43,6 @@
         <table tableName="NOTIFICATION" domainObjectName="Notification"/>
         <table tableName="VIEW_HISTORY" domainObjectName="ViewHistory"/>
         <table tableName="THUMB_HISTORY" domainObjectName="ThumbHistory"/>
-
+        <table tableName="COLLECTION" domainObjectName="Collection"/>
     </context>
 </generatorConfiguration>
