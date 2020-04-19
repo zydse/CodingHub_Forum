@@ -1,10 +1,7 @@
 package top.zydse.mapper;
 
 import org.apache.ibatis.annotations.Param;
-import top.zydse.dto.HotTagDTO;
-import top.zydse.dto.QuestionQueryDTO;
-import top.zydse.dto.ThumbHistoryDTO;
-import top.zydse.dto.ViewHistoryDTO;
+import top.zydse.dto.*;
 import top.zydse.model.*;
 
 import java.util.List;
@@ -46,4 +43,8 @@ public interface CommonExtensionMapper {
     List<Question> findQuestionByTagId(@Param("tagId") Integer tagId,
                                        @Param("offset") int offset,
                                        @Param("size") Integer size);
+
+    List<CollectionDTO> listCollection(@Param("userId") Long id,
+                                       @Param("offset") int offset,
+                                       @Param("size") int size);
 }

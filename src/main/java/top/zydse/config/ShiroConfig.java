@@ -12,6 +12,7 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -36,6 +37,7 @@ public class ShiroConfig {
 
     /**
      * 注册一个EhCache的缓存管理器
+     *
      * @return
      */
     @Bean
@@ -56,6 +58,7 @@ public class ShiroConfig {
         advisorAutoProxyCreator.setProxyTargetClass(true);
         return advisorAutoProxyCreator;
     }
+
     @Bean
     public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager) {
         AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
@@ -87,6 +90,7 @@ public class ShiroConfig {
 
     /**
      * 注册一个权限过滤器，并将权限过滤器绑定一个安全管理器
+     *
      * @param manager
      * @return
      */
@@ -97,15 +101,14 @@ public class ShiroConfig {
         factoryBean.setUnauthorizedUrl("/401");
         factoryBean.setSecurityManager(manager);
         Map<String, String> map = new LinkedHashMap<>();
-//        map.put("/user/logout", "logout");
         map.put("/**", "anon");
         factoryBean.setFilterChainDefinitionMap(map);
-        System.out.println(map);
         return factoryBean;
     }
 
     /**
      * 似乎开启aop支持后需要这样一步来让权限过滤器起作用
+     *
      * @return
      */
     @Bean
@@ -120,26 +123,25 @@ public class ShiroConfig {
 
     /**
      * 注册一个rememberMeCookie
+     *
      * @return
      */
     @Bean
     public SimpleCookie rememberMeCookie() {
-        //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
-        //如果httpOnly设置为true，则不会暴露给客户端脚本代码，使用HttpOnly cookie有助于减少某些类型的跨站点脚本攻击；
         simpleCookie.setHttpOnly(true);
-        //记住我cookie生效时间,单位是秒
-        simpleCookie.setMaxAge(600);
+        simpleCookie.setMaxAge(60 * 60 * 24 * 30);
         return simpleCookie;
     }
 
     /**
      * 注册一个rememberMeManager
+     *
      * @param simpleCookie
      * @return
      */
     @Bean
-    public RememberMeManager getRememberMeManager(SimpleCookie simpleCookie){
+    public RememberMeManager getRememberMeManager(SimpleCookie simpleCookie) {
         CookieRememberMeManager rememberMeManager = new CookieRememberMeManager();
         byte[] cipherKey = Base64.decode("wGiHplamyXlVB11UXWol8g==");
         rememberMeManager.setCipherKey(cipherKey);
@@ -147,21 +149,30 @@ public class ShiroConfig {
         return rememberMeManager;
     }
 
+    @Bean
+    public DefaultWebSessionManager webSessionManager() {
+        DefaultWebSessionManager webSessionManager = new DefaultWebSessionManager();
+        webSessionManager.setSessionIdUrlRewritingEnabled(false);
+        return webSessionManager;
+    }
+
     /**
      * 注册核心安全管理器
+     *
      * @param realm
      * @param ehCacheManager
      * @param rememberMeManager
      * @return
      */
     @Bean
-    public DefaultWebSecurityManager getSecurityManager(@Qualifier("getUserRealm") Realm realm,
-                                                        EhCacheManager ehCacheManager,
-                                                        RememberMeManager rememberMeManager) {
+    public DefaultWebSecurityManager getSecurityManager(
+            @Qualifier("getUserRealm") Realm realm,
+            EhCacheManager ehCacheManager,
+            RememberMeManager rememberMeManager) {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(realm);
         manager.setCacheManager(ehCacheManager);
-//        manager.setRememberMeManager(rememberMeManager);
+        manager.setRememberMeManager(rememberMeManager);
         return manager;
     }
 }

@@ -724,7 +724,8 @@ abbr[data-original-title], abbr[title] {
 
 .posts-item .item-info {
     position: relative;
-    display: inline-block
+    display: inline-block;
+    width: 100%;
 }
 
 .posts-item .item-info ul {
@@ -737,6 +738,15 @@ abbr[data-original-title], abbr[title] {
     float: left;
     padding: 0;
     margin: 0 10px 0 0;
+    color: #748594;
+    position: relative;
+}
+
+.posts-item .item-info ul li.pull-right {
+    font-size: 15px;
+    letter-spacing: -0.2px;
+    float: right;
+    padding: 0;
     color: #748594;
     position: relative;
 }

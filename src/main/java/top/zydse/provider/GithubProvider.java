@@ -9,6 +9,7 @@ import top.zydse.dto.AccessTokenDTO;
 import top.zydse.dto.GithubUserDTO;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * CreateBy: zydse
@@ -28,7 +29,9 @@ public class GithubProvider {
     private String getTokenUrl;
 
     public GithubProvider() {
-        client = new OkHttpClient();
+        client = new OkHttpClient.Builder()
+                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS))
+                .build();
     }
 
     public String getAccessToken(AccessTokenDTO accessTokenDTO) {
@@ -48,12 +51,10 @@ public class GithubProvider {
     }
 
     public GithubUserDTO getGithubUser(String token) {
-        log.info("使用token获取用户信息");
         Request request = new Request.Builder()
                 .url(getTokenUrl)
-                .header("Authorization", "token " + token )
+                .header("Authorization", "token " + token)
                 .build();
-
         try (Response response = client.newCall(request).execute()) {
             String string = response.body().string();
             return JSON.parseObject(string, GithubUserDTO.class);

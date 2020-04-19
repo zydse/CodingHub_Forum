@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>修改资料 - CodingHub</title>
+    <head th:insert="fragment/import :: head"></head>
+</head>
+<body>
+<div th:replace="fragment/navigation :: navigation"></div>
+<div class="wrap">
+    <!-- Main -->
+    <div class="container">
+        <div class="panel panel-default stacked">
+            <div class="panel-heading">
+                <ul class="nav nav-pills account-tab">
+                    <li th:class="${type == 'profile' ? 'active' : _}"><a href="profile">基本信息</a></li>
+                    <li th:class="${type == 'phone' ? 'active' : _}"><a href="phone">修改手机号</a></li>
+                    <li th:class="${type == 'avatar' ? 'active' : _}"><a href="avatar">修改头像</a></li>
+                    <li th:class="${type == 'password' ? 'active' : _}"><a href="password">修改密码</a></li>
+                </ul>
+            </div>
+            <div class="panel-body">
+                <div class="tab-pane active" th:id="${type}">
+                    <div th:insert="fragment/settingsForm :: ${type}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="application/javascript">
+    $('#upload_btn').change(function(){
+        // $(this).upload(upload_url, function(data){
+        //     if (data.status == 200) {
+        //         window.location.reload();
+        //     } else {
+        //         layer.msg(data.message, {icon: 5});
+        //     }
+        // });
+        alert("似乎有文件进来了");
+    });
+</script>
+
+<div th:replace="fragment/navigation :: footer"></div>
+</body>
+</html>

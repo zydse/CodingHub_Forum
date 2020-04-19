@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>发布 | CodingHub</title>
-    <head th:insert="import :: head"></head>
+    <title>发布 - CodingHub</title>
+    <head th:insert="fragment/import :: head"></head>
 </head>
 <body>
-<div th:replace="navigation :: navigation"></div>
+<div th:replace="fragment/navigation :: navigation"></div>
 <div class="wrap">
     <div class="container">
         <div class="col-xs-12 side-left background-white">
@@ -63,7 +63,7 @@
                            th:value="${tags}" onclick="showSelectTag()" readonly>
                     <div id="select-tag" class="publish-tag-tab">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" th:class="${type.type == 'language' ? 'active' : ''}"
+                            <li role="presentation" th:class="${type.type == '开发语言' ? 'active' : ''}"
                                 th:each="type : ${typeList}">
                                 <a th:href="${'#'+ type.getType()}" aria-controls="home" role="tab" data-toggle="tab"
                                    aria-expanded="false">[[${type.type}]]</a>
@@ -71,7 +71,7 @@
                         </ul>
                         <div class="tab-content">
                             <div role="tabpanel" th:id="${type.type}" th:each="type : ${typeList}"
-                                 th:class="${type.type == 'language'? 'active tab-pane' : 'tab-pane'}">
+                                 th:class="${type.type == '开发语言' ? 'active tab-pane' : 'tab-pane'}">
                                 <span th:each="tag : ${type.tags}" class="community-tag" onclick="selectTag(this)"
                                       th:data-tag="${tag.tagName}">
                                     [[${tag.tagName}]]
@@ -85,7 +85,7 @@
         </div>
     </div>
 </div>
-<div th:replace="alert :: original"></div>
+<div th:replace="fragment/alert :: original"></div>
 <script type="application/javascript">
     $("#questionForm").submit(function (e) {
         e.preventDefault();
@@ -159,6 +159,6 @@
         }
     }
 </script>
-<div th:replace="navigation :: footer"></div>
+<div th:replace="fragment/navigation :: footer"></div>
 </body>
 </html>

@@ -84,8 +84,7 @@
         </div>
     </div>
 </section>
-
-<div th:insert="alert :: modal"></div>
+<div th:insert="fragment/alert :: modal"></div>
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/modernizr.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
@@ -213,7 +212,6 @@
             }
         });
     });
-
     function task($val) {
         if (countdown === 0) {
             clearTimeout(timer);

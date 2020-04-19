@@ -156,10 +156,24 @@ a.blue:hover {
     text-decoration: none;
 }
 
-.icon_font {
-    font-size: 30px;
+.text_desc.middle {
+    font-size: 14px;
+}
+
+.six-size{
+    font-size: 16px;
 }
 
 .panel-danger > .panel-heading {
     background-color: #f2dede;
+}
+
+.editormd-fullscreen{
+    z-index: 100;
+}
+
+.list-group-item.active{
+    color: #fff;
+    background-color: #03a9f4;
+    border-color: #03a9f4;
 }

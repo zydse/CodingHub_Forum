@@ -37,12 +37,12 @@ public interface QuestionService {
 
     /**
      * 根据用户id查询所有发帖记录
+     * @param id 用户id
      * @param page
      * @param size
-     * @param id 用户id
      * @return
      */
-    PaginationDTO<QuestionDTO> findAll(int page, int size, Long id);
+    PaginationDTO<QuestionDTO> findAll(Long id, int page, int size);
 
     /**
      * 点击问题后查看问题，记录浏览历史

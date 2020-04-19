@@ -1,20 +1,18 @@
 package top.zydse.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import top.zydse.dto.PaginationDTO;
-import top.zydse.dto.ThumbHistoryDTO;
-import top.zydse.dto.UserProfileDTO;
-import top.zydse.dto.ViewHistoryDTO;
+import top.zydse.dto.*;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.*;
 import top.zydse.model.*;
 import top.zydse.service.ProfileService;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +40,8 @@ public class ProfileServiceImpl implements ProfileService {
     private CommentMapper commentMapper;
     @Autowired
     private SubCommentMapper subCommentMapper;
+    @Autowired
+    private CollectionMapper collectionMapper;
 
     public PaginationDTO<ViewHistoryDTO> viewHistory(Integer page, Integer size, Long userId) {
         PaginationDTO<ViewHistoryDTO> paginationDTO = new PaginationDTO<>();
@@ -95,7 +95,7 @@ public class ProfileServiceImpl implements ProfileService {
         subCommentExample.createCriteria().andReviewerEqualTo(id);
         long subCommentNum = subCommentMapper.countByExample(subCommentExample);
         userProfileDTO.setCommentNum(commentList.size() + subCommentNum);
-        if(commentList.size() == 0)
+        if (commentList.size() == 0)
             userProfileDTO.setThumbedNum(0);
         else {
             Integer thumbedNum = commentList.stream()
@@ -105,5 +105,20 @@ public class ProfileServiceImpl implements ProfileService {
             userProfileDTO.setThumbedNum(thumbedNum);
         }
         return userProfileDTO;
+    }
+
+    @Override
+    public PaginationDTO<CollectionDTO> collection(Long id, int page, int size) {
+        PaginationDTO<CollectionDTO> paginationDTO = new PaginationDTO<>();
+        CollectionExample collectionExample = new CollectionExample();
+        collectionExample.createCriteria().andUserIdEqualTo(id);
+        long totalCount = collectionMapper.countByExample(collectionExample);
+        if (totalCount == 0)
+            return paginationDTO;
+        paginationDTO.setPagination((int) totalCount, page, size);
+        int offset = (paginationDTO.getCurrentPage() - 1) * size;
+        List<CollectionDTO> collectionDTOs = commonExtensionMapper.listCollection(id, offset, size);
+        paginationDTO.setPageData(collectionDTOs);
+        return paginationDTO;
     }
 }

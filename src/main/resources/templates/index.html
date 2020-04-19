@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>发现 - CodingHub</title>
-    <head th:insert="import :: head"></head>
+    <head th:insert="fragment/import :: head"></head>
 </head>
 <body>
-<div th:replace="navigation :: navigation"></div>
+<div th:replace="fragment/navigation :: navigation"></div>
 <!--<div class="fore-wrapper">-->
 <div class="wrap">
     <div class="container">
@@ -47,7 +47,7 @@
                 </div>
                 <!--主题内容-->
                 <div class="posts" th:if="${showType != 6}">
-                    <div th:if="${pagination.pageCount == null}" class="jumbotron" style="background-color: #fff;">
+                    <div th:if="${pagination.pageCount == null}" class="jumbotron background-white">
                         <p class="text_desc">看起来还没有相关问题呢.....</p>
                     </div>
                     <ul class="posts-list" th:each="question : ${pagination.pageData}">
@@ -99,71 +99,24 @@
                 <!--分页-->
                 <div class="text-center"
                      th:if="${showType != 6 and pagination.pageCount != null and pagination.pageCount > 1}">
-                    <div th:if="${showType == 1}" th:insert="pageNav :: index"></div>
-                    <div th:if="${showType  == 2}" th:insert="pageNav :: search"></div>
-                    <div th:if="${showType == 3}" th:insert="pageNav :: tag"></div>
-                    <div th:if="${showType == 4}" th:insert="pageNav :: emptyComment"></div>
-                    <div th:if="${showType == 5}" th:insert="pageNav :: trend"></div>
+                    <div th:if="${showType == 1}" th:insert="fragment/pageNav :: index"></div>
+                    <div th:if="${showType  == 2}" th:insert="fragment/pageNav :: search"></div>
+                    <div th:if="${showType == 3}" th:insert="fragment/pageNav :: tag"></div>
+                    <div th:if="${showType == 4}" th:insert="fragment/pageNav :: emptyComment"></div>
+                    <div th:if="${showType == 5}" th:insert="fragment/pageNav :: trend"></div>
                 </div>
             </div>
             <div class="col-md-3 col-xs-12 side-right">
-                <div class="panel panel-default widget">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <i class="fa fa-paper-plane"></i>
-                            热门标签
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="list">
-                            <li class="text_desc" th:each="hotTag : ${hotTags}">
-                                <a class="community-tag" th:href="@{/question/tags/{tagId}(tagId = ${hotTag.id})}">
-                                    <span class="icon-tag"></span>
-                                    <span>[[${hotTag.tagName}]]</span>
-                                </a>
-                                <span th:text="${hotTag.questionCount + '个问题,'+ hotTag.commentCount + '个回复'}"></span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="panel panel-default widget">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <i class="fa fa-rmb"></i>
-                            资助站长
-                        </h3>
-                    </div>
-                    <div class="panel-body text-center">
-                        <img style="width: 50%; height: auto;" th:src="@{/images/alipay.jpg}">
-                    </div>
-                </div>
+                <div th:replace="fragment/sides :: hotTags"></div>
+                <div th:replace="fragment/sides :: latest"></div>
+                <div th:replace="fragment/sides :: donate"></div>
             </div>
         </div>
     </div>
 </div>
-
-<a class="site-scroll-top" title="返回顶部">
-    <i class="fa fa-angle-double-up fa-2x"></i>
-</a>
-<div th:replace="navigation :: footer"></div>
-<!--</div>-->
+<div th:replace="fragment/navigation :: footer"></div>
 <script type="application/javascript">
     $(function () {
-        var $backTop = $('.site-scroll-top');
-        $backTop.hide();
-        $(window).scroll(function () {
-            if ($(window).scrollTop() > 200) {
-                $backTop.fadeIn(200);
-            } else {
-                $backTop.fadeOut(200);
-            }
-        });
-        $backTop.on("click", function () {
-            $('html').animate({
-                scrollTop: 0
-            }, 400);
-            return false;
-        });
         $("#searchForm").on("submit", function (e) {
             var searchTxt = $("[name=search]").val();
             if (searchTxt === '' || searchTxt === null) {

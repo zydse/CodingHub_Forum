@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${question.title} + ' - CodingHub'">问题</title>
-    <head th:insert="import :: head"></head>
+    <head th:insert="fragment/import :: head"></head>
 </head>
 <body>
-<div th:replace="navigation :: navigation"></div>
+<div th:replace="fragment/navigation :: navigation"></div>
 <div class="wrap">
     <div class="container">
         <div class="row">
@@ -83,7 +83,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-xs-12" id="comments" th:data-active="${session.user == null ? 0 : 1}">
+                    <div class="col-xs-12 margin_top_20" id="comments" th:data-active="${session.user == null ? 0 : 1}">
                         <!--最佳答案-->
                         <div class="panel panel-danger" th:if="${excellent != null}">
                             <div class="panel-heading">
@@ -189,8 +189,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div th:if="${excellent == null}" class="jumbotron"
-                             style="background-color: #fff">
+                        <div th:if="${excellent == null}" class="jumbotron background-white">
                             <p class="text-center text_desc">这个问题可能太复杂了，还没人回答......</p>
                         </div>
                     </div>
@@ -236,65 +235,15 @@
             </div>
 
             <div class="col-xs-12 col-md-3 side-right">
-                <ul class="list-group about-user">
-                    <li class="list-group-item user-card">
-                        <div class="user-avatar">
-                            <a th:href="@{/profile/user/{userId}(userId=${question.user.id})}">
-                                <img class="img-circle" th:src="${question.user.avatarUrl}" alt="avatar">
-                            </a>
-                        </div>
-                        <div class="user-name">
-                            <span>[[${question.user.name}]]</span>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="user-datas">
-                            <div class="text_desc text-center"
-                                 th:text="${question.user.bio == null ? '太神秘.没有签名...' : question.user.bio}">
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="text-center">
-                            <a shiro:authenticated="" id="collect" th:data-id="${question.id}" rel="favor"
-                               th:class="${question.isCollect == 0 ? 'btn btn-default btn-sm' : 'btn btn-success btn-sm'}">
-                                <span th:class="${question.isCollect == 0 ? 'fa fa-star' : 'icon-star'}"
-                                      th:text="${question.isCollect == 0 ? ' 收藏 ' : ' 取消 '}"
-                                      id="isCollect"></span>
-                                <strong id="favors">[[${question.collectionCount}]]</strong>
-                            </a>
-                            <span shiro:guest="" style="font-size: 12px">
-                                <i class="icon-star"></i>
-                                收藏 <strong>[[${question.collectionCount}]]</strong>
-                            </span>
-                        </div>
-                    </li>
-                </ul>
-
-                <div class="panel panel-default widget">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="icon icon-link"></i> 相关问题</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="text_desc" th:if="${related == null}">
-                            这个问题问的太有新意了，好像还没相关的问题呢...
-                        </div>
-                        <ul class="list" th:if="${related != null}">
-                            <li th:each="question : ${related}">
-                                <a th:href="@{/question/{questionId}(questionId = ${question.id})}">[[${question.title}]]</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <div th:replace="fragment/sides :: creator"></div>
+                <div th:replace="fragment/sides :: related"></div>
+                <div th:replace="fragment/sides :: donate"></div>
             </div>
         </div>
     </div>
 </div>
-<div th:replace="alert :: original"></div>
-<a class="site-scroll-top" title="返回顶部">
-    <i class="fa fa-angle-double-up fa-2x"></i>
-</a>
-<div th:replace="navigation :: footer"></div>
+<div th:replace="fragment/alert :: original"></div>
+<div th:replace="fragment/navigation :: footer"></div>
 <form id="updateForm" method="post">
     <input type="hidden" name="_method" value="put"/>
 </form>
@@ -303,25 +252,6 @@
 </form>
 <script>
     $(function () {
-        //先将#back-top隐藏
-        var $backTop = $('.site-scroll-top');
-        $backTop.hide();
-        //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
-        $(window).scroll(function () {
-            if ($(window).scrollTop() > 200) {
-                $backTop.fadeIn(200);
-            } else {
-                $backTop.fadeOut(200);
-            }
-        });
-        //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
-        $backTop.on("click", function () {
-            $('html').animate({
-                scrollTop: 0
-            }, 400);
-            return false;
-        });
-
         $("#collect").on("click", function (e) {
             var id = $(this).data("id");
             $.ajax({

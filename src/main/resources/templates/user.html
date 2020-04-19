@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${userProfile.name + ' - 用户资料'}"></title>
-    <head th:insert="import :: head"></head>
+    <head th:insert="fragment/import :: head"></head>
 </head>
 <body>
-<div th:replace="navigation :: navigation"></div>
+<div th:replace="fragment/navigation :: navigation"></div>
 <div class="wrap">
     <div class="container">
         <div class="row users-show">
@@ -29,45 +29,7 @@
                         </div>
                     </li>
                 </ul>
-                <nav class="navbar navbar-default shadow-box background-white">
-                    <div class="container-fluid">
-                        <div class="navbar-header visible-xs">
-                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                                    data-target="#home-navbar" aria-expanded="false">
-                                <span class="sr-only">Toggle navigation</span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <span class="navbar-brand">导航</span>
-                        </div>
-                    </div>
-                    <div id="home-navbar" class="collapse navbar-collapse">
-                        <div class="list-group user-nav first">
-                            <a th:href="@{/profile/user/{userId}(userId = ${userId})}" class="list-group-item"
-                               th:if="${section != 'info'}">
-                                <i class="icon icon-list"></i>用户资料
-                            </a>
-                            <span th:if="${section == 'info'}" class="list-group-item active">
-                                <i class="icon icon-list"></i>用户资料
-                            </span>
-                            <a th:href="@{/profile/user/{userId}(userId = ${userId}, s = 'publish')}"
-                               class="list-group-item" th:if="${section != 'publish'}">
-                                <i class="icon icon-puzzle"></i>历史提问
-                            </a>
-                            <span th:if="${section == 'publish'}" class="list-group-item active">
-                                <i class="icon icon-puzzle"></i>历史提问
-                            </span>
-                            <a th:href="@{/profile/user/{userId}(userId = ${userId}, s = 'comment')}"
-                               class="list-group-item" th:if="${section != 'comment'}">
-                                <i class="icon icon-speech"></i>历史回复
-                            </a>
-                            <span th:if="${section == 'comment'}" class="list-group-item active">
-                                <i class="icon icon-speech"></i>历史回复
-                            </span>
-                        </div>
-                    </div>
-                </nav>
+                <div th:replace="fragment/sides :: userNav"></div>
             </div>
             <div class="col-xs-12 col-md-9 side-right">
                 <div class="panel panel-default">
@@ -81,53 +43,28 @@
                     </div>
                     <div class="panel-body">
                         <div th:if="${section == 'info'}">
-                            <div th:replace="section :: info"></div>
+                            <div th:replace="fragment/section :: info"></div>
                         </div>
                         <div th:if="${section == 'publish'}">
-                            <div th:replace="section :: publish"></div>
+                            <div th:replace="fragment/section :: publish"></div>
                         </div>
                         <div th:if="${section == 'comment'}">
-                            <div th:replace="section :: comment"></div>
+                            <div th:replace="fragment/section :: comment"></div>
                         </div>
-                        <div th:if="${section != 'info' and pagination.pageCount == null}" class="jumbotron"
-                             style="background-color: #fff;">
+                        <div th:if="${section != 'info' and pagination.pageCount == null}"
+                             class="jumbotron background-white text-center">
                             <p class="text_desc">看起来Ta还没有这些历史呢.....</p>
                         </div>
                     </div>
                     <div class="panel-footer text-center"
                          th:if="${section != 'info' and pagination.pageCount != null and pagination.pageCount > 1}">
-                        <div th:replace="pageNav :: user"></div>
+                        <div th:replace="fragment/pageNav :: user"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<a class="site-scroll-top" title="返回顶部">
-    <i class="fa fa-angle-double-up fa-2x"></i>
-</a>
-<script type="application/javascript">
-    $(function () {
-        //先将#back-top隐藏
-        var $backTop = $('.site-scroll-top');
-        $backTop.hide();
-        //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
-        $(window).scroll(function () {
-            if ($(window).scrollTop() > 200) {
-                $backTop.fadeIn(200);
-            } else {
-                $backTop.fadeOut(200);
-            }
-        });
-        //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
-        $backTop.on("click", function () {
-            $('html').animate({
-                scrollTop: 0
-            }, 400);
-            return false;
-        });
-    });
-</script>
-<div th:replace="navigation :: footer"></div>
+<div th:replace="fragment/navigation :: footer"></div>
 </body>
 </html>

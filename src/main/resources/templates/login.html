@@ -7,7 +7,7 @@
     <link th:href="@{/css/font-family.css}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&subset=devanagari,latin-ext"
           rel="stylesheet">
-    <title>登录页 | CodingHub</title>
+    <title>登录页 - CodingHub</title>
     <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
     <link rel="stylesheet" th:href="@{/css/animate.css}">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
@@ -62,7 +62,9 @@
                                             <label for="rememberMe">记住我</label>
                                         </li>
                                         <li>
-                                            <a th:href="@{/user/forget}">忘记了你的账户或密码 ?</a>
+                                            <a href="javascript:void(0);" data-toggle="modal" data-target="#forget">
+                                                忘记了你的账户或密码?
+                                            </a>
                                         </li>
                                     </ul>
                                 </div><!--/.awesome-checkbox-list -->
@@ -88,10 +90,75 @@
                     </div><!--/.row -->
                 </form><!--/form -->
             </div>
-        </div><!--/.sign-description -->
+        </div>
+        <div class="modal fade signin_modal" id="forget" tabindex="-1" role="dialog"
+             aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="sign-content">
+                        <div class="modal-header">
+                            <h2>找回密码</h2>
+                        </div><!--/.modal-header -->
+                        <div class="modal-body">
+                            <div class="signin-form">
+                                <div class=" ">
+                                    <div class=" ">
+                                        <form action="signin.html">
+                                            <div class="form-group">
+                                                <label for="phone-number">手机号</label>
+                                                <input type="text" class="form-control" id="phone-number"
+                                                       name="phone-number"
+                                                       pattern="(\d{11})|(\d{3}-\d{4}-\d{4})$"
+                                                       required placeholder="请输入注册手机号获得验证码">
+                                            </div><!--/.form-group -->
+                                            <div class="form-col">
+                                                <div class="form-group">
+                                                    <label for="verify-code">验证码</label>
+                                                    <input type="text" class="form-control" id="verify-code"
+                                                           name="verify-code"
+                                                           required maxlength="6" minlength="6"
+                                                           placeholder="请输入你获得的验证码">
+                                                </div>
+                                            </div>
+                                            <div class="form-col1">
+                                                <div class="form-group">
+                                                    <button type="button" id="code-btn" class="btn btn_get pull-right">
+                                                        获取验证码
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                            <div class="form-group">
+                                                <label class="pull-left" for="newPassword">新密码</label>
+                                                <input type="password" class="form-control" name="newPassword"
+                                                       id="newPassword" minlength="6" required
+                                                       placeholder="请输入密码(至少6位)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password-retype">确认密码</label>
+                                                <input type="password" class="form-control" id="password-retype"
+                                                       minlength="6" required placeholder="请重新输入密码">
+                                            </div>
+                                        </form><!--/form -->
+                                    </div><!--/.col -->
+                                </div><!--/.row -->
+                            </div><!--/.signin-form -->
+                            <div class="signin-footer">
+                                <button type="button" class="btn signin_btn" data-toggle="modal"
+                                        data-target=".signin_modal">
+                                    重新设置密码
+                                </button>
+                            </div><!--/.signin-footer -->
+                        </div><!--/.modal-body -->
+                    </div><!--/.sign-content -->
+                </div><!--/.modal-content -->
+            </div><!--/.modal-dialog -->
+        </div><!--/.modal -->
+        <!-- modal part end -->
+        <!--/.sign-description -->
     </div><!--/.container -->
 </section><!--/.signin -->
-<div th:insert="alert :: modal"></div>
+<div th:insert="fragment/alert :: modal"></div>
 <script th:src="@{/js/jquery.js}"></script>
 <script th:src="@{/js/modernizr.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
@@ -105,7 +172,7 @@
         var username = $("input#username").val();
         var password = $("input#password").val();
         var captchaCode = $("input#captchaCode").val();
-        var isRemember = $("input#isRemember").prop("checked") ? 1 : 0;
+        var rememberMe = $("input#rememberMe").prop("checked") ? 1 : 0;
         $.ajax({
             type: "POST",
             url: "/user/login",
@@ -113,7 +180,7 @@
             data: {
                 "username": username,
                 "password": $.md5(password),
-                "isRemember": isRemember,
+                "rememberMe": rememberMe,
                 "captchaCode": captchaCode
             },
             success: function (result) {

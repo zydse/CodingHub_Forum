@@ -74,7 +74,7 @@ html, body {
 }
 .signin {
     background: #fff;
-    padding: 216px 0;
+    padding: 50px 0;
 }
 .signin.signup {
     padding: 123px 0px;
@@ -228,7 +228,7 @@ html, body {
 }
 
 .btn.signin_btn, .btn.signin_btn:focus {
-    width: 620px;
+    width: 100%;
     padding: 0;
     height: 60px;
     background: #5a84fd;

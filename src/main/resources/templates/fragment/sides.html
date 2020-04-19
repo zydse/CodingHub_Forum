@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<body>
+<div th:fragment="hotTags">
+    <div class="panel panel-default widget">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="icon-fire"></i>
+                热门标签
+            </h3>
+        </div>
+        <div class="panel-body">
+            <ul class="list">
+                <li class="text_desc" th:each="hotTag : ${hotTags}">
+                    <a class="community-tag" th:href="@{/question/tags/{tagId}(tagId = ${hotTag.id})}">
+                        <span class="icon-tag"></span>
+                        <span>[[${hotTag.tagName}]]</span>
+                    </a>
+                    <span th:text="${hotTag.questionCount + '个问题,'+ hotTag.commentCount + '个回复'}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="latest">
+    <div class="panel panel-default widget">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-paper-plane"></i>
+                最新发布
+            </h3>
+        </div>
+        <div class="panel-body">
+            <ul class="list">
+                <li class="text_desc" th:each="hotTag : ${hotTags}">
+                    <a class="community-tag" th:href="@{/question/tags/{tagId}(tagId = ${hotTag.id})}">
+                        <span class="icon-tag"></span>
+                        <span>[[${hotTag.tagName}]]</span>
+                    </a>
+                    <span th:text="${hotTag.questionCount + '个问题,'+ hotTag.commentCount + '个回复'}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="donate">
+    <div class="panel panel-default widget">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-rmb"></i>
+                资助站长
+            </h3>
+        </div>
+        <div class="panel-body text-center">
+            <img style="width: 50%; height: auto;" th:src="@{/images/alipay.jpg}">
+        </div>
+    </div>
+</div>
+
+<div th:fragment="profileNav">
+    <nav class="navbar navbar-default shadow-box background-white">
+        <div class="container-fluid">
+            <div class="navbar-header visible-xs">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#home-navbar" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span class="navbar-brand">导航</span>
+            </div>
+        </div>
+        <div id="home-navbar" class="collapse navbar-collapse">
+            <div class="list-group user-nav first">
+                <a th:href="@{/profile/info}" class="list-group-item" th:if="${section != 'info'}">
+                    <i class="icon icon-list"></i>我的资料
+                </a>
+                <span th:if="${section == 'info'}" class="list-group-item active">
+                    <i class="icon icon-list"></i>我的资料
+                </span>
+                <a th:href="@{/profile/notification}" class="list-group-item"
+                   th:if="${section != 'notification'}">
+                    <i class="icon icon-bell"></i>我的通知
+                    <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
+                </a>
+                <span th:if="${section == 'notification'}" class="list-group-item active">
+                    <i class="icon icon-bell"></i>我的通知
+                    <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
+                </span>
+                <a th:href="@{/profile/thumb}" class="list-group-item" th:if="${section != 'thumb'}">
+                    <i class="fa fa-thumbs-o-up"></i>我的赞
+                </a>
+                <span th:if="${section == 'thumb'}" class="list-group-item active">
+                    <i class="fa fa-thumbs-o-up"></i>我的赞
+                </span>
+                <a th:href="@{/profile/view}" class="list-group-item" th:if="${section != 'view'}">
+                    <i class="icon icon-book-open"></i>我看过的
+                </a>
+                <span th:if="${section == 'view'}" class="list-group-item active">
+                    <i class="icon icon-book-open"></i>我看过的
+                </span>
+                <a th:href="@{/profile/publish}" class="list-group-item" th:if="${section != 'publish'}">
+                    <i class="icon icon-puzzle"></i>我的提问
+                </a>
+                <span th:if="${section == 'publish'}" class="list-group-item active">
+                    <i class="icon icon-puzzle"></i>我的提问
+                </span>
+                <a th:href="@{/profile/collection}" class="list-group-item"
+                   th:if="${section != 'collection'}">
+                    <i class="fa fa-star-o"></i>我的收藏
+                </a>
+                <span th:if="${section == 'collection'}" class="list-group-item active">
+                    <i class="fa fa-star-o"></i>我的收藏
+                </span>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div th:fragment="creator">
+    <ul class="list-group about-user">
+        <li class="list-group-item user-card">
+            <div class="user-avatar">
+                <a th:href="@{/profile/user/{userId}(userId=${question.user.id})}">
+                    <img class="img-circle" th:src="${question.user.avatarUrl}" alt="avatar">
+                </a>
+            </div>
+            <div class="user-name">
+                <span>[[${question.user.name}]]</span>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="user-datas">
+                <div class="text_desc text-center"
+                     th:text="${question.user.bio == null ? '太神秘.没有签名...' : question.user.bio}">
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="text-center">
+                <a shiro:authenticated="" id="collect" th:data-id="${question.id}" rel="favor"
+                   th:class="${question.isCollect == 0 ? 'btn btn-default btn-sm' : 'btn btn-success btn-sm'}">
+                   <span th:class="${question.isCollect == 0 ? 'fa fa-star' : 'icon-star'}"
+                         th:text="${question.isCollect == 0 ? ' 收藏 ' : ' 取消 '}"
+                         id="isCollect"></span>
+                    <strong id="favors">[[${question.collectionCount}]]</strong>
+                </a>
+                <span shiro:guest="" style="font-size: 12px">
+                    <i class="icon-star"></i>
+                    收藏 <strong>[[${question.collectionCount}]]</strong>
+                </span>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div th:fragment="related">
+    <div class="panel panel-default widget">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="icon icon-link"></i> 相关问题</h3>
+        </div>
+        <div class="panel-body">
+            <div class="text_desc" th:if="${related == null}">
+                这个问题问的太有新意了，好像还没相关的问题呢...
+            </div>
+            <ul class="list" th:if="${related != null}">
+                <li th:each="question : ${related}">
+                    <a th:href="@{/question/{questionId}(questionId = ${question.id})}">[[${question.title}]]</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="userNav">
+    <nav class="navbar navbar-default shadow-box background-white">
+        <div class="container-fluid">
+            <div class="navbar-header visible-xs">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#home-navbar" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span class="navbar-brand">关于Ta</span>
+            </div>
+        </div>
+        <div id="home-navbar" class="collapse navbar-collapse">
+            <div class="list-group user-nav first">
+                <a th:href="@{/profile/user/{userId}(userId = ${userId})}" class="list-group-item"
+                   th:if="${section != 'info'}">
+                    <i class="icon icon-list"></i>用户资料
+                </a>
+                <span th:if="${section == 'info'}" class="list-group-item active">
+                    <i class="icon icon-list"></i>用户资料
+                </span>
+                <a th:href="@{/profile/user/{userId}(userId = ${userId}, s = 'publish')}"
+                   class="list-group-item" th:if="${section != 'publish'}">
+                    <i class="icon icon-puzzle"></i>历史提问
+                </a>
+                <span th:if="${section == 'publish'}" class="list-group-item active">
+                    <i class="icon icon-puzzle"></i>历史提问
+                </span>
+                <a th:href="@{/profile/user/{userId}(userId = ${userId}, s = 'comment')}"
+                   class="list-group-item" th:if="${section != 'comment'}">
+                    <i class="icon icon-speech"></i>历史回复
+                </a>
+                <span th:if="${section == 'comment'}" class="list-group-item active">
+                    <i class="icon icon-speech"></i>历史回复
+                </span>
+            </div>
+        </div>
+    </nav>
+</div>
+
+</body>
+</html>

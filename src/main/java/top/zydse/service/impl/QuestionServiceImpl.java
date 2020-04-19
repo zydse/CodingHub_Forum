@@ -103,11 +103,11 @@ public class QuestionServiceImpl implements QuestionService {
         return getQuestionDTOPaginationDTO(paginationDTO, questionList);
     }
 
-    public PaginationDTO<QuestionDTO> findAll(int page, int size, Long id) {
+    public PaginationDTO<QuestionDTO> findAll(Long id, int page, int size) {
         PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
         QuestionExample example = new QuestionExample();
         example.createCriteria().andCreatorEqualTo(id);
-        example.setOrderByClause("gmt_create desc");
+        example.setOrderByClause("gmt_modified desc");
         int totalCount = (int) questionMapper.countByExample(example);
         if (totalCount == 0) {
             return paginationDTO;
@@ -115,7 +115,16 @@ public class QuestionServiceImpl implements QuestionService {
         paginationDTO.setPagination(totalCount, page, size);
         int offset = (paginationDTO.getCurrentPage() - 1) * size;
         List<Question> questionList = questionMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
-        return getQuestionDTOPaginationDTO(paginationDTO, questionList);
+        List<QuestionDTO> dtoList = new ArrayList<>();
+        User user = userMapper.selectByPrimaryKey(questionList.get(0).getCreator());
+        for (Question plainQuestion : questionList) {
+            QuestionDTO questionDTO = new QuestionDTO();
+            BeanUtils.copyProperties(plainQuestion, questionDTO);
+            questionDTO.setUser(user);
+            dtoList.add(questionDTO);
+        }
+        paginationDTO.setPageData(dtoList);
+        return paginationDTO;
     }
 
     @NotNull
@@ -167,7 +176,7 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionDTO dto = new QuestionDTO();
         BeanUtils.copyProperties(question, dto);
         List<Tag> tagList = extensionMapper.listTagsByQuestion(questionId);
-        if (viewer != null){
+        if (viewer != null) {
             CollectionExample collectionExample = new CollectionExample();
             collectionExample.createCriteria()
                     .andQuestionIdEqualTo(questionId)
@@ -223,7 +232,7 @@ public class QuestionServiceImpl implements QuestionService {
             if (count != 1)
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_ALREADY_DELETED);
             Optional<Publish> optional = publishRepository.findById(question.getId());
-            if(!optional.isPresent())
+            if (!optional.isPresent())
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             Publish publish = optional.get();
             publish.setTitle(question.getTitle());
@@ -385,7 +394,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .andQuestionIdEqualTo(questionId);
         List<Collection> list = collectionMapper.selectByExample(example);
         Question question = questionMapper.selectByPrimaryKey(questionId);
-        if(list.size() != 0){
+        if (list.size() != 0) {
             collectionMapper.deleteByPrimaryKey(list.get(0).getId());
             question.setCollectionCount(question.getCollectionCount() - 1);
             questionMapper.updateByPrimaryKeySelective(question);

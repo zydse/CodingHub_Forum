@@ -3,11 +3,11 @@ package top.zydse.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import top.zydse.interceptor.HotTagInterceptor;
 import top.zydse.interceptor.SessionInterceptor;
+import top.zydse.interceptor.ProfileInterceptor;
 
 import java.util.Arrays;
 
@@ -25,6 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
     private SessionInterceptor sessionInterceptor;
     @Autowired
     private HotTagInterceptor hotTagInterceptor;
+    @Autowired
+    private ProfileInterceptor profileInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -35,6 +37,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(hotTagInterceptor)
                 .addPathPatterns("/", "/question/search", "/question/trend",
                         "/question/emptyComment", "/question/tags/**", "/question/allTags");
+        registry.addInterceptor(profileInterceptor)
+                .addPathPatterns("/profile/*");
     }
 
     @Override

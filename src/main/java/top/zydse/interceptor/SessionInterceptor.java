@@ -1,6 +1,8 @@
 package top.zydse.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -29,6 +31,13 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (SecurityUtils.getSubject().isRemembered()) {
+            User user = (User) SecurityUtils.getSubject().getPrincipal();
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getName(), user.getPassword());
+            token.setRememberMe(true);
+            SecurityUtils.getSubject().login(token);
+            request.getSession().setAttribute("user", user);
+        }
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {
             long count = notificationService.unreadCount(user.getId());

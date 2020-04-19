@@ -57,21 +57,21 @@ public class UserController {
     @PostMapping("/login")
     public ResultDTO login(@RequestParam(name = "username") String username,
                            @RequestParam(name = "password") String password,
+                           @RequestParam(name = "rememberMe") Integer rememberMe,
                            @RequestParam(name = "captchaCode") String captchaCode,
                            HttpServletRequest request) {
         String sessionCaptcha = (String) request.getSession().getAttribute("captchaCode");
-        if(sessionCaptcha == null || !sessionCaptcha.equals(captchaCode)){
+        if (sessionCaptcha == null || !sessionCaptcha.equals(captchaCode)) {
             return ResultDTO.errorOf(CustomizeErrorCode.CAPTCHA_CODE_ERROR);
         }
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+        token.setRememberMe(rememberMe == 1);
         try {
             subject.login(token);
             SavedRequest savedRequest = WebUtils.getSavedRequest(request);
             String url = savedRequest == null ? "/" : savedRequest.getRequestUrl();
-            log.info("user request from :: " + url);
             User user = (User) subject.getPrincipal();
-            log.info("login-ed user : " + user.getToken());
             request.getSession().setAttribute("user", user);
             return ResultDTO.successOf(url);
         } catch (UnknownAccountException e) {

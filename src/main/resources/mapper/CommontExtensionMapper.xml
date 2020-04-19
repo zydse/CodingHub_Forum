@@ -2,18 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.zydse.mapper.CommonExtensionMapper">
     <resultMap id="BaseResultMap" type="top.zydse.model.Question">
-        <id column="ID" jdbcType="BIGINT" property="id" />
-        <result column="TITLE" jdbcType="VARCHAR" property="title" />
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="TITLE" jdbcType="VARCHAR" property="title"/>
         <result column="DESCRIPTION" jdbcType="CLOB" property="description"/>
-        <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate" />
-        <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified" />
-        <result column="GMT_LAST_COMMENT" jdbcType="BIGINT" property="gmtLastComment" />
-        <result column="CREATOR" jdbcType="BIGINT" property="creator" />
-        <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount" />
-        <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount" />
-        <result column="IS_TOP" jdbcType="INTEGER" property="isTop" />
-        <result column="IS_QUALITY" jdbcType="INTEGER" property="isQuality" />
-        <result column="COLLECTION_COUNT" jdbcType="INTEGER" property="collectionCount" />
+        <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate"/>
+        <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified"/>
+        <result column="GMT_LAST_COMMENT" jdbcType="BIGINT" property="gmtLastComment"/>
+        <result column="CREATOR" jdbcType="BIGINT" property="creator"/>
+        <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount"/>
+        <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount"/>
+        <result column="IS_TOP" jdbcType="INTEGER" property="isTop"/>
+        <result column="IS_QUALITY" jdbcType="INTEGER" property="isQuality"/>
+        <result column="COLLECTION_COUNT" jdbcType="INTEGER" property="collectionCount"/>
     </resultMap>
 
     <select id="listViewHistory" resultType="top.zydse.dto.ViewHistoryDTO">
@@ -272,6 +272,16 @@
         WHERE tag_id = #{tagId})
         ORDER BY gmt_last_comment DESC
         LIMIT #{offset},#{size};
+    </select>
+
+    <select id="listCollection" resultType="top.zydse.dto.CollectionDTO">
+        SELECT c.id id, q.ID questionId, u.ID userId,
+         u.NAME, u.AVATAR_URL avatarUrl, u.GMT_MODIFIED gmtModified, q.TITLE, c.GMT_CREATE gmtCreate,
+         q.COMMENT_COUNT commentCount, q.VIEW_COUNT viewCount
+        FROM COLLECTION c, QUESTION q, USER u
+        WHERE user_id = #{userId} AND c.QUESTION_ID = q.ID AND q.CREATOR = u.ID
+        ORDER BY c.GMT_CREATE DESC
+        LIMIT #{offset},#{size}
     </select>
 
 </mapper>

@@ -2,7 +2,6 @@ package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,11 +48,10 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        UserProfileDTO dto = profileService.findUserById(user.getId());
+        log.info("model get user : {}", model.getAttribute("user"));
         model.addAttribute("section", "publish");
         model.addAttribute("sectionName", "我的提问");
-        request.setAttribute("userProfile", dto);
-        PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size, user.getId());
+        PaginationDTO<QuestionDTO> pagination = questionService.findAll(user.getId(), page, size);
         model.addAttribute("pagination", pagination);
         return "profile";
     }
@@ -65,10 +63,8 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "notification");
         model.addAttribute("sectionName", "我的通知");
-        request.setAttribute("userProfile", dto);
         PaginationDTO<NotificationDTO> pagination = notificationService.list(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -81,10 +77,8 @@ public class ProfileController {
                        @RequestParam(name = "page", defaultValue = "1") Integer page,
                        @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "view");
         model.addAttribute("sectionName", "浏览历史");
-        request.setAttribute("userProfile", dto);
         PaginationDTO<ViewHistoryDTO> pagination = profileService.viewHistory(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -97,10 +91,8 @@ public class ProfileController {
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
                         @RequestParam(name = "size", defaultValue = "8") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-        UserProfileDTO dto = profileService.findUserById(user.getId());
         model.addAttribute("section", "thumb");
         model.addAttribute("sectionName", "我的赞");
-        request.setAttribute("userProfile", dto);
         PaginationDTO<ThumbHistoryDTO> pagination = profileService.thumbHistory(page, size, user.getId());
         model.addAttribute("pagination", pagination);
         return "profile";
@@ -109,11 +101,21 @@ public class ProfileController {
     @RequiresAuthentication
     @GetMapping("/info")
     public String userInfo(HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
-        UserProfileDTO dto = profileService.findUserById(user.getId());
         request.setAttribute("section", "info");
         request.setAttribute("sectionName", "我的资料");
-        request.setAttribute("userProfile", dto);
+        return "profile";
+    }
+
+    @RequiresAuthentication
+    @GetMapping("/collection")
+    public String getCollection(HttpServletRequest request,
+                                @RequestParam(name = "page", defaultValue = "1") Integer page,
+                                @RequestParam(name = "size", defaultValue = "8") Integer size){
+        User user = (User) request.getSession().getAttribute("user");
+        PaginationDTO<CollectionDTO> pagination = profileService.collection(user.getId(), page, size);
+        request.setAttribute("section", "collection");
+        request.setAttribute("sectionName", "我的收藏");
+        request.setAttribute("pagination", pagination);
         return "profile";
     }
 
@@ -133,7 +135,7 @@ public class ProfileController {
             request.setAttribute("sectionName", "用户资料");
         }
         else if (section.equals("publish")) {
-            PaginationDTO<QuestionDTO> pagination = questionService.findAll(page, size, id);
+            PaginationDTO<QuestionDTO> pagination = questionService.findAll(id, page, size);
             request.setAttribute("pagination", pagination);
             request.setAttribute("section", "publish");
             request.setAttribute("sectionName", "历史提问");

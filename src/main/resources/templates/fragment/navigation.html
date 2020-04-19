@@ -6,6 +6,31 @@
     服务器: 阿里云 &middot; 网站程序:
     <a class="blue" href="https://github.com/zydse/CodingHub_Forum" target="_blank">CodingHub_Forum</a> &middot;
     <a class="blue" target="_blank" href="http://www.beian.miit.gov.cn/">皖ICP备20003339号</a>
+    <a class="site-scroll-top" title="返回顶部">
+        <i class="fa fa-angle-double-up fa-2x"></i>
+    </a>
+    <script type="application/javascript">
+        $(function () {
+            //先将#back-top隐藏
+            var $backTop = $('.site-scroll-top');
+            $backTop.hide();
+            //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
+            $(window).scroll(function () {
+                if ($(window).scrollTop() > 200) {
+                    $backTop.fadeIn(200);
+                } else {
+                    $backTop.fadeOut(200);
+                }
+            });
+            //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
+            $backTop.on("click", function () {
+                $('html').animate({
+                    scrollTop: 0
+                }, 400);
+                return false;
+            });
+        });
+    </script>
 </div>
 
 <div th:fragment="navigation">
@@ -80,8 +105,20 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a th:href="@{/profile/info}"><i class="icon icon-user"></i>个人中心</a></li>
-                                <li><a th:href="@{/user/logout}"><i class="icon icon-logout"></i>退出</a></li>
+                                <li>
+                                    <a th:href="@{/profile/info}"><i class="icon icon-user"></i>
+                                    个人中心</a>
+                                </li>
+                                <li>
+                                    <a th:href="@{/settings/profile}"><i class="icon icon-note"></i>
+                                        修改信息
+                                    </a>
+                                </li>
+                                <li>
+                                    <a th:href="@{/user/logout}"><i class="icon icon-logout"></i>
+                                        退出
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
