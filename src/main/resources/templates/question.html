@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-xs-12 margin_top_20" id="comments" th:data-active="${session.user == null ? 0 : 1}">
                         <!--最佳答案-->
-                        <div class="panel panel-danger" th:if="${excellent != null}">
+                        <div class="panel panel-danger box-shadow-red zoom-nine" th:if="${excellent != null}">
                             <div class="panel-heading">
                                 <h4 class="panel-title">最佳答案</h4>
                             </div>
@@ -143,7 +143,7 @@
                             <ul class="list-group">
                                 <li class="list-group-item" th:each="comment : ${comments}"
                                     style="padding: 20px 15px">
-                                    <div class="media">
+                                    <div class="media zoom-nine">
                                         <div class="media-left">
                                             <a th:href="@{/profile/user/{userId}(userId = ${comment.user.id})}">
                                                 <img class="media-object img-circle"
@@ -195,7 +195,7 @@
                     </div>
                 </div>
                 <!--回复编辑区-->
-                <div class="col-xs-12 background-white" id="comment_main">
+                <div class="col-xs-12 background-white margin_bottom_20" id="comment_main">
                     <div class="chat_post">
                         <div class="cbox-title">
                             <h4>我来回复</h4>

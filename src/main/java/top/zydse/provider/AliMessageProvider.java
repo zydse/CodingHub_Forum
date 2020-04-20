@@ -52,12 +52,9 @@ public class AliMessageProvider {
         request.putQueryParameter("TemplateParam", "{\"code\":" + code + "}");
         try {
             CommonResponse response = client.getCommonResponse(request);
-            AliResponseDTO aliResponseDTO = JSON.parseObject(response.getData(), AliResponseDTO.class);
-            return aliResponseDTO;
-        } catch (ServerException e) {
-            throw new CustomizeException(CustomizeErrorCode.ALI_SERVER_ERROR);
+            return JSON.parseObject(response.getData(), AliResponseDTO.class);
         } catch (ClientException e) {
-            throw new CustomizeException(CustomizeErrorCode.SYSTEM_ERROR);
+            throw new CustomizeException(CustomizeErrorCode.ALI_SERVER_ERROR);
         }
     }
 }

@@ -2,10 +2,16 @@ package top.zydse.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import top.zydse.dto.ResultDTO;
+import top.zydse.enums.CustomizeErrorCode;
+import top.zydse.exception.CustomizeException;
 import top.zydse.mapper.UserMapper;
 import top.zydse.model.User;
 import top.zydse.model.UserExample;
@@ -32,11 +38,19 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (SecurityUtils.getSubject().isRemembered()) {
+            log.info("是remember me状态");
             User user = (User) SecurityUtils.getSubject().getPrincipal();
             UsernamePasswordToken token = new UsernamePasswordToken(user.getName(), user.getPassword());
             token.setRememberMe(true);
-            SecurityUtils.getSubject().login(token);
-            request.getSession().setAttribute("user", user);
+            try {
+                SecurityUtils.getSubject().login(token);
+                request.getSession().setAttribute("user", user);
+            } catch (AuthenticationException e) {
+                Cookie me = new Cookie("rememberMe", "");
+                me.setMaxAge(0);
+                response.addCookie(me);
+                throw new CustomizeException(CustomizeErrorCode.COOKIE_ERROR);
+            }
         }
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {

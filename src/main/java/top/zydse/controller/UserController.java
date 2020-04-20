@@ -73,6 +73,7 @@ public class UserController {
             String url = savedRequest == null ? "/" : savedRequest.getRequestUrl();
             User user = (User) subject.getPrincipal();
             request.getSession().setAttribute("user", user);
+            request.getSession().removeAttribute("captchaCode");
             return ResultDTO.successOf(url);
         } catch (UnknownAccountException e) {
             return ResultDTO.errorOf(CustomizeErrorCode.USERNAME_INCORRECT);
@@ -124,6 +125,7 @@ public class UserController {
         SavedRequest savedRequest = WebUtils.getSavedRequest(request);
         String url = savedRequest == null ? "/" : savedRequest.getRequestUrl();
         request.getSession().setAttribute("user", resultDTO.getData());
+        request.getSession().removeAttribute("verificationCode");
         return ResultDTO.successOf(url);
     }
 

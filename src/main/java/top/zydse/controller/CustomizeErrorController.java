@@ -35,6 +35,7 @@ public class CustomizeErrorController implements ErrorController {
         ModelAndView error = new ModelAndView("error");
         if (status.is4xxClientError()) {
             error.addObject("message", CustomizeErrorCode.BAD_REQUEST.getMessage());
+            return error;
         }
         error.addObject("message", CustomizeErrorCode.SYSTEM_ERROR.getMessage());
         return error;

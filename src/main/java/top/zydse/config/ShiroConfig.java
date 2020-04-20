@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import top.zydse.shiro.UserRealm;
 
+import javax.servlet.DispatcherType;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -118,6 +119,8 @@ public class ShiroConfig {
         proxy.setTargetFilterLifecycle(true);
         proxy.setTargetBeanName("myFilter");
         filterRegistrationBean.setFilter(proxy);
+        filterRegistrationBean.setDispatcherTypes(DispatcherType.ERROR,
+                DispatcherType.FORWARD, DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.INCLUDE);
         return filterRegistrationBean;
     }
 

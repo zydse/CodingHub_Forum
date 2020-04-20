@@ -285,7 +285,7 @@ html, body {
 }
 
 .modal-content .btn.signin_btn, .modal-content .btn.signin_btn:focus {
-    width: 500px;
+    width: 100%;
 }
 
 .modal-header {
@@ -304,13 +304,13 @@ html, body {
 
 .signin.popup-in, .signin.signup.popup-up {
     position: relative;
-    background: url(/images/popupsignin.png) no-repeat center ;
+    background: url(/images/bg-earth.jpg) no-repeat fixed;
     background-size: cover;
 }
 
 .sign-content.popup-in-content {
-    background: #fff;
-    border-radius: 5px;
+    background: rgba(246,246,246,.90);
+    border-radius: 15px;
     padding: 10px 0;
 }
 
@@ -320,6 +320,7 @@ html, body {
 
 }
 
-.sign-content.popup-in-content .btn.signin_btn, .sign-content.popup-in-content .btn.signin_btn:focus {
-    width: 500px;
+.sign-content.popup-in-content .btn.signin_btn,
+.sign-content.popup-in-content .btn.signin_btn:focus {
+    width: 100%;
 }

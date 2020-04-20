@@ -1,6 +1,7 @@
 package top.zydse.service;
 
 import top.zydse.dto.*;
+import top.zydse.model.User;
 
 /**
  * CreateBy: zydse
@@ -17,4 +18,9 @@ public interface ProfileService {
     UserProfileDTO findUserById(Long id);
 
     PaginationDTO<CollectionDTO> collection(Long id, int page, int size);
+
+    void updatePhoneOrInfo(User user);
+
+    void updatePassword(Long id, Long salt, String newPassword);
+
 }

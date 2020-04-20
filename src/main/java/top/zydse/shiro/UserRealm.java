@@ -55,6 +55,7 @@ public class UserRealm extends AuthorizingRealm {
         User user = userService.findByName(username);
         if (user == null)
             return null;
+        log.info("user password form database : {}", user.getPassword());
         User cookieUser = new User();
         BeanUtils.copyProperties(user, cookieUser);
         cookieUser.setPassword(String.valueOf(token.getPassword()));

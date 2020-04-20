@@ -31,7 +31,10 @@ public enum CustomizeErrorCode implements ICustomizeErrorCode {
     VERIFICATION_CODE_INACTIVE(4003, "你输入短信验证码错误，或者你太长时间没有操作，验证码已经失效了"),
     USERNAME_INCORRECT(4004, "你看起来好像还没有注册过，请先注册后再登录"),
     PASSWORD_INCORRECT(4005, "你输入的密码错了，请重新输入后登录"),
-    CAPTCHA_CODE_ERROR(4006, "你的登录验证码似乎错了呢");
+    CAPTCHA_CODE_ERROR(4006, "你的登录验证码似乎错了呢"),
+    COOKIE_ERROR(4006, "登录中的Cookie遇到了一点问题，现在你可以返回主页，或者重新登录了"),
+    PASSWORD_RETYPE_INCORRECT(4007, "你两次输入的验证码不同，请检查后重新修改"),
+    ORIGINAL_PASSWORD_INCORRECT(4008, "看起来你输入的原密码错了，请仔细想想再修改吧！");
 
     private String message;
     private Integer code;

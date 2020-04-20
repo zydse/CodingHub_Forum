@@ -30,15 +30,18 @@ public class FileController {
     public Object upload(@RequestPart("editormd-image-file") MultipartFile file,
                          String guid,
                          HttpServletRequest request) {
-        if(file == null){
+        if (file == null) {
             throw new CustomizeException(CustomizeErrorCode.BAD_REQUEST);
         }
         String path = request.getServletContext().getRealPath("/posts/");
         String fileName = file.getOriginalFilename();
         String fileType = fileName.substring(fileName.lastIndexOf("."));
         File directory = new File(path);
-        if(!directory.exists()){
+        if (!directory.exists()) {
+            log.info("/posts/不存在");
             directory.mkdir();
+        } else {
+            log.info("存在");
         }
         try {
             file.transferTo(new File(directory, guid + fileType));

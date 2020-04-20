@@ -3,7 +3,7 @@
 <body>
 <!--我的浏览历史-->
 <div th:fragment="view">
-    <div class="panel panel-default" th:each="viewHistory : ${pagination.pageData}">
+    <div class="panel panel-default zoom-nine" th:each="viewHistory : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
                 <div class="media-body">
@@ -29,7 +29,7 @@
 </div>
 <!--我的点赞-->
 <div th:fragment="thumb">
-    <div class="panel panel-default" th:each="thumbHistory : ${pagination.pageData}">
+    <div class="panel panel-default zoom-nine" th:each="thumbHistory : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
                 <div class="media-body six-size">
@@ -55,7 +55,7 @@
 </div>
 <!--我的通知-->
 <div th:fragment="notification">
-    <div class="panel panel-default" th:each="notification : ${pagination.pageData}">
+    <div class="panel panel-default zoom-nine" th:each="notification : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
                 <div class="media-body">
@@ -83,7 +83,7 @@
 </div>
 <!--我的提问-->
 <div th:fragment="publish">
-    <div class="media" th:each="question : ${pagination.pageData}">
+    <div class="media zoom-nine box-shadow-blue" th:each="question : ${pagination.pageData}">
         <div class="media-body">
             <div class="posts-item">
                 <h4 class="item-title" style="margin-bottom: 10px">
@@ -142,7 +142,7 @@
 </div>
 <!--历史评论-->
 <div th:fragment="comment">
-    <div class="panel panel-default" th:each="comment : ${pagination.pageData}">
+    <div class="panel panel-default zoom-nine" th:each="comment : ${pagination.pageData}">
         <div class="panel-body">
             <div class="media">
                 <div class="media-body">
@@ -170,7 +170,7 @@
 </div>
 <!--收藏-->
 <div th:fragment="collection">
-    <div class="media" th:each="collection : ${pagination.pageData}">
+    <div class="media zoom-nine box-shadow-blue" th:each="collection : ${pagination.pageData}">
         <div class="media-left">
             <a th:href="@{/profile/user/{userId}(userId = ${collection.userId})}">
                 <img class="media-object img-circle" th:src="${collection.avatarUrl}" alt="avatar">

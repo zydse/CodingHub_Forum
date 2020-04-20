@@ -177,3 +177,26 @@ a.blue:hover {
     background-color: #03a9f4;
     border-color: #03a9f4;
 }
+.list-group-item.active:hover{
+    color: #fff;
+    background-color: #03a9f4;
+    border-color: #03a9f4;
+    box-shadow: 0px 0px 8px rgba(3, 169, 244, .8);
+}
+
+.box-shadow-red:hover{
+    box-shadow: 0px 0px 8px rgba(242, 222, 222, .8);
+}
+
+.zoom-nine:hover{
+    transform: scale(0.98);
+}
+
+.box-shadow-blue:hover{
+    box-shadow: 0px 0px 8px rgba(153, 207, 255, .8);
+    padding: 3px;
+}
+
+.input-group-btn .btn{
+    margin-left: 5px;
+}

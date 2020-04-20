@@ -1,10 +1,11 @@
 package top.zydse.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.session.RowBounds;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.zydse.dto.*;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.exception.CustomizeException;
@@ -12,9 +13,7 @@ import top.zydse.mapper.*;
 import top.zydse.model.*;
 import top.zydse.service.ProfileService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * CreateBy: zydse
@@ -121,4 +120,21 @@ public class ProfileServiceImpl implements ProfileService {
         paginationDTO.setPageData(collectionDTOs);
         return paginationDTO;
     }
+
+    @Override
+    @Transactional
+    public void updatePhoneOrInfo(User user) {
+        userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(Long id, Long salt, String newPassword) {
+        User user = new User();
+        user.setId(id);
+        Md5Hash hash = new Md5Hash(newPassword, salt.toString(), 1);
+        user.setPassword(hash.toString());
+        userMapper.updateByPrimaryKeySelective(user);
+    }
+
 }
