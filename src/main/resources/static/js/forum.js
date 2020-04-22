@@ -121,7 +121,7 @@ function collapseComment(e) {
                 $a.append($avatar);
                 $mediaLeft.append($a);
                 var elem = $("<div/>", {
-                    class: "col-lg-12 col-md-12 col-sm-12 col-xs-12 media comment_section"
+                    class: "col-xs-12 media comment_section"
                 });
                 elem.append($mediaLeft).append($mediaBody);
                 commentContainer.append(elem);

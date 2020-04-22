@@ -20,4 +20,5 @@ public class UserProfileDTO implements Serializable {
     private Long publishNum;
     private Long commentNum;
     private Integer thumbedNum;
+    private Integer credit;
 }

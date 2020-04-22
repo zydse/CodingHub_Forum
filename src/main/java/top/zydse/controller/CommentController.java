@@ -2,7 +2,6 @@ package top.zydse.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,10 +12,10 @@ import top.zydse.dto.ResultDTO;
 import top.zydse.dto.SubCommentDTO;
 import top.zydse.enums.CommentTypeEnum;
 import top.zydse.enums.CustomizeErrorCode;
-import top.zydse.exception.CustomizeException;
 import top.zydse.model.Comment;
 import top.zydse.model.SubComment;
 import top.zydse.model.User;
+import top.zydse.provider.SensitiveWordFilter;
 import top.zydse.service.CommentService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +33,8 @@ import java.util.List;
 public class CommentController {
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private SensitiveWordFilter wordFilter;
 
     @RequiresPermissions("comment:create")
     @PostMapping("/comment")
@@ -41,14 +42,17 @@ public class CommentController {
     public ResultDTO post(@RequestBody CommentCreateDTO commentCreateDTO,
                           HttpServletRequest request) {
         if (commentCreateDTO.getParentId() == null || commentCreateDTO.getParentId() == 0) {
-            throw new CustomizeException(CustomizeErrorCode.COMMENT_TARGET_NOT_FOUND);
+            return ResultDTO.errorOf(CustomizeErrorCode.COMMENT_TARGET_NOT_FOUND);
         }
         if (commentCreateDTO.getType() == null || !CommentTypeEnum.isExist(commentCreateDTO.getType())) {
-            throw new CustomizeException(CustomizeErrorCode.COMMENT_TYPE_NOT_FOUND);
+            return ResultDTO.errorOf(CustomizeErrorCode.COMMENT_TYPE_NOT_FOUND);
         }
         if (StringUtils.isBlank(commentCreateDTO.getContent()))
-            throw new CustomizeException(CustomizeErrorCode.CONTENT_IS_EMPTY_OR_TO_SHORT);
+            return ResultDTO.errorOf(CustomizeErrorCode.CONTENT_IS_EMPTY_OR_TO_SHORT);
         User user = (User) request.getSession().getAttribute("user");
+        if (wordFilter.isContainSensitiveWord(commentCreateDTO.getContent())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_DESCRIPTION);
+        }
         if (commentCreateDTO.getType().equals(1)) {
             Comment comment = new Comment();
             comment.setReviewer(user.getId());

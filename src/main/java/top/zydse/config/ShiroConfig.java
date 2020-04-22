@@ -102,6 +102,7 @@ public class ShiroConfig {
         factoryBean.setUnauthorizedUrl("/401");
         factoryBean.setSecurityManager(manager);
         Map<String, String> map = new LinkedHashMap<>();
+        map.put("/user/logout", "logout");
         map.put("/**", "anon");
         factoryBean.setFilterChainDefinitionMap(map);
         return factoryBean;
@@ -171,11 +172,13 @@ public class ShiroConfig {
     public DefaultWebSecurityManager getSecurityManager(
             @Qualifier("getUserRealm") Realm realm,
             EhCacheManager ehCacheManager,
+            DefaultWebSessionManager webSessionManager,
             RememberMeManager rememberMeManager) {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(realm);
         manager.setCacheManager(ehCacheManager);
         manager.setRememberMeManager(rememberMeManager);
+        manager.setSessionManager(webSessionManager);
         return manager;
     }
 }

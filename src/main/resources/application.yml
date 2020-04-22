@@ -68,8 +68,11 @@ sensitiveWord:
   encoding: utf-8
   matchType: 1
 
-server:
-  port: 8080
+forum:
+  default:
+    commentBonus: 2
+    thumbBonus: 5
+    publishCredit: 50
 ---
 
 spring:

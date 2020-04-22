@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/font-family.css}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&subset=devanagari,latin-ext"
+          rel="stylesheet">
+    <title>忘记密码 - CodingHub</title>
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/css/animate.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootsnav.css}">
+    <link rel="stylesheet" th:href="@{/css/sign.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+</head>
+<body>
+
+<section class="signin popup-in">
+    <div class="container">
+        <div class="sign-content popup-in-content">
+            <div class="popup-in-txt">
+                <h2 class="h2">找回密码</h2>
+                <form id="reset-password-form">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="signin-form">
+                                    <div class="form-group">
+                                        <label for="phone-number">手机号</label>
+                                        <input type="text" class="form-control" id="phone-number"
+                                               name="phoneNumber" maxlength="11"
+                                               required placeholder="请输入注册时的手机号获得验证码">
+                                    </div><!--/.form-group -->
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="verify-code">验证码</label>
+                                            <input type="text" class="form-control" id="verify-code"
+                                                   name="verifyCode" required maxlength="6" minlength="6"
+                                                   placeholder="请输入你获得的验证码">
+                                        </div>
+                                    </div>
+                                    <div class="form-col1">
+                                        <div class="form-group">
+                                            <button type="button" id="code-btn"
+                                                    class="btn btn_get pull-right">
+                                                获取验证码
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="form-group" id="newInput" style="display: none;">
+                                        <label class="pull-left" for="newPassword">新密码</label>
+                                        <input type="password" class="form-control" name="newPassword"
+                                               id="newPassword" minlength="6" required maxlength="15"
+                                               placeholder="请输入密码(至少6位,不超过15位)">
+                                    </div>
+                                    <div class="form-group" id="reInput" style="display: none;">
+                                        <label for="retype">确认密码</label>
+                                        <input type="password" class="form-control" id="retype" maxlength="15"
+                                               name="retype" minlength="6" required placeholder="请重新输入密码">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="signin-footer">
+                                    <button type="submit" id="reset-btn" class="btn signin_btn"
+                                            style="display: none">
+                                        确认重设密码
+                                    </button>
+                                    <p>
+                                        现在去
+                                        <a th:href="@{/user/toRegister}">注册</a>,
+                                        <a th:href="@{/user/toLogin}">登录</a>
+                                    </p>
+                                    <p>
+                                        <a th:href="@{/}">返回首页</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form><!--/form -->
+                <div class="text-center signin-footer">
+                    <p>
+                        Copyright &copy; 2020 &middot; CodingHub问答社区 &middot;
+                        服务器: 阿里云 &middot;
+                        网站程序: <a href="https://github.com/zydse/CodingHub_Forum" target="_blank">CodingHub_Forum</a>
+                        &middot;
+                        <a target="_blank" href="http://www.beian.miit.gov.cn/">皖ICP备20003339号</a>
+                    </p>
+                </div>
+            </div><!--/.col -->
+        </div><!--/.row -->
+    </div><!--/.signin-form -->
+</section>
+<div th:replace="fragment/alert :: modal"></div>
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/modernizr.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/bootsnav.js}"></script>
+<script th:src="@{/js/jquery.sticky.js}"></script>
+<script th:src="@{/js/jquery.easing.min.js}"></script>
+<script th:src="@{/js/jquery.md5.js}"></script>
+<script type="application/javascript">
+    var countdown = 60;
+    var timer;
+    var three;
+    //手机号码校验
+    $('#phone-number').on("blur", function () {
+        var phoneNumber = $("input#phone-number").val();
+        if (!phoneNumber) {
+            return;
+        }
+        var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+        if (!reg.test(phoneNumber)) {
+            $(".modal-body").text("手机号格式不正确");
+            $('#notice').modal('show');
+            $(this).val('');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/user/register/verifyPhone",
+            dataType: "json",
+            data: {
+                "phoneNumber": phoneNumber,
+                "timestamp": new Date().getTime()
+            },
+            success: function (result) {
+                if (result.code !== 2008) {
+                    $(".modal-body").text("这个号码还未在本站注册过账户，请先去注册吧！！！");
+                    $('#notice').modal('show');
+                    $("input#phone-number").val("");
+                    return false;
+                }
+            }
+        });
+    });
+    //获取验证码
+    $("#code-btn").on("click", function () {
+        if ($("input#phone-number").val() === '') {
+            $(".modal-body").text("手机号不能为空");
+            $('#notice').modal('show');
+            return;
+        }
+        var phoneNumber = $("input#phone-number").val();
+        task($('#code-btn'));
+        $.ajax({
+            type: "POST",
+            url: "/user/register/verifyCode",
+            dataType: "json",
+            data: {
+                "phoneNumber": phoneNumber,
+                "timestamp": new Date().getTime()
+            },
+            success: function (result) {
+                if (result.code !== 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    return false;
+                } else {
+                    $("#newInput").show();
+                    $("#reInput").show();
+                    $("#reset-btn").show();
+                }
+            }
+        });
+    });
+
+    function task($val) {
+        if (countdown === 0) {
+            clearTimeout(timer);
+            $val.attr("disabled", false);
+            $val.text("获取验证码");
+            countdown = 60;
+        } else {
+            $val.attr("disabled", true);
+            $val.text("重新发送(" + countdown + ")");
+            countdown--;
+            timer = setTimeout(function () {
+                task($('#code-btn'));
+            }, 1000);
+        }
+    }
+
+    //重设密码
+    $("#reset-password-form").submit(function (e) {
+        e.preventDefault();
+        var password = $("#newPassword").val();
+        if (password == null || password === '' || password.length < 6) {
+            $(".modal-body").text("你输入的密码不符合规范");
+            $('#notice').modal('show');
+            return false;
+        }
+        var retype = $("#retype").val();
+        if (retype == null || retype === '' || retype.length < 6) {
+            $(".modal-body").text("你输入的确认密码不符合规范");
+            $('#notice').modal('show');
+            return false;
+        }
+        if (password !== retype) {
+            $(".modal-body").text("你两次输入的密码不一致");
+            $('#notice').modal("show");
+            return false;
+        }
+        var phoneNumber = $("input#phone-number").val();
+        var verifyCode = $("input#verify-code").val();
+        $.ajax({
+            type: "POST",
+            url: "/user/reset",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                "password": $.md5(password),
+                "phoneNumber": phoneNumber,
+                "verifyCode": verifyCode
+            }),
+            success: function (result) {
+                if (result.code !== 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    return false;
+                } else {
+                    countDown($(".modal-body"));
+                    $('#notice').modal('show');
+                    return false;
+                }
+            }
+        });
+    });
+    var time = 60;
+
+    function countDown($val) {
+        if (time === 0) {
+            clearTimeout(three);
+            window.location.pathname = '/user/toLogin';
+        } else {
+            $val.text("成功修改密码，" + time-- + "秒后自动跳转回登录页面，或者你可以手动 ");
+            var $a = $("<a href='/user/toLogin'>去登录</a>");
+            $val.append($a);
+            three = setTimeout(function () {
+                countDown($val);
+            }, 1000);
+        }
+    }
+</script>
+</body>
+</html>

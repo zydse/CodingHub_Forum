@@ -33,7 +33,7 @@
                                     <div class="form-group">
                                         <label for="password-input">密码</label>
                                         <input type="password" class="form-control" id="password-input" name="password"
-                                               minlength="6" required placeholder="请输入密码(至少6位)">
+                                               minlength="6" maxlength="20" required placeholder="请输入密码(至少6位,不超过20位)">
                                     </div><!--/.form-group -->
                                     <div class="form-group">
                                         <label for="password-retype">确认密码</label>
@@ -42,8 +42,8 @@
                                     </div><!--/.form-group -->
                                     <div class="form-group">
                                         <label for="phone-number">手机号</label>
-                                        <input type="text" class="form-control" id="phone-number" name="phone-number"
-                                               pattern="(\d{11})|(\d{3}-\d{4}-\d{4})$"
+                                        <input type="text" class="form-control" id="phone-number"
+                                               name="phone-number" maxlength="11"
                                                required placeholder="请输入手机号获得验证码">
                                     </div><!--/.form-group -->
                                     <div class="form-col">
@@ -114,8 +114,7 @@
     var timer;
     //用户名唯一性验证
     $('input#username-input').on("blur", function () {
-        if (this.validity.valueMissing) {
-        } else if (this.validity.tooShort) {
+        if (this.validity.tooShort) {
             $(".modal-body").text('你输入的用户名太短了');
             $('#notice').modal('show');
         } else {
@@ -193,14 +192,37 @@
             }
         });
     });
-    //手机号码格式校验
+    //手机号码校验
     $('#phone-number').on("blur", function () {
-        if (this.validity.valueMissing) {
-        } else if (this.validity.patternMismatch) {
+        var phoneNumber = $("input#phone-number").val();
+        if (!phoneNumber) {
+            return;
+        }
+        var reg=/^[1][3,4,5,7,8][0-9]{9}$/;
+        if(!reg.test(phoneNumber))
+        {
             $(".modal-body").text("手机号格式不正确");
             $('#notice').modal('show');
             $(this).val('');
+            return;
         }
+        $.ajax({
+            type: "POST",
+            url: "/user/register/verifyPhone",
+            dataType: "json",
+            data: {
+                "phoneNumber": phoneNumber,
+                "timestamp": new Date().getTime()
+            },
+            success: function (result) {
+                if (result.code !== 200) {
+                    $(".modal-body").text(result.message);
+                    $('#notice').modal('show');
+                    $("input#phone-number").val("");
+                    return false;
+                }
+            }
+        });
     });
     //获取验证码
     $("#code-btn").on("click", function () {
@@ -220,7 +242,7 @@
                 "timestamp": new Date().getTime()
             },
             success: function (result) {
-                if (result.code != 200) {
+                if (result.code !== 200) {
                     $(".modal-body").text(result.message);
                     $('#notice').modal('show');
                     return false;

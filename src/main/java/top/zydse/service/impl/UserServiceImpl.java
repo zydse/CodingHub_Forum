@@ -55,10 +55,9 @@ public class UserServiceImpl implements UserService {
                 .andNameEqualTo(user.getName())
                 .andAccountIdIsNull();
         List<User> users = userMapper.selectByExample(userExample);
-        if(users.size() != 0){
+        if (users.size() != 0) {
             throw new CustomizeException(CustomizeErrorCode.DUPLICATE_USERNAME);
-        }
-        else if (githubUsers.size() == 0) {
+        } else if (githubUsers.size() == 0) {
             //新增用户
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
@@ -101,6 +100,9 @@ public class UserServiceImpl implements UserService {
     public ResultDTO register(RegisterDTO registerDTO, VerificationDTO verificationCode) {
         if (verificationCode == null || !registerDTO.getPhoneNumber().equals(verificationCode.getPhoneNumber())) {
             return ResultDTO.errorOf(CustomizeErrorCode.VERIFICATION_CODE_ERROR);
+        }
+        if(selectByPhone(registerDTO.getPhoneNumber()) != null){
+            return ResultDTO.errorOf(CustomizeErrorCode.DUPLICATE_PHONE_NUMBER);
         }
         long gap = (registerDTO.getGmtCreate() - verificationCode.getGmtCreate()) / 1000 / 60;
         if (verificationCode.getCode().equals(registerDTO.getVerifyCode()) && gap < 15L) {
@@ -162,7 +164,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User selectByPhone(String phoneNumber) {
+        UserExample example = new UserExample();
+        example.createCriteria().andPhoneNumberEqualTo(phoneNumber);
+        List<User> userList = userMapper.selectByExample(example);
+        return userList.size() == 0 ? null : userList.get(0);
+    }
+
+    @Override
     public List<String> getPermCode(Long userId) {
         return extensionMapper.getPermCodeByUser(userId);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String password, String phone) {
+        UserExample example = new UserExample();
+        example.createCriteria().andPhoneNumberEqualTo(phone);
+        List<User> userList = userMapper.selectByExample(example);
+        if(userList.size() != 1)
+            throw new CustomizeException(CustomizeErrorCode.ACCOUNT_ERROR);
+        User user = userList.get(0);
+        Md5Hash hash = new Md5Hash(password, user.getSalt().toString(), 1);
+        user.setPassword(hash.toString());
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }

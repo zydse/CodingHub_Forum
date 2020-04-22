@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import top.zydse.dto.VerificationDTO;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.model.User;
+import top.zydse.provider.SensitiveWordFilter;
 import top.zydse.service.ProfileService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 /**
  * CreateBy: zydse
@@ -23,12 +25,15 @@ import javax.servlet.http.HttpServletRequest;
  * @Date: 2020/4/19
  */
 @Controller
+@RequiresAuthentication
 @RequestMapping("/settings")
 @Slf4j
 public class SettingsController {
 
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private SensitiveWordFilter wordFilter;
 
     @RequiresAuthentication
     @GetMapping("/{type}")
@@ -44,11 +49,11 @@ public class SettingsController {
                         @RequestParam(value = "code") String code) {
         VerificationDTO dto = (VerificationDTO) request.getSession().getAttribute("verificationCode");
         request.setAttribute("type", "phone");
-        if (dto == null || !phone.equals(dto.getPhoneNumber()) || !code.equals(dto.getCode())){
+        if (dto == null || !phone.equals(dto.getPhoneNumber()) || !code.equals(dto.getCode())) {
             request.setAttribute("error", "错误的验证码");
             return "settings";
         }
-        if(System.currentTimeMillis() - dto.getGmtCreate() > 1000 * 60 *15){
+        if (System.currentTimeMillis() - dto.getGmtCreate() > 1000 * 60 * 15) {
             request.setAttribute("error", CustomizeErrorCode.VERIFICATION_CODE_INACTIVE.getMessage());
             return "settings";
         }
@@ -67,12 +72,12 @@ public class SettingsController {
                            @RequestParam(value = "retype") String retype,
                            @RequestParam(value = "new") String newPassword) {
         request.setAttribute("type", "password");
-        if(!retype.equals(newPassword)){
+        if (!retype.equals(newPassword)) {
             request.setAttribute("error", CustomizeErrorCode.PASSWORD_RETYPE_INCORRECT.getMessage());
             return "settings";
         }
         User user = (User) request.getSession().getAttribute("user");
-        if(!user.getPassword().equals(original)){
+        if (!user.getPassword().equals(original)) {
             request.setAttribute("error", CustomizeErrorCode.ORIGINAL_PASSWORD_INCORRECT.getMessage());
             return "settings";
         }
@@ -93,8 +98,12 @@ public class SettingsController {
                           @RequestParam(value = "name") String name,
                           @RequestParam(value = "bio", required = false) String bio) {
         request.setAttribute("type", "profile");
+        if (wordFilter.isContainSensitiveWord(name + "..." + bio)) {
+            request.setAttribute("error", CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_DESCRIPTION.getMessage());
+            return "settings";
+        }
         User user = (User) request.getSession().getAttribute("user");
-        if (bio != null){
+        if (bio != null) {
             user.setBio(bio);
         }
         boolean flag = name.equals(user.getName());

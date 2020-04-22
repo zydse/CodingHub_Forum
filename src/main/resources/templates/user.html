@@ -42,15 +42,7 @@
                         </h3>
                     </div>
                     <div class="panel-body">
-                        <div th:if="${section == 'info'}">
-                            <div th:replace="fragment/section :: info"></div>
-                        </div>
-                        <div th:if="${section == 'publish'}">
-                            <div th:replace="fragment/section :: publish"></div>
-                        </div>
-                        <div th:if="${section == 'comment'}">
-                            <div th:replace="fragment/section :: comment"></div>
-                        </div>
+                        <div th:replace="fragment/section :: ${section}"></div>
                         <div th:if="${section != 'info' and pagination.pageCount == null}"
                              class="jumbotron background-white text-center">
                             <p class="text_desc">看起来Ta还没有这些历史呢.....</p>

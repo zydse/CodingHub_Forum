@@ -38,7 +38,6 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (SecurityUtils.getSubject().isRemembered()) {
-            log.info("是remember me状态");
             User user = (User) SecurityUtils.getSubject().getPrincipal();
             UsernamePasswordToken token = new UsernamePasswordToken(user.getName(), user.getPassword());
             token.setRememberMe(true);

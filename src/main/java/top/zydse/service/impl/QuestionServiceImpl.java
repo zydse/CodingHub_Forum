@@ -372,7 +372,7 @@ public class QuestionServiceImpl implements QuestionService {
         PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
         QuestionExample questionExample = new QuestionExample();
         long start = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 7;
-        questionExample.createCriteria().andGmtCreateGreaterThan(start);
+        questionExample.createCriteria().andGmtLastCommentGreaterThan(start);
         int totalCount = (int) questionMapper.countByExample(questionExample);
         if (totalCount == 0) {
             return paginationDTO;

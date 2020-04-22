@@ -27,4 +27,8 @@ public interface UserService {
     ResultDTO<VerificationDTO> sendSms(String phoneNumber, long timestamp);
 
     List<String> getPermCode(Long userId);
+
+    User selectByPhone(String phoneNumber);
+
+    void resetPassword(String password, String phone);
 }

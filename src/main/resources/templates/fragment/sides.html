@@ -23,22 +23,24 @@
     </div>
 </div>
 
-<div th:fragment="latest">
+<div th:fragment="hotQuestions">
     <div class="panel panel-default widget">
         <div class="panel-heading">
             <h3 class="panel-title">
                 <i class="fa fa-paper-plane"></i>
-                最新发布
+                今日最热讨论
             </h3>
         </div>
         <div class="panel-body">
             <ul class="list">
-                <li class="text_desc" th:each="hotTag : ${hotTags}">
-                    <a class="community-tag" th:href="@{/question/tags/{tagId}(tagId = ${hotTag.id})}">
-                        <span class="icon-tag"></span>
-                        <span>[[${hotTag.tagName}]]</span>
+                <li class="text_desc" th:if="${hotQuestions.size() == 0}">
+                    今天还没有人讨论问题呢...
+                </li>
+                <li class="text_desc" th:each="question : ${hotQuestions}">
+                    <span>[[${questionStat.index + 1}]]</span>:
+                    <a th:href="@{/question/{questionId}(questionId = ${question.id})}">
+                        [[${question.title}]]
                     </a>
-                    <span th:text="${hotTag.questionCount + '个问题,'+ hotTag.commentCount + '个回复'}"></span>
                 </li>
             </ul>
         </div>

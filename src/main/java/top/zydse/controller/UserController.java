@@ -18,15 +18,16 @@ import top.zydse.dto.ResultDTO;
 import top.zydse.dto.VerificationDTO;
 import top.zydse.enums.CustomizeErrorCode;
 import top.zydse.model.User;
+import top.zydse.provider.SensitiveWordFilter;
 import top.zydse.service.UserService;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.Set;
 
 /**
  * CreateBy: zydse
@@ -44,14 +45,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private DefaultKaptcha captchaProducer;
-
-    @RequestMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        SecurityUtils.getSubject().logout();
-        request.getSession().removeAttribute("user");
-        request.getSession().invalidate();
-        return "redirect:/";
-    }
+    @Autowired
+    private SensitiveWordFilter wordFilter;
 
     @ResponseBody
     @PostMapping("/login")
@@ -116,6 +111,9 @@ public class UserController {
     @ResponseBody
     @PostMapping(value = "/register")
     public ResultDTO register(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
+        if (wordFilter.isContainSensitiveWord(registerDTO.getUsername())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_USERNAME);
+        }
         VerificationDTO verificationCode = (VerificationDTO) request.getSession().getAttribute("verificationCode");
         ResultDTO resultDTO = userService.register(registerDTO, verificationCode);
         if (resultDTO.getCode() != 200)
@@ -133,9 +131,23 @@ public class UserController {
     @RequestMapping(path = "/register/verifyUsername")
     public ResultDTO verifyUsername(@RequestParam("username") String username,
                                     @RequestParam("timestamp") Long timestamp) {
+        if (wordFilter.isContainSensitiveWord(username)) {
+            return ResultDTO.errorOf(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_USERNAME);
+        }
         User user = userService.selectByName(username);
         if (user != null) {
             return ResultDTO.errorOf(CustomizeErrorCode.DUPLICATE_USERNAME);
+        }
+        return ResultDTO.successOf();
+    }
+
+    @ResponseBody
+    @RequestMapping(path = "/register/verifyPhone")
+    public ResultDTO verifyPhone(@RequestParam("phoneNumber") String phoneNumber,
+                                 @RequestParam("timestamp") Long timestamp) {
+        User user = userService.selectByPhone(phoneNumber);
+        if (user != null) {
+            return ResultDTO.errorOf(CustomizeErrorCode.DUPLICATE_PHONE_NUMBER);
         }
         return ResultDTO.successOf();
     }
@@ -151,6 +163,22 @@ public class UserController {
             resultDTO.setData(null);
         }
         return resultDTO;
+    }
+
+    @ResponseBody
+    @RequestMapping("/reset")
+    public ResultDTO resetPassword(HttpServletRequest request, @RequestBody RegisterDTO registerDTO) {
+        VerificationDTO dto = (VerificationDTO) request.getSession().getAttribute("verificationCode");
+        if (dto == null || !registerDTO.getPhoneNumber().equals(dto.getPhoneNumber())
+                || !registerDTO.getVerifyCode().equals(dto.getCode())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.VERIFICATION_CODE_ERROR);
+        }
+        if (System.currentTimeMillis() - dto.getGmtCreate() > 1000 * 60 * 15) {
+            return ResultDTO.errorOf(CustomizeErrorCode.VERIFICATION_CODE_INACTIVE);
+        }
+        userService.resetPassword(registerDTO.getPassword(), registerDTO.getPhoneNumber());
+        request.getSession().removeAttribute("verificationCode");
+        return ResultDTO.successOf();
     }
 
 }

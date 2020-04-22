@@ -4,6 +4,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.zydse.dto.CommentDTO;
@@ -43,11 +44,20 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
+    private UserRoleMapper userRoleMapper;
+    @Autowired
     private NotificationMapper notificationMapper;
     @Autowired
     private ThumbHistoryMapper thumbHistoryMapper;
     @Autowired
     private PublishRepository publishRepository;
+
+    @Value("${forum.default.commentBonus}")
+    private int commentBonus;
+    @Value("${forum.default.thumbBonus}")
+    private int thumbBonus;
+    @Value("${forum.default.publishCredit}")
+    private int publishCredit;
 
     @Transactional
     public void insert(Comment comment, User user) {
@@ -68,6 +78,19 @@ public class CommentServiceImpl implements CommentService {
         publishRepository.save(publish);
         //评论插入评论表
         commentMapper.insertSelective(comment);
+        Integer before = user.getCredit();
+        //如果不是自己回复自己，更新用户的积分，二级评论无法提升积分
+        if (!user.getId().equals(question.getCreator())) {
+            user.setCredit(user.getCredit() + commentBonus);
+            userMapper.updateByPrimaryKeySelective(user);
+            if (before < publishCredit && user.getCredit() >= publishCredit) {
+                UserRole userRole = new UserRole();
+                userRole.setRoleId(2);
+                UserRoleExample userRoleExample = new UserRoleExample();
+                userRoleExample.createCriteria().andUserIdEqualTo(user.getId());
+                userRoleMapper.updateByExampleSelective(userRole, userRoleExample);
+            }
+        }
         //创建一个通知
         createNotification(comment, question, user);
     }
@@ -95,11 +118,6 @@ public class CommentServiceImpl implements CommentService {
         publishRepository.save(publish);
         //存储子回复
         subCommentMapper.insertSelective(subComment);
-        //如果不是自己回复自己，更新用户的积分，二级评论无法提升贡献值
-        if (!user.getId().equals(question.getCreator())) {
-            user.setCredit(user.getCredit() + 2);
-            userMapper.updateByPrimaryKeySelective(user);
-        }
         //子评论的通知，可能是通知一级评论人和问题创建者
         createNotification(subComment, comment, question, user);
     }
@@ -270,7 +288,15 @@ public class CommentServiceImpl implements CommentService {
         commentMapper.updateByPrimaryKeySelective(comment);
         //更新被点赞用户的积分
         User reviewer = userMapper.selectByPrimaryKey(comment.getReviewer());
-        reviewer.setCredit(reviewer.getCredit() + 20);
+        Integer before = reviewer.getCredit();
+        reviewer.setCredit(reviewer.getCredit() + thumbBonus);
+        if (before < publishCredit && reviewer.getCredit() >= publishCredit) {
+            UserRole userRole = new UserRole();
+            userRole.setRoleId(2);
+            UserRoleExample userRoleExample = new UserRoleExample();
+            userRoleExample.createCriteria().andUserIdEqualTo(reviewer.getId());
+            userRoleMapper.updateByExampleSelective(userRole, userRoleExample);
+        }
         userMapper.updateByPrimaryKeySelective(reviewer);
         return ResultDTO.successOf(comment.getThumbCount());
     }

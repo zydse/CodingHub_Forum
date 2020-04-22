@@ -168,7 +168,7 @@ html, body {
     vertical-align: text-top;
     width: 25px;
     height: 25px;
-    background: transparent;
+    background: #efefef;
     border: 1px solid #ebebeb;
 }
 
@@ -252,7 +252,7 @@ html, body {
     color: #91949c;
     font-size: 16px;
     text-align: center;
-    margin: 35px auto;
+    margin: 20px auto;
 }
 
 .signin-footer p > a {
@@ -260,7 +260,6 @@ html, body {
     font-size: 16px;
     font-weight: 500;
     text-transform: capitalize;
-
 }
 
 .signin-footer p > a:hover {
@@ -276,7 +275,19 @@ html, body {
 
 .modal-body {
     position: relative;
+    font-weight: 500;
     padding: 0;
+}
+
+.modal-body a{
+    color: #0077cc;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.modal-body a:hover{
+    color: #7c8089;
 }
 
 .modal-content .sign-content, .modal-content .centered {
@@ -302,9 +313,11 @@ html, body {
     padding: 48px 0;
 }
 
-.signin.popup-in, .signin.signup.popup-up {
+.signin.popup-in,
+.signin.signup.popup-up {
+    min-height: 100vh;
     position: relative;
-    background: url(/images/bg-earth.jpg) no-repeat fixed;
+    background: url(/images/coast.jpg) no-repeat fixed;
     background-size: cover;
 }
 
@@ -316,8 +329,7 @@ html, body {
 
 .popup-in-txt {
     max-width: 500px;
-    margin: 0 auto;
-
+    margin: 50px auto;
 }
 
 .sign-content.popup-in-content .btn.signin_btn,

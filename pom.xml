@@ -157,7 +157,6 @@
 
     <build>
         <plugins>
-            <!--引入Flyway的h2数据库迁移插件-->
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>

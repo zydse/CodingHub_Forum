@@ -63,12 +63,10 @@ public class QuestionController {
         if (createDTO.getTags() == null || "".equals(createDTO.getTags())) {
             return ResultDTO.errorOf(CustomizeErrorCode.QUESTION_INFO_ERROR);
         }
-        Set<String> sensitiveTitle = wordFilter.getSensitiveWord(createDTO.getTitle());
-        if (sensitiveTitle.size() != 0) {
+        if (wordFilter.isContainSensitiveWord(createDTO.getTitle())) {
             throw new CustomizeException(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_TITLE);
         }
-        Set<String> sensitiveDescription = wordFilter.getSensitiveWord(createDTO.getDescription());
-        if (sensitiveDescription.size() != 0) {
+        if (wordFilter.isContainSensitiveWord(createDTO.getDescription())) {
             throw new CustomizeException(CustomizeErrorCode.SENSITIVE_WORD_FOUND_IN_DESCRIPTION);
         }
         User user = (User) request.getSession().getAttribute("user");

@@ -96,7 +96,7 @@ public class SensitiveWordFilter {
      * @version 1.0
      */
     public Set<String> getSensitiveWord(String txt) {
-        Set<String> sensitiveWordList = new HashSet<String>();
+        Set<String> sensitiveWordList = new HashSet<>();
         for (int i = 0; i < txt.length(); i++) {
             int length = CheckSensitiveWord(txt, i);    //判断是否包含敏感字符
             if (length > 0) {    //存在,加入list中
