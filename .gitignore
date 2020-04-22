@@ -33,3 +33,4 @@ build/
 ### logging file ###
 *.log
 *.gz
+*.yml
