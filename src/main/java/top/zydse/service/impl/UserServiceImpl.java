@@ -116,6 +116,7 @@ public class UserServiceImpl implements UserService {
             user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl("/images/avatar" + registerDTO.getGmtCreate() % 10 + ".png");
             user.setToken(UUID.randomUUID().toString());
+            user.setCredit(0);
             extensionMapper.saveUser(user);
             UserRole record = new UserRole();
             record.setUserId(user.getId());
@@ -155,6 +156,7 @@ public class UserServiceImpl implements UserService {
         log.info(aliResponseDTO.toString());
         if ("OK".equals(aliResponseDTO.getCode())) {
             VerificationDTO record = new VerificationDTO();
+            log.info("code put into session : {}", code.toString());
             record.setCode(code.toString());
             record.setPhoneNumber(phoneNumber);
             record.setGmtCreate(timestamp);

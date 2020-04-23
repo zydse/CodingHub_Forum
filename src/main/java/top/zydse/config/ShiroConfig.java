@@ -157,6 +157,10 @@ public class ShiroConfig {
     public DefaultWebSessionManager webSessionManager() {
         DefaultWebSessionManager webSessionManager = new DefaultWebSessionManager();
         webSessionManager.setSessionIdUrlRewritingEnabled(false);
+        SimpleCookie sessionIdCookie = new SimpleCookie();
+        sessionIdCookie.setName("sessionID");
+        webSessionManager.setSessionIdCookie(sessionIdCookie);
+        webSessionManager.setSessionIdCookieEnabled(true);
         return webSessionManager;
     }
 

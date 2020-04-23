@@ -11,6 +11,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.zydse.dto.AliResponseDTO;
@@ -25,6 +26,7 @@ import top.zydse.exception.CustomizeException;
  * @Date: 2020/3/27
  */
 @Component
+@Slf4j
 public class AliMessageProvider {
     @Value("${aliyun.regionId}")
     private String regionId;
@@ -49,6 +51,7 @@ public class AliMessageProvider {
         request.putQueryParameter("PhoneNumbers", phone);
         request.putQueryParameter("SignName", signName);
         request.putQueryParameter("TemplateCode", templateCode);
+        log.info("code in ali request : {}", code);
         request.putQueryParameter("TemplateParam", "{\"code\":" + code + "}");
         try {
             CommonResponse response = client.getCommonResponse(request);

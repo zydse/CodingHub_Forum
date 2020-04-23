@@ -81,9 +81,11 @@ public class CommentServiceImpl implements CommentService {
         Integer before = user.getCredit();
         //如果不是自己回复自己，更新用户的积分，二级评论无法提升积分
         if (!user.getId().equals(question.getCreator())) {
-            user.setCredit(user.getCredit() + commentBonus);
-            userMapper.updateByPrimaryKeySelective(user);
-            if (before < publishCredit && user.getCredit() >= publishCredit) {
+            User userUpdate = new User();
+            userUpdate.setId(user.getId());
+            userUpdate.setCredit(user.getCredit() + commentBonus);
+            userMapper.updateByPrimaryKeySelective(userUpdate);
+            if (before < publishCredit && userUpdate.getCredit() >= publishCredit) {
                 UserRole userRole = new UserRole();
                 userRole.setRoleId(2);
                 UserRoleExample userRoleExample = new UserRoleExample();

@@ -44,7 +44,6 @@ public class NotificationController {
     public String readAll(HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
         int result = notificationService.readAll(user);
-        log.info("{} read {} notifications ", user.getName(), result);
         return "redirect:/profile/notification";
     }
 }

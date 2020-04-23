@@ -76,17 +76,26 @@
 </div>
 
 <div th:fragment="profile">
+
     <div class="form-group">
-        <label class="control-label col-lg-3" for="name">昵称</label>
-        <div class="col-lg-4">
-            <input type="text" class="form-control" id="name" minlength="3" name="name"
-                   th:data-original="${session.user.name}" th:value="${session.user.name}" maxlength="15" required="">
+        <div class="col-xs-3"></div>
+        <div class="col-xs-3 alert alert-info text-center" style="padding: 5px; margin: 0 15px">
+            如果你修改了用户名将需要重新登录
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-lg-3" for="bio">个性签名</label>
-        <div class="col-lg-6">
-            <textarea id="bio" name="bio" class="form-control" rows="3" maxlength="128">[[${session.user.bio}]]</textarea>
+        <label class="control-label col-xs-3" for="name">昵称</label>
+        <div class="col-xs-4">
+            <input type="text" class="form-control" id="name" minlength="3" name="name"
+                   th:data-original="${session.user.name}" th:value="${session.user.name}" maxlength="15" required="">
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-3" for="bio">个性签名</label>
+        <div class="col-xs-6">
+            <textarea id="bio" name="bio" class="form-control" rows="3"
+                      maxlength="128">[[${session.user.bio}]]</textarea>
         </div>
     </div>
     <script type="application/javascript">
@@ -123,6 +132,12 @@
 </div>
 
 <div th:fragment="password">
+    <div class="form-group">
+        <div class="col-xs-3"></div>
+        <div class="col-xs-3 alert alert-info text-center" style="padding: 5px; margin: 0 15px">
+            修改密码将需要重新登录
+        </div>
+    </div>
     <div class="form-group">
         <label class="control-label col-lg-3" for="original">当前密码</label>
         <div class="col-lg-4">

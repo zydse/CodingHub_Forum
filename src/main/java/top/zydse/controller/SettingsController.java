@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.SubjectContext;
+import org.apache.shiro.web.subject.support.DefaultWebSubjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -82,15 +85,8 @@ public class SettingsController {
             return "settings";
         }
         profileService.updatePassword(user.getId(), user.getSalt(), newPassword);
-        user.setPassword(newPassword);
         SecurityUtils.getSubject().logout();
-        UsernamePasswordToken token = new UsernamePasswordToken(user.getName(), user.getPassword());
-        token.setRememberMe(false);
-        log.info("new password:{}", newPassword);
-        SecurityUtils.getSubject().login(token);
-        request.getSession().setAttribute("user", user);
-        request.setAttribute("msg", "操作成功，如果使用了<记住我>登录，修改密码后下次需要重新登录");
-        return "settings";
+        return "redirect:/user/toLogin";
     }
 
     @PutMapping("/profile")
@@ -113,8 +109,7 @@ public class SettingsController {
         profileService.updatePhoneOrInfo(user);
         if (!flag) {
             SecurityUtils.getSubject().logout();
-            UsernamePasswordToken token = new UsernamePasswordToken(user.getName(), password);
-            SecurityUtils.getSubject().login(token);
+            return "redirect:/user/toLogin";
         }
         user.setPassword(password);
         request.getSession().setAttribute("user", user);
