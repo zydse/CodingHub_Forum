@@ -29,4 +29,8 @@ public interface CommentService {
     ResultDTO thumbUpComment(Long commentId, User user);
 
     PaginationDTO<CommentDTO> findAllByUser(Long id, Integer page, Integer size);
+
+    int deleteCommentByUserId(Long userId);
+
+    int deleteThumbHistoryByUserId(Long userId);
 }

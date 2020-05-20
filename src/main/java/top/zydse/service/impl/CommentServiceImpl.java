@@ -106,18 +106,6 @@ public class CommentServiceImpl implements CommentService {
         //增加子回复数
         comment.setSubCommentCount(comment.getSubCommentCount() + 1);
         commentMapper.updateByPrimaryKey(comment);
-        //更新问题信息
-        question.setCommentCount(question.getCommentCount() + 1);
-        question.setGmtLastComment(System.currentTimeMillis());
-        questionMapper.updateByPrimaryKey(question);
-        //更新elasticsearch
-        Optional<Publish> optional = publishRepository.findById(question.getId());
-        if (!optional.isPresent())
-            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
-        Publish publish = optional.get();
-        publish.setCommentCount(question.getCommentCount());
-        publish.setGmtLastComment(question.getGmtLastComment());
-        publishRepository.save(publish);
         //存储子回复
         subCommentMapper.insertSelective(subComment);
         //子评论的通知，可能是通知一级评论人和问题创建者
@@ -322,6 +310,55 @@ public class CommentServiceImpl implements CommentService {
         }
         paginationDTO.setPageData(dtoList);
         return paginationDTO;
+    }
+
+    @Override
+    public int deleteCommentByUserId(Long userId) {
+        SubCommentExample subCommentExample = new SubCommentExample();
+        subCommentExample.createCriteria().andReviewerEqualTo(userId);
+        List<SubComment> subCommentList = subCommentMapper.selectByExample(subCommentExample);
+        if (subCommentList.size() != 0) {
+            subCommentList.stream()
+                    .map(SubComment::getCommentId)
+                    .forEach(commentId -> {
+                        Comment comment = commentMapper.selectByPrimaryKey(commentId);
+                        comment.setSubCommentCount(comment.getSubCommentCount() - 1);
+                        commentMapper.updateByPrimaryKeySelective(comment);
+                    });
+            subCommentMapper.deleteByExample(subCommentExample);
+        }
+        CommentExample commentExample = new CommentExample();
+        commentExample.createCriteria().andReviewerEqualTo(userId);
+        List<Comment> commentList = commentMapper.selectByExample(commentExample);
+        if (commentList.size() != 0) {
+            commentList.stream()
+                    .map(Comment::getQuestionId)
+                    .forEach(questionId -> {
+                        Question question = questionMapper.selectByPrimaryKey(questionId);
+                        question.setCommentCount(question.getCommentCount() - 1);
+                        questionMapper.updateByPrimaryKeySelective(question);
+                    });
+            commentMapper.deleteByExample(commentExample);
+        }
+        return 1;
+    }
+
+    @Override
+    public int deleteThumbHistoryByUserId(Long userId) {
+        ThumbHistoryExample thumbHistoryExample = new ThumbHistoryExample();
+        thumbHistoryExample.createCriteria().andThumbUserEqualTo(userId);
+        List<ThumbHistory> thumbHistoryList = thumbHistoryMapper.selectByExample(thumbHistoryExample);
+        if (thumbHistoryList.size() != 0) {
+            thumbHistoryList.stream()
+                    .map(ThumbHistory::getCommentId)
+                    .forEach(commentId -> {
+                        Comment comment = commentMapper.selectByPrimaryKey(commentId);
+                        comment.setThumbCount(comment.getThumbCount() - 1);
+                        commentMapper.updateByPrimaryKeySelective(comment);
+                    });
+            thumbHistoryMapper.deleteByExample(thumbHistoryExample);
+        }
+        return 1;
     }
 
     @NotNull

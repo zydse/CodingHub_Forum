@@ -83,4 +83,15 @@ public class NotificationServiceImpl implements NotificationService {
     public int readAll(User user) {
         return extensionMapper.readAllNotification(user.getId());
     }
+
+    @Override
+    public int deleteNotificationByUserId(Long userId) {
+        NotificationExample notificationExample = new NotificationExample();
+        notificationExample.createCriteria().andNotifierEqualTo(userId);
+        notificationMapper.deleteByExample(notificationExample);
+        notificationExample.clear();
+        notificationExample.createCriteria().andReceiverEqualTo(userId);
+        notificationMapper.deleteByExample(notificationExample);
+        return 0;
+    }
 }

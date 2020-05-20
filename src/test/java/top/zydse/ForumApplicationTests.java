@@ -21,6 +21,14 @@ class ForumApplicationTests {
     @Autowired
     private SensitiveWordFilter wordFilter;
 
+    @Test
+    public void testSensitive(){
+        System.out.println("========词库加载完成，即将开始比对=======");
+        String text = "垃圾就是fool";
+        Set<String> set = wordFilter.getSensitiveWord(text);
+        System.out.println("待检测文本{" + text +"}中包含[" + set.size() + "]个敏感词");
+        System.out.println("敏感词为:" + set);
+    }
 //    @Autowired
 //    private PublishRepository publishRepository;
 //
@@ -53,18 +61,6 @@ class ForumApplicationTests {
         s = s.replace(" ","");
         System.out.println(ids);
         System.out.println(s);
-    }
-
-    @Test
-    public void testSensitive(){
-        System.out.println("========词库加载完成，即将开始比对");
-        String text = "```java";
-        System.out.println(System.currentTimeMillis());
-        Set<String> set = wordFilter.getSensitiveWord(text);
-        System.out.println(System.currentTimeMillis());
-        System.out.println("============");
-        System.out.println(set.size());
-        System.out.println(set);
     }
 
     @Test

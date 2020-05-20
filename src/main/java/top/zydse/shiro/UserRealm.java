@@ -61,9 +61,4 @@ public class UserRealm extends AuthorizingRealm {
         return new SimpleAuthenticationInfo(cookieUser, user.getPassword(),
                 ByteSource.Util.bytes(user.getSalt().toString()), this.getName());
     }
-
-    public void clearCache(){
-        PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
-        super.clearCache(principals);
-    }
 }

@@ -46,9 +46,7 @@ public class OAuthController {
     @GetMapping("/callback")
     public String callback(String code,
                            Integer state,
-                           HttpServletRequest request,
-                           HttpServletResponse response) {
-        log.info("进入回调 code {} state {}", code, state);
+                           HttpServletRequest request) {
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(clientId);
         accessTokenDTO.setCode(code);
@@ -56,9 +54,7 @@ public class OAuthController {
         accessTokenDTO.setState(state);
         accessTokenDTO.setRedirect_uri(redirectUri);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
-        log.info("进入回调 accessToken {}", accessToken);
         GithubUserDTO githubUser = githubProvider.getGithubUser(accessToken);
-        log.info("进入回调 githubUser {}", githubUser);
         if (githubUser != null && githubUser.getId() != null) {
             User user = new User();
             user.setAccountId(String.valueOf(githubUser.getId()));
@@ -71,10 +67,7 @@ public class OAuthController {
             UsernamePasswordToken loginToken = new UsernamePasswordToken(user.getName(), password.toString());
             SecurityUtils.getSubject().login(loginToken);
             request.getSession().setAttribute("user", user);
-            return "redirect:/";
-        } else {
-            //重新登录
-            return "redirect:/";
         }
+        return "redirect:/";
     }
 }

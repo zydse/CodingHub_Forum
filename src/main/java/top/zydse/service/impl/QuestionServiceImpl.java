@@ -103,10 +103,10 @@ public class QuestionServiceImpl implements QuestionService {
         return getQuestionDTOPaginationDTO(paginationDTO, questionList);
     }
 
-    public PaginationDTO<QuestionDTO> findAll(Long id, int page, int size) {
+    public PaginationDTO<QuestionDTO> findAll(Long userId, int page, int size) {
         PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO<>();
         QuestionExample example = new QuestionExample();
-        example.createCriteria().andCreatorEqualTo(id);
+        example.createCriteria().andCreatorEqualTo(userId);
         example.setOrderByClause("gmt_modified desc");
         int totalCount = (int) questionMapper.countByExample(example);
         if (totalCount == 0) {
@@ -306,6 +306,9 @@ public class QuestionServiceImpl implements QuestionService {
             tag.setCount(tag.getCount() - 1);
             tagMapper.updateByPrimaryKey(tag);
         }
+        ViewHistoryExample viewHistoryExample = new ViewHistoryExample();
+        viewHistoryExample.createCriteria().andQuestionIdEqualTo(questionId);
+        viewHistoryMapper.deleteByExample(viewHistoryExample);
         publishRepository.deleteById(questionId);
         return questionMapper.deleteByPrimaryKey(questionId);
     }
@@ -408,5 +411,30 @@ public class QuestionServiceImpl implements QuestionService {
         question.setCollectionCount(question.getCollectionCount() + 1);
         questionMapper.updateByPrimaryKeySelective(question);
         return question.getCollectionCount();
+    }
+
+    @Override
+    public int deleteCollectionByUserId(Long userId) {
+        CollectionExample collectionExample = new CollectionExample();
+        collectionExample.createCriteria().andUserIdEqualTo(userId);
+        return collectionMapper.deleteByExample(collectionExample);
+    }
+
+    @Override
+    public int deleteQuestionByUserId(Long userId) {
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria().andCreatorEqualTo(userId);
+        List<Question> questionList = questionMapper.selectByExample(questionExample);
+        if (questionList.size() != 0) {
+            questionList.stream().map(Question::getId).forEach(this::deleteById);
+        }
+        return 1;
+    }
+
+    @Override
+    public int deleteViewHistoryByUserId(Long userId) {
+        ViewHistoryExample viewHistoryExample = new ViewHistoryExample();
+        viewHistoryExample.createCriteria().andViewerEqualTo(userId);
+        return viewHistoryMapper.deleteByExample(viewHistoryExample);
     }
 }

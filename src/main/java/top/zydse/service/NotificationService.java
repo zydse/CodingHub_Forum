@@ -19,4 +19,6 @@ public interface NotificationService {
     NotificationDTO read(Long id, User user);
 
     int readAll(User user);
+
+    int deleteNotificationByUserId(Long userId);
 }

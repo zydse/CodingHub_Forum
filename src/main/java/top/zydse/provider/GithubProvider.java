@@ -18,22 +18,19 @@ import java.util.Arrays;
  *
  * @Date: 2020/3/3
  */
-@Component
 @Slf4j
+@Component
 public class GithubProvider {
     private OkHttpClient client;
-
     @Value("${github.oauthUrl}")
     private String oauthUrl;
     @Value("${github.getTokenUrl}")
     private String getTokenUrl;
-
     public GithubProvider() {
         client = new OkHttpClient.Builder()
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS))
                 .build();
     }
-
     public String getAccessToken(AccessTokenDTO accessTokenDTO) {
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON.toJSONString(accessTokenDTO), mediaType);
@@ -49,7 +46,6 @@ public class GithubProvider {
         }
         return null;
     }
-
     public GithubUserDTO getGithubUser(String token) {
         Request request = new Request.Builder()
                 .url(getTokenUrl)

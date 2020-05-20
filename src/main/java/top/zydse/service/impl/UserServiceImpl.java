@@ -17,7 +17,11 @@ import top.zydse.mapper.UserRoleMapper;
 import top.zydse.model.User;
 import top.zydse.model.UserExample;
 import top.zydse.model.UserRole;
+import top.zydse.model.UserRoleExample;
 import top.zydse.provider.AliMessageProvider;
+import top.zydse.service.CommentService;
+import top.zydse.service.NotificationService;
+import top.zydse.service.QuestionService;
 import top.zydse.service.UserService;
 
 import java.util.List;
@@ -42,6 +46,12 @@ public class UserServiceImpl implements UserService {
     private AliMessageProvider aliMessageProvider;
     @Autowired
     private UserRoleMapper userRoleMapper;
+    @Autowired
+    private QuestionService questionService;
+    @Autowired
+    private CommentService commentService;
+    @Autowired
+    private NotificationService notificationService;
 
     //保存一个github用户的资料
     @Transactional
@@ -190,5 +200,32 @@ public class UserServiceImpl implements UserService {
         Md5Hash hash = new Md5Hash(password, user.getSalt().toString(), 1);
         user.setPassword(hash.toString());
         userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    @Transactional
+    @Override
+    public int deleteById(Long userId) {
+        User user = userMapper.selectByPrimaryKey(userId);
+        if(user == null)
+            throw new CustomizeException(CustomizeErrorCode.SYSTEM_ERROR);
+        UserRoleExample userRoleExample = new UserRoleExample();
+        userRoleExample.createCriteria().andUserIdEqualTo(userId);
+        //删除用户角色
+        userRoleMapper.deleteByExample(userRoleExample);
+        //删除所有一级、二级回复
+        commentService.deleteCommentByUserId(userId);
+        //删除点赞历史
+        commentService.deleteThumbHistoryByUserId(userId);
+        //删除收藏历史
+        questionService.deleteCollectionByUserId(userId);
+        //删除通知人和接收人为当前用户的所有通知
+        notificationService.deleteNotificationByUserId(userId);
+        //删除用户所有的发帖历史
+        questionService.deleteQuestionByUserId(userId);
+        //删除用户的浏览历史
+        questionService.deleteViewHistoryByUserId(userId);
+        //删除用户
+        userMapper.deleteByPrimaryKey(userId);
+        return 1;
     }
 }

@@ -58,5 +58,13 @@
     </div>
 </div>
 <div th:replace="fragment/navigation :: footer"></div>
+<form id="deleteForm" method="post">
+    <input type="hidden" name="_method" value="delete"/>
+</form>
+<script type="application/javascript">
+    $("#deleteUser").on("click", function () {
+        $("#deleteForm").attr("action", $(this).attr("uri")).submit();
+    });
+</script>
 </body>
 </html>

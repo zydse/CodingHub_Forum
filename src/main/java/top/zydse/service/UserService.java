@@ -31,4 +31,6 @@ public interface UserService {
     User selectByPhone(String phoneNumber);
 
     void resetPassword(String password, String phone);
+
+    int deleteById(Long userId);
 }

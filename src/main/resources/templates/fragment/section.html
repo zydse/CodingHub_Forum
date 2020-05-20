@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <body>
 <!--我的浏览历史-->
 <div th:fragment="view">
@@ -142,6 +142,13 @@
     <i class="fa fa-diamond text_desc profile_badge">
         声望:[[${userProfile.credit}]]
     </i>
+    <div shiro:hasPermission="user:delete" th:if="${userId != null}" class="pull-right">
+        <button th:attr="uri=@{/profile/user/{userId}(userId = ${userId})}"
+                class="btn btn-danger" id="deleteUser">
+            <span class="fa fa-trash"></span>
+            删除用户
+        </button>
+    </div>
 </div>
 <!--历史评论-->
 <div th:fragment="comment">
