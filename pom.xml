@@ -50,7 +50,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
+            <version>8.0.16</version>
         </dependency>
         <!--spring boot整合mybatis-->
         <dependency>
@@ -165,7 +165,7 @@
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.6</version>
+                        <version>8.0.16</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -178,7 +178,7 @@
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.6</version>
+                        <version>8.0.16</version>
                     </dependency>
                 </dependencies>
             </plugin>
