@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.zydse.mapper.CommonExtensionMapper">
+    <resultMap id="BaseResultMap" type="top.zydse.model.Question">
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="TITLE" jdbcType="VARCHAR" property="title"/>
+        <result column="DESCRIPTION" jdbcType="CLOB" property="description"/>
+        <result column="GMT_CREATE" jdbcType="BIGINT" property="gmtCreate"/>
+        <result column="GMT_MODIFIED" jdbcType="BIGINT" property="gmtModified"/>
+        <result column="GMT_LAST_COMMENT" jdbcType="BIGINT" property="gmtLastComment"/>
+        <result column="CREATOR" jdbcType="BIGINT" property="creator"/>
+        <result column="COMMENT_COUNT" jdbcType="INTEGER" property="commentCount"/>
+        <result column="VIEW_COUNT" jdbcType="INTEGER" property="viewCount"/>
+        <result column="IS_TOP" jdbcType="INTEGER" property="isTop"/>
+        <result column="IS_QUALITY" jdbcType="INTEGER" property="isQuality"/>
+        <result column="COLLECTION_COUNT" jdbcType="INTEGER" property="collectionCount"/>
+    </resultMap>
+
+    <select id="listViewHistory" resultType="top.zydse.dto.ViewHistoryDTO">
+        SELECT u.id userId, u.name username, q.ID questionId, q.TITLE title, vh.gmt_Modified gmtModified
+        FROM VIEW_HISTORY vh
+        JOIN QUESTION q ON vh.QUESTION_ID = q.ID
+        JOIN USER u ON q.CREATOR = u.ID
+        where vh.viewer = #{userId}
+        ORDER BY vh.gmt_modified DESC
+        limit #{offset},#{size};
+    </select>
+
+    <select id="listThumbHistory" resultType="top.zydse.dto.ThumbHistoryDTO">
+        SELECT u.id userId, u.name username, c.ID commentId, c.content comment,
+         th.gmt_create gmtCreate, q.id questionId
+        FROM THUMB_HISTORY th
+        JOIN COMMENT c ON th.comment_id = c.ID
+        JOIN USER u ON c.reviewer = u.ID
+        JOIN QUESTION q on q.id = c.question_id
+        where th.thumb_user = #{userId}
+        ORDER BY th.gmt_create DESC
+        limit #{offset},#{size};
+    </select>
+
+    <insert id="savePublish" parameterType="top.zydse.model.Question">
+        insert into QUESTION
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="title != null">
+                TITLE,
+            </if>
+            <if test="gmtCreate != null">
+                GMT_CREATE,
+            </if>
+            <if test="gmtModified != null">
+                GMT_MODIFIED,
+            </if>
+            <if test="gmtLastComment != null">
+                GMT_LAST_COMMENT,
+            </if>
+            <if test="creator != null">
+                CREATOR,
+            </if>
+            <if test="commentCount != null">
+                COMMENT_COUNT,
+            </if>
+            <if test="viewCount != null">
+                VIEW_COUNT,
+            </if>
+            <if test="isTop != null">
+                IS_TOP,
+            </if>
+            <if test="isQuality != null">
+                IS_QUALITY,
+            </if>
+            <if test="collectionCount != null">
+                COLLECTION_COUNT,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=BIGINT},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=BIGINT},
+            </if>
+            <if test="gmtLastComment != null">
+                #{gmtLastComment,jdbcType=BIGINT},
+            </if>
+            <if test="creator != null">
+                #{creator,jdbcType=BIGINT},
+            </if>
+            <if test="commentCount != null">
+                #{commentCount,jdbcType=INTEGER},
+            </if>
+            <if test="viewCount != null">
+                #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="isTop != null">
+                #{isTop,jdbcType=INTEGER},
+            </if>
+            <if test="isQuality != null">
+                #{isQuality,jdbcType=INTEGER},
+            </if>
+            <if test="collectionCount != null">
+                #{collectionCount,jdbcType=INTEGER},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+        <selectKey resultType="java.lang.Long" keyColumn="id" keyProperty="id" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+    <insert id="saveUser" parameterType="top.zydse.model.User">
+        insert into USER
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="name != null">
+                NAME,
+            </if>
+            <if test="password != null">
+                PASSWORD,
+            </if>
+            <if test="salt != null">
+                SALT,
+            </if>
+            <if test="phoneNumber != null">
+                PHONE_NUMBER,
+            </if>
+            <if test="token != null">
+                TOKEN,
+            </if>
+            <if test="credit != null">
+                CREDIT,
+            </if>
+            <if test="bio != null">
+                BIO,
+            </if>
+            <if test="accountId != null">
+                ACCOUNT_ID,
+            </if>
+            <if test="gmtCreate != null">
+                GMT_CREATE,
+            </if>
+            <if test="gmtModified != null">
+                GMT_MODIFIED,
+            </if>
+            <if test="avatarUrl != null">
+                AVATAR_URL,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="salt != null">
+                #{salt,jdbcType=BIGINT},
+            </if>
+            <if test="phoneNumber != null">
+                #{phoneNumber,jdbcType=CHAR},
+            </if>
+            <if test="token != null">
+                #{token,jdbcType=CHAR},
+            </if>
+            <if test="credit != null">
+                #{credit,jdbcType=INTEGER},
+            </if>
+            <if test="bio != null">
+                #{bio,jdbcType=VARCHAR},
+            </if>
+            <if test="accountId != null">
+                #{accountId,jdbcType=VARCHAR},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=BIGINT},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=BIGINT},
+            </if>
+            <if test="avatarUrl != null">
+                #{avatarUrl,jdbcType=VARCHAR},
+            </if>
+        </trim>
+        <selectKey resultType="java.lang.Long" keyColumn="id" keyProperty="id" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+    <select id="listTagsByQuestion" resultType="top.zydse.model.Tag">
+        SELECT t.id id,t.TAG_TYPE tagType, t.TAG_NAME tagName, t.COUNT count
+        FROM QUESTION_TAG qt
+        JOIN QUESTION q ON qt.QUESTION_ID = q.ID
+        JOIN TAG t ON t.ID = qt.TAG_ID
+        WHERE q.ID = #{questionId}
+    </select>
+
+    <select id="getPermCodeByUser" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT p.per_code
+        FROM USER_ROLE ur,ROLE_PERMISSION rp,PERMISSION p
+        WHERE ur.user_id = #{userId} AND rp.role_id = ur.role_id AND p.id = rp.permission_id
+    </select>
+
+    <insert id="insertQuestionTag" parameterType="top.zydse.model.QuestionTag">
+        insert into QUESTION_TAG (QUESTION_ID, TAG_ID, GMT_CREATE)
+        values (#{questionId,jdbcType=BIGINT}, #{tagId,jdbcType=INTEGER},
+        #{gmtCreate,jdbcType=BIGINT})
+    </insert>
+
+    <select id="getTagPriority" resultType="top.zydse.dto.HotTagDTO">
+        SELECT t.ID id, t.TAG_NAME tagName, t.COUNT questionCount,
+         tc.comment_count commentCount,t.COUNT * 3 + tc.comment_count AS priority
+        FROM TAG t,(
+            SELECT qt.TAG_ID, SUM(q.COMMENT_COUNT) comment_count
+            FROM QUESTION_TAG qt, QUESTION q
+            WHERE qt.QUESTION_ID = q.ID
+            GROUP BY qt.tag_id) tc
+        WHERE t.id = tc.tag_id
+        ORDER BY priority DESC
+        LIMIT 0,6
+    </select>
+
+    <select id="relatedQuestion" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT *
+        FROM QUESTION
+        WHERE ID IN(
+            SELECT DISTINCT qt2.QUESTION_ID
+            FROM QUESTION_TAG qt2
+            WHERE qt2.QUESTION_ID != #{questionId} AND qt2.TAG_ID IN(
+                SELECT qt1.TAG_ID
+                FROM QUESTION_TAG qt1
+                WHERE qt1.QUESTION_ID = #{questionId}))
+        ORDER BY gmt_last_comment
+        LIMIT 0,8;
+    </select>
+
+    <update id="readAllNotification" parameterType="java.lang.Long">
+        UPDATE NOTIFICATION
+        SET status = 1
+        WHERE receiver = #{id} AND status = 0
+    </update>
+
+    <select id="countQuestionByTagId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM QUESTION_TAG
+        WHERE tag_id = #{tagId}
+    </select>
+
+    <select id="findQuestionByTagId" resultMap="BaseResultMap">
+        SELECT *
+        FROM QUESTION
+        WHERE id IN (
+        SELECT question_id
+        FROM QUESTION_TAG
+        WHERE tag_id = #{tagId})
+        ORDER BY gmt_last_comment DESC
+        LIMIT #{offset},#{size};
+    </select>
+
+    <select id="listCollection" resultType="top.zydse.dto.CollectionDTO">
+        SELECT c.id id, q.ID questionId, u.ID userId,
+         u.NAME, u.AVATAR_URL avatarUrl, u.GMT_MODIFIED gmtModified, q.TITLE, c.GMT_CREATE gmtCreate,
+         q.COMMENT_COUNT commentCount, q.VIEW_COUNT viewCount
+        FROM COLLECTION c, QUESTION q, USER u
+        WHERE user_id = #{userId} AND c.QUESTION_ID = q.ID AND q.CREATOR = u.ID
+        ORDER BY c.GMT_CREATE DESC
+        LIMIT #{offset},#{size}
+    </select>
+
+</mapper>

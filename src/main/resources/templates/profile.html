@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${sectionName + ' - CodingHub'}"></title>
+    <head th:insert="fragment/import :: head"></head>
+</head>
+<body>
+<div th:replace="fragment/navigation :: navigation"></div>
+<div class="wrap">
+    <div class="container">
+        <div class="row users-show">
+            <div class="col-xs-12 col-md-3 side-left">
+                <ul class="list-group about-user">
+                    <li class="list-group-item user-card">
+                        <div class="user-avatar">
+                            <img class="img-circle" th:src="${userProfile.avatarUrl}"/>
+                        </div>
+                        <div class="user-name">
+                            <span>[[${userProfile.name}]]</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="user-datas">
+                            <ul>
+                                <li><strong>[[${userProfile.publishNum}]]</strong><span>发布</span></li>
+                                <li class="noborder"><strong>[[${userProfile.commentNum}]]</strong><span>评论</span></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <a class="btn btn-primary btn-block btn-sm" th:href="@{/settings/profile}">
+                            <i class="icon icon-note"></i> 编辑个人资料
+                        </a>
+                    </li>
+                </ul>
+                <div th:replace="fragment/sides :: profileNav"></div>
+            </div>
+            <div class="col-xs-12 col-md-9 side-right">
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="pull-right" th:if="${section == 'notification'}">
+                            <a th:href="@{/notification/all}" th:if="${unreadCount > 0}" class="btn btn-default">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                                全部已读
+                            </a>
+                        </div>
+                        <h3>
+                            <span class="icon-puzzle" th:if="${section == 'publish'}"></span>
+                            <span class="fa fa-eye" th:if="${section == 'view'}"></span>
+                            <span class="fa fa-thumbs-o-up" th:if="${section == 'thumb'}"></span>
+                            <span class="fa fa-bullhorn" th:if="${section == 'notification'}"></span>
+                            <span class="icon icon-list" th:if="${section == 'info'}"></span>
+                            <span class="fa fa-star" th:if="${section == 'collection'}"></span>
+                            [[${sectionName}]]
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div th:replace="fragment/section :: ${section}"></div>
+                        <div th:if="${section != 'info' and pagination.pageCount == null}"
+                             class="jumbotron background-white">
+                            <p class="text_desc text-center">看起来你还没有这些历史呢.....</p>
+                        </div>
+                    </div>
+                    <div class="panel-footer text-center"
+                         th:if="${section != 'info' and pagination.pageCount != null and pagination.pageCount > 1}">
+                        <div th:replace="fragment/pageNav :: profile"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragment/navigation :: footer"></div>
+</body>
+</html>

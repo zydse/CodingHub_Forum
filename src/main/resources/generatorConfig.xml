@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+
+        <!--分页支持的插件-->
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://address:port/dbname"
+                        userId="XXXX"
+                        password="XXXX">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="top.zydse.model" targetProject="src\main\java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="mapper" targetProject="src\main\resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="top.zydse.mapper" targetProject="src\main\java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <table tableName="TAG" domainObjectName="Tag"/>
+        <table tableName="ROLE" domainObjectName="Role"/>
+        <table tableName="PERMISSION" domainObjectName="Permission"/>
+        <table tableName="USER_ROLE" domainObjectName="UserRole"/>
+        <table tableName="ROLE_PERMISSION" domainObjectName="RolePermission"/>
+        <table tableName="USER" domainObjectName="User"/>
+        <table tableName="QUESTION" domainObjectName="Question"/>
+        <table tableName="COMMENT" domainObjectName="Comment"/>
+        <table tableName="SUB_COMMENT" domainObjectName="SubComment"/>
+        <table tableName="NOTIFICATION" domainObjectName="Notification"/>
+        <table tableName="VIEW_HISTORY" domainObjectName="ViewHistory"/>
+        <table tableName="THUMB_HISTORY" domainObjectName="ThumbHistory"/>
+        <table tableName="COLLECTION" domainObjectName="Collection"/>
+    </context>
+</generatorConfiguration>

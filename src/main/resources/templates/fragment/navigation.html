@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<body>
+<div th:fragment="footer" class="page_footer text_desc">
+    Copyright &copy; 2020 &middot; CodingHub问答社区 &middot;
+    服务器: 阿里云 &middot; 网站程序:
+    <a class="blue" href="https://github.com/zydse/CodingHub_Forum" target="_blank">CodingHub_Forum</a> &middot;
+    <a class="blue" target="_blank" href="http://www.beian.miit.gov.cn/">皖ICP备20003339号</a>
+    <a class="site-scroll-top" title="返回顶部">
+        <i class="fa fa-angle-double-up fa-2x"></i>
+    </a>
+    <script type="application/javascript">
+        $(function () {
+            //先将#back-top隐藏
+            var $backTop = $('.site-scroll-top');
+            $backTop.hide();
+            //当滚动条的垂直位置距顶部100像素一下时，跳转链接出现，否则消失
+            $(window).scroll(function () {
+                if ($(window).scrollTop() > 200) {
+                    $backTop.fadeIn(200);
+                } else {
+                    $backTop.fadeOut(200);
+                }
+            });
+            //点击跳转链接，滚动条跳到0的位置，页面移动速度是400
+            $backTop.on("click", function () {
+                $('html').animate({
+                    scrollTop: 0
+                }, 400);
+                return false;
+            });
+        });
+    </script>
+</div>
+
+<div th:fragment="navigation">
+    <div class="site-header headroom">
+        <div class="container">
+            <nav class="navbar" role="navigation">
+                <div class="navbar-header">
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#header-co">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" th:href="@{/}">
+                        <img th:src="@{/images/logo.png}" alt="logo">
+                    </a>
+                </div>
+                <div id="header-co" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li th:class="${showType == 1 ? 'active' : ''}">
+                            <a th:href="@{/}">最新</a>
+                        </li>
+                        <li th:class="${showType == 5 ? 'active' : ''}">
+                            <a th:href="@{/question/trend}">七日最热</a>
+                        </li>
+                        <li th:class="${showType == 4 ? 'active' : ''}">
+                            <a th:href="@{/question/emptyComment}">等你来答</a>
+                        </li>
+                        <li th:class="${showType == 6 ? 'active' : ''}">
+                            <a th:href="@{/question/allTags}">所有标签</a>
+                        </li>
+                        <li view="search" class="hidden-sm">
+                            <form method="GET" th:action="@{/question/search}" accept-charset="UTF-8"
+                                  class="navbar-form navbar-left" id="searchForm">
+                                <div class="form-group">
+                                    <input class="form-control search-input mac-style" placeholder="搜索问题" name="search"
+                                           type="text" th:value="${search} == null ? '' : ${search}">
+                                    <button class="search-btn" type="submit" title="点击查询"><i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </li>
+                    </ul>
+                    <ul class="navbar-button list-inline" id="header_user" shiro:guest="">
+                        <li>
+                            <a class="btn" style="padding: 0" title="使用GitHub账户登录本站"
+                               th:href="@{https://github.com/login/oauth/authorize(client_id='6f77efebf08b5cde324b',
+                                redirect_uri=${#httpServletRequest.getRequestURL()}+'callback',scope='user',state=1)}">
+                                <i class="fa fa-github fa-2x"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/user/toLogin}" class="btn btn-default btn-sm signup">登录</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/user/toRegister}" class="btn btn-primary btn-sm signup">注册</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right" shiro:authenticated="">
+                        <li shiro:hasPermission="question:create">
+                            <a th:href="@{/question/publish}">发布问题</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/profile/notification}">
+                                <i class="fa fa-bell"></i>
+                                <span class="badge" th:if="${unreadCount > 0}">[[${unreadCount}]]</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle"
+                               data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span>[[${session.user.getName()}]]</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a th:href="@{/profile/info}"><i class="icon icon-user"></i>
+                                    个人中心</a>
+                                </li>
+                                <li>
+                                    <a th:href="@{/settings/profile}"><i class="icon icon-note"></i>
+                                        修改信息
+                                    </a>
+                                </li>
+                                <li>
+                                    <a th:href="@{/user/logout}"><i class="icon icon-logout"></i>
+                                        退出
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

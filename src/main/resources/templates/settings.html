@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>修改资料 - CodingHub</title>
+    <head th:insert="fragment/import :: head"></head>
+</head>
+<body>
+<div th:replace="fragment/navigation :: navigation"></div>
+<div class="wrap">
+    <div class="container">
+        <div class="panel panel-default stacked">
+            <div class="panel-heading">
+                <ul class="nav nav-pills account-tab">
+                    <li th:class="${type == 'profile' ? 'active' : _}">
+                        <a th:href="@{/settings/profile}">基本信息</a>
+                    </li>
+                    <li th:class="${type == 'phone' ? 'active' : _}">
+                        <a th:href="@{/settings/phone}">修改手机号</a>
+                    </li>
+                    <li th:class="${type == 'password' ? 'active' : _}">
+                        <a th:href="@{/settings/password}">修改密码</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-offset-3 col-xs-4 text-center alert alert-danger" th:if="${error != null}">
+                            [[${error}]]
+                        </div>
+                        <div class="col-xs-offset-3 col-xs-4 text-center alert alert-success" th:if="${msg != null}">
+                            [[${msg}]]
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane active" th:id="${type}">
+                    <form id="submitForm" th:data-type="${type}"
+                          th:action="@{/settings/{type}(type = ${type})}" method="post" class="form-horizontal">
+                        <input type="hidden" name="_method" value="put"/>
+                        <div th:replace="fragment/settingsForm :: ${type}"></div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragment/alert :: original"></div>
+<script type="application/javascript">
+    $("#submitForm").submit(function (e) {
+        var $form = $("#submitForm");
+        if ($form.data("type") === 'password') {
+            var $original = $("#original");
+            var $new = $("#new");
+            var $retype = $("#retype");
+            if ($new.val() !== $retype.val()) {
+                $(".modal-body").text("你两次输入的密码不一致，请确认后重新输入");
+                $('#error_notice').modal('show');
+                return false;
+            }
+            var original = $original.val();
+            $original.val($.md5(original));
+            var newPassword = $new.val();
+            $new.val($.md5(newPassword));
+            var retype = $retype.val();
+            $retype.val($.md5(retype));
+        }
+    });
+</script>
+<div th:replace="fragment/navigation :: footer"></div>
+</body>
+</html>

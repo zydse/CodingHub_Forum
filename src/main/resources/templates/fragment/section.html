@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<body>
+<!--我的浏览历史-->
+<div th:fragment="view">
+    <div class="panel panel-default zoom-nine" th:each="viewHistory : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading six-size">
+                        你浏览了
+                        <a th:href="@{/profile/user/{userId}(userId = ${viewHistory.userId})}"
+                           th:text="${viewHistory.username}"></a>
+                        的问题
+                        <a th:href="@{/question/{questionId}(questionId = ${viewHistory.questionId})}"
+                           th:text="${viewHistory.title}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span class="text_desc middle">
+                <i class="fa fa-clock-o">
+                    [[${#dates.format(viewHistory.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                </i>
+            </span>
+        </div>
+    </div>
+</div>
+<!--我的点赞-->
+<div th:fragment="thumb">
+    <div class="panel panel-default zoom-nine" th:each="thumbHistory : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body six-size">
+                    <p class="media-heading six-size">
+                        你点赞了
+                        <a th:href="@{/profile/user/{userId}(userId = ${thumbHistory.userId})}"
+                           th:text="${thumbHistory.username}"></a>
+                        的回复
+                        <a th:href="@{/question/{questionId}(questionId = ${thumbHistory.questionId})}"
+                           th:text="${thumbHistory.comment}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span class="text_desc middle">
+                <i class="fa fa-clock-o">
+                    [[${#dates.format(thumbHistory.gmtCreate, 'yyyy-MM-dd HH:mm')}]]
+                </i>
+            </span>
+        </div>
+    </div>
+</div>
+<!--我的通知-->
+<div th:fragment="notification">
+    <div class="panel panel-default zoom-nine" th:each="notification : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading six-size">
+                        <a th:href="@{/profile/user/{userId}(userId = ${notification.notifier})}">
+                            [[${notification.notifierName}]]
+                        </a>
+                        <span> [[${notification.typeName}]] </span>
+                        <a th:href="@{/notification/{noticfication}(noticfication = ${notification.id})}">
+                            [[${notification.outerTitle}]]
+                        </a>
+                        <span class="label label-danger" th:if="${notification.status == 0}">未读</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span class="text_desc middle">
+                <i class="fa fa-clock-o">
+                    [[${#dates.format(notification.gmtCreate, 'yyyy-MM-dd HH:mm')}]]
+                </i>
+            </span>
+        </div>
+    </div>
+</div>
+<!--我的提问-->
+<div th:fragment="publish">
+    <div class="media zoom-nine box-shadow-blue" th:each="question : ${pagination.pageData}">
+        <div class="media-body">
+            <div class="posts-item">
+                <h4 class="item-title" style="margin-bottom: 10px">
+                    <a th:href="@{/question/{questionId}(questionId = ${question.id})}"
+                       th:text="${question.title}"></a>
+                </h4>
+                <div class="item-info middle">
+                    <ul>
+                        <li class="ico-time">
+                            <i class="fa fa-clock-o">
+                                [[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                            </i>
+                        </li>
+                        <li class="ico-eye hidden-xs">
+                            <i class="icon-book-open">
+                                [[${question.viewCount}]]
+                            </i>
+                        </li>
+                        <li class="ico-like hidden-xs">
+                            <i class="icon-speech">
+                                [[${question.commentCount}]]
+                            </i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--个人资料-->
+<div th:fragment="info">
+    <div class="media">
+        <div class="media-left">
+            <img class="media-object img-circle" th:src="${userProfile.avatarUrl}" alt="avatar">
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading name_vertical_center">[[${userProfile.name}]]</h4>
+            <div th:if="${userProfile.bio == null}" class="jumbotron background-white">
+                <p class="text_desc text-center">神秘到没有留下只言片语.....</p>
+            </div>
+            <div th:if="${userProfile.bio != null}" class="jumbotron background-white">
+                <p class="text_desc text-center">[[${userProfile.bio}]]</p>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <i class="fa fa-puzzle-piece text_desc profile_badge">
+        发布:[[${userProfile.publishNum}]]
+    </i>
+    <i class="fa fa-comment text_desc profile_badge">
+        评论:[[${userProfile.commentNum}]]
+    </i>
+    <i class="fa fa-thumbs-up text_desc profile_badge">
+        被赞:[[${userProfile.thumbedNum}]]
+    </i>
+    <i class="fa fa-diamond text_desc profile_badge">
+        声望:[[${userProfile.credit}]]
+    </i>
+    <div shiro:hasPermission="user:delete" th:if="${userId != null}" class="pull-right">
+        <button th:attr="uri=@{/profile/user/{userId}(userId = ${userId})}"
+                class="btn btn-danger" id="deleteUser">
+            <span class="fa fa-trash"></span>
+            删除用户
+        </button>
+    </div>
+</div>
+<!--历史评论-->
+<div th:fragment="comment">
+    <div class="panel panel-default zoom-nine" th:each="comment : ${pagination.pageData}">
+        <div class="panel-body">
+            <div class="media">
+                <div class="media-body">
+                    <p class="media-heading six-size">
+                        <span>[[${userProfile.name}]]</span>
+                        <span>  发表了回复  </span>
+                        <a th:href="@{/question/{questionId}(questionId = ${comment.questionId})}">
+                            [[${comment.content}]]
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <span class="text_desc middle pull-right">
+                <i class="fa fa-thumbs-up"></i>
+                [[${comment.thumbCount}]]
+            </span>
+            <span class="text_desc middle">
+                <i class="fa fa-clock-o"> [[${#dates.format(comment.gmtCreate, 'yyyy-MM-dd HH:mm')}]]
+                </i>
+            </span>
+        </div>
+    </div>
+</div>
+<!--收藏-->
+<div th:fragment="collection">
+    <div class="media zoom-nine box-shadow-blue" th:each="collection : ${pagination.pageData}">
+        <div class="media-left">
+            <a th:href="@{/profile/user/{userId}(userId = ${collection.userId})}">
+                <img class="media-object img-circle" th:src="${collection.avatarUrl}" alt="avatar">
+            </a>
+        </div>
+        <div class="media-body">
+            <div class="posts-item">
+                <h4 class="item-title" style="margin-bottom: 10px">
+                    <a th:href="@{/question/{questionId}(questionId = ${collection.questionId})}">
+                        [[${collection.title}]]
+                    </a>
+                </h4>
+                <div class="item-info middle">
+                    <ul>
+                        <li class="ico-time">
+                            <i class="fa fa-clock-o">
+                                [[${#dates.format(collection.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                            </i>
+                        </li>
+                        <li class="ico-eye hidden-xs">
+                            <i class="icon-book-open">
+                                [[${collection.viewCount}]]
+                            </i>
+                        </li>
+                        <li class="ico-like hidden-xs">
+                            <i class="icon-speech">
+                                [[${collection.commentCount}]]
+                            </i>
+                        </li>
+                        <li class="ico-like pull-right hidden-xs">
+                            <i class="icon">
+                                收藏于：[[${#dates.format(collection.gmtCreate, 'yyyy-MM-dd HH:mm')}]]
+                            </i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

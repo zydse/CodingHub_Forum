@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${question.title} + ' - CodingHub'">问题</title>
+    <head th:insert="fragment/import :: head"></head>
+</head>
+<body>
+<div th:replace="fragment/navigation :: navigation"></div>
+<div class="wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-9 side-left topics-show">
+                <div class="topic panel panel-default">
+                    <div class="infos panel-heading">
+                        <h1 class="panel-title topic-title">
+                            [[${question.title}]]
+                        </h1>
+                        <div class="meta inline-block text_desc">
+                            作者:<span>[[${question.user.name}]]</span> |
+                            发布时间:<span>[[${#dates.format(question.gmtModified, 'yyyy-MM-dd HH:mm')}]]</span> |
+                            阅读数:<span>[[${question.viewCount}]]</span>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="markdown-preview" class="content-body entry-content panel-body">
+                        <textarea style="display:none;">[[${question.description}]]</textarea>
+                        <script type="text/javascript">
+                            $(function () {
+                                editormd.markdownToHTML("markdown-preview", {
+                                    // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+                                    // htmlDecode : true,  // Enable / disable HTML tag encode.
+                                    // htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+                                });
+                            });
+                        </script>
+                    </div>
+                    <div class="panel-footer operate">
+                        <a class="community-tag" th:each="tag : ${question.tags}"
+                           th:href="@{/question/tags/{tagId}(tagId = ${tag.id})}">
+                            <span class="icon-tag"></span>
+                            <span>[[${tag.tagName}]]</span>
+                        </a>
+                        <hr/>
+                        <div shiro:authenticated="">
+                            <button class="text_desc btn btn-default" id="updateQuestion"
+                                    th:if="${question.user.id == session.user.id}"
+                                    th:attr="uri=@{/question/{questionId}(questionId = ${question.id})}">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                修改
+                            </button>
+                            <button class="text_desc btn btn-default" id="deleteQuestion"
+                                    shiro:hasPermission="question:delete"
+                                    th:attr="uri=@{/question/{questionId}(questionId = ${question.id})}">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                删除
+                            </button>
+                            <a class="text_desc btn btn-default" shiro:hasPermission="question:quality"
+                               th:if="${question.isQuality == 0}"
+                               th:href="@{/question/quality/{questionId}(questionId = ${question.id})}">
+                                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+                                加精
+                            </a>
+                            <a class="text_desc btn btn-default" shiro:hasPermission="question:quality"
+                               th:if="${question.isQuality == 1}"
+                               th:href="@{/question/quality/{questionId}(questionId = ${question.id})}">
+                                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+                                取消加精
+                            </a>
+                            <a class="text_desc btn btn-default" shiro:hasPermission="question:top"
+                               th:if="${question.isTop == 0}"
+                               th:href="@{/question/top/{questionId}(questionId = ${question.id})}">
+                                <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span>
+                                置顶
+                            </a>
+                            <a class="text_desc btn btn-default" shiro:hasPermission="question:top"
+                               th:if="${question.isTop == 1}"
+                               th:href="@{/question/top/{questionId}(questionId = ${question.id})}">
+                                <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span>
+                                取消置顶
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 margin_top_20" id="comments" th:data-active="${session.user == null ? 0 : 1}">
+                        <!--最佳答案-->
+                        <div class="panel panel-danger box-shadow-red zoom-nine" th:if="${excellent != null}">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">最佳答案</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <a th:href="@{/profile/user/{userId}(userId = ${excellent.user.id})}">
+                                            <img class="media-object img-circle"
+                                                 th:src="${excellent.user.avatarUrl}"
+                                                 alt="avatar">
+                                        </a>
+                                    </div>
+                                    <div class="media-body">
+                                        <h5 class="media-heading text_desc">[[${excellent.user.name}]]</h5>
+                                        <div>[[${excellent.content}]]</div>
+                                        <div class="comment_operate">
+                                            <span th:class="${excellent.isThumbUp == 1 ? 'icon-my active' : 'icon-my'}"
+                                                  onclick="thumbComment(this)" th:data-id="${excellent.id}"
+                                                  th:data-active="${session.user == null ? 0 : 1}"
+                                                  th:id="${'thumb-' + excellent.id}">
+                                                <span class="fa fa-thumbs-up"></span>
+                                                <span th:id="${'thumbCount-' + excellent.id}">[[${excellent.thumbCount}]]</span>
+                                            </span>
+                                            <span class="icon-my" onclick="collapseComment(this)"
+                                                  th:data-id="${excellent.id}"
+                                                  th:id="${'collapse-' + excellent.id}">
+                                                <span class="fa fa-comments"></span>
+                                                <span th:id="${'subCount-' + excellent.id}">[[${excellent.subCommentCount}]]</span>
+                                            </span>
+                                            <span class="icon text_desc pull-right">
+                                                [[${#dates.format(excellent.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 collapse sub_comment"
+                                             th:id="'comment-' + ${excellent.id}">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <input type="text" class="form-control"
+                                                       th:name="${'input-' + excellent.id}"
+                                                       placeholder="评论一下...">
+                                                <button type="button" class="btn btn-success pull-right"
+                                                        th:data-id="${excellent.id}"
+                                                        style="margin-top: 10px" onclick="subComment(this)">回复
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--更多回复-->
+                        <div class="panel panel-default" th:if="${comments.size() > 0}">
+                            <div class="panel-heading">
+                                <h4 class="panel-title" th:text="${comments.size()} + '个回复'"></h4>
+                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item" th:each="comment : ${comments}"
+                                    style="padding: 20px 15px">
+                                    <div class="media zoom-nine">
+                                        <div class="media-left">
+                                            <a th:href="@{/profile/user/{userId}(userId = ${comment.user.id})}">
+                                                <img class="media-object img-circle"
+                                                     th:src="${comment.user.avatarUrl}"
+                                                     alt="avatar">
+                                            </a>
+                                        </div>
+                                        <div class="media-body">
+                                            <h5 class="media-heading text_desc">[[${comment.user.name}]]</h5>
+                                            <div>[[${comment.content}]]</div>
+                                            <div class="comment_operate">
+                                                <span th:class="${comment.isThumbUp == 1 ? 'icon-my active' : 'icon-my'}"
+                                                      onclick="thumbComment(this)" th:data-id="${comment.id}"
+                                                      th:data-active="${session.user == null ? 0 : 1}"
+                                                      th:id="${'thumb-' + comment.id}">
+                                                    <span class="fa fa-thumbs-up"></span>
+                                                    <span th:id="${'thumbCount-' + comment.id}">[[${comment.thumbCount}]]</span>
+                                                </span>
+                                                <span class="icon-my" onclick="collapseComment(this)"
+                                                      th:data-id="${comment.id}"
+                                                      th:id="${'collapse-' + comment.id}">
+                                                    <span class="fa fa-comments"></span>
+                                                    <span th:id="${'subCount-' + comment.id}">[[${comment.subCommentCount}]]</span>
+                                                </span>
+                                                <span class="text_desc pull-right">
+                                                    [[${#dates.format(comment.gmtModified, 'yyyy-MM-dd HH:mm')}]]
+                                                </span>
+                                            </div>
+                                            <div class="col-xs-12 collapse sub_comment"
+                                                 th:id="'comment-' + ${comment.id}">
+                                                <div class="col-xs-12">
+                                                    <input type="text" class="form-control"
+                                                           th:name="${'input-' + comment.id}"
+                                                           placeholder="评论一下...">
+                                                    <button type="button" class="btn btn-success pull-right"
+                                                            th:data-id="${comment.id}"
+                                                            style="margin-top: 10px" onclick="subComment(this)">回复
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div th:if="${excellent == null}" class="jumbotron background-white">
+                            <p class="text-center text_desc">这个问题可能太复杂了，还没人回答......</p>
+                        </div>
+                    </div>
+                </div>
+                <!--回复编辑区-->
+                <div class="col-xs-12 background-white margin_bottom_20" id="comment_main">
+                    <div class="chat_post">
+                        <div class="cbox-title">
+                            <h4>我来回复</h4>
+                        </div>
+                        <hr/>
+                        <div class="media margin_bottom_20">
+                            <div class="media-left">
+                                <img class="media-object img-circle"
+                                     th:src="${session.user == null ? '/images/default-avatar.jpg' : session.user.avatarUrl}"
+                                     alt="avatar"/>
+                            </div>
+                            <div class="media-body">
+                                <h5 class="media-heading name_vertical_center">
+                                    [[${session.user == null ? '匿名用户' : session.user.name}]]
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="text-center text_desc" style="font-size: 15px" th:if="${session.user == null}">
+                            评论功能需要登录后才可以使用，点击
+                            <a class="blue" th:href="@{/user/toLogin}">登录</a>
+                            或
+                            <a class="blue" th:href="@{/user/toRegister}">注册</a>
+                        </div>
+                        <div th:if="${session.user != null}" class="cbox-post">
+                            <div class="cbox-input">
+                                <textarea id="comment_content" rows="6" placeholder="请输入回复内容"></textarea>
+                                <input type="hidden" id="question_id" th:value="${question.id}"/>
+                            </div>
+                            <div class="cbox-ats clearfix">
+                                <div class="ats-issue">
+                                    <button class="btn btn-success btn-sm bt" onclick="comment()">回复</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-3 side-right">
+                <div th:replace="fragment/sides :: creator"></div>
+                <div th:replace="fragment/sides :: related"></div>
+                <div th:replace="fragment/sides :: donate"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragment/alert :: original"></div>
+<div th:replace="fragment/navigation :: footer"></div>
+<form id="updateForm" method="post">
+    <input type="hidden" name="_method" value="put"/>
+</form>
+<form id="deleteForm" method="post">
+    <input type="hidden" name="_method" value="delete"/>
+</form>
+<script>
+    $(function () {
+        $("#collect").on("click", function (e) {
+            var id = $(this).data("id");
+            $.ajax({
+                type: 'POST',
+                url: '/question/collect',
+                dataType: 'json',
+                data: {
+                    questionId: id
+                },
+                success: function (result) {
+                    if (result.code !== 200) {
+                        $(".modal-body").html("<p>" + result.message + "&hellip;</p>");
+                        $('#error_notice').modal('show');
+                    } else {
+                        var $isCollect = $("#isCollect");
+                        $("#favors").text(result.data);
+                        if ($isCollect.hasClass("fa-star")) {
+                            $isCollect.removeClass();
+                            $isCollect.addClass("icon-star");
+                            $("#collect").removeClass("btn-default");
+                            $("#collect").addClass("btn-success");
+                            $isCollect.text(" 取消 ");
+                            return;
+                        }
+                        $isCollect.removeClass();
+                        $isCollect.addClass("fa fa-star");
+                        $("#collect").removeClass("btn-success");
+                        $("#collect").addClass("btn-default");
+                        $isCollect.text(" 收藏 ");
+                    }
+                }
+            });
+        });
+    });
+    $("#updateQuestion").on("click", function () {
+        $("#updateForm").attr("action", $(this).attr("uri")).submit();
+    });
+
+    $("#deleteQuestion").on("click", function () {
+        $("#deleteForm").attr("action", $(this).attr("uri")).submit();
+    });
+</script>
+</body>
+</html>

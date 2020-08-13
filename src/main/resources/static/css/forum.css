@@ -1,0 +1,202 @@
+.show-type{
+    font-size: 24px;
+    list-style: none;
+    padding: 20px 0 10px 15px;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+    margin-bottom: 10px;
+}
+
+.btn_float_right {
+    float: right;
+    margin-bottom: 10px;
+}
+
+/*主要用于头像*/
+.media-object {
+    width: 38px;
+    height: 38px;
+}
+
+.name_vertical_center {
+    padding-top: 10px;
+}
+
+/*灰色描述文本*/
+.text_desc {
+    font-size: 12px;
+    font-weight: normal;
+    color: #999;
+}
+
+.profile_badge {
+    font-size: 15px;
+    margin-right: 15px;
+}
+
+.question_desc {
+    padding: 5px;
+    background-color: #f6f6f6;
+    border-radius: 10px;
+    font-weight: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.comment_edit {
+    margin: 10px 0;
+}
+
+.margin_top_20 {
+    margin-top: 20px;
+}
+
+.margin_bottom_20 {
+    margin-bottom: 20px;
+}
+
+.comment_section {
+    padding-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: #eee solid 1px;
+}
+
+.comment_operate {
+    margin-top: 10px;
+}
+
+.comment_operate .icon-my {
+    font-size: 16px;
+    vertical-align: middle;
+    margin-right: 15px;
+    color: #999;
+    cursor: pointer;
+}
+
+.comment_operate .icon-my:hover {
+    color: #499ef3;
+}
+
+.comment_operate .icon-my.active {
+    color: #499ef3;
+}
+
+.sub_comment {
+    margin-top: 10px;
+    padding: 20px 15px 10px;
+    border: #eee solid 1px;
+    border-radius: 5px;
+}
+
+.community-tag:hover {
+    background-color: #339dff;
+    color: #fff !important;
+    text-decoration-line: none;
+}
+
+.community-tag {
+    text-decoration-line: none;
+    cursor: pointer;
+    display: inline-block;
+    height: 25px;
+    line-height: 25px;
+    padding: 0 5px !important;
+    background-color: #99cfff;
+    font-size: 12px;
+    color: #fff !important;
+    border-radius: 4px;
+    margin: 4px;
+}
+
+.publish-tag-tab {
+    display: none;
+    margin-top: 15px;
+    background-color: #f6f6f6;
+    border-radius: 5px;
+    border: 2px solid #f6f6f6;
+}
+
+.publish-tag-tab .tab-content{
+    background-color: #fff;
+}
+
+.publish-tag-tab .label-info {
+    white-space: normal;
+    margin: 5px 5px;
+    display: inline-block;
+}
+
+.page_footer {
+    padding: 35px 0;
+    text-align: center;
+}
+
+a.blue {
+    color: #339dff;
+}
+
+a.blue:hover {
+    color: #333;
+}
+
+.back_top {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    bottom: 200px;
+    right: 10px;
+    background: #ccc;
+    text-align: center;
+    line-height: 40px;
+    text-decoration: none;
+}
+
+.text_desc.middle {
+    font-size: 14px;
+}
+
+.six-size{
+    font-size: 16px;
+}
+
+.panel-danger > .panel-heading {
+    background-color: #f2dede;
+}
+
+.editormd-fullscreen{
+    z-index: 100;
+}
+
+.list-group-item.active{
+    color: #fff;
+    background-color: #03a9f4;
+    border-color: #03a9f4;
+}
+.list-group-item.active:hover{
+    color: #fff;
+    background-color: #03a9f4;
+    border-color: #03a9f4;
+    box-shadow: 0px 0px 8px rgba(3, 169, 244, .8);
+}
+
+.box-shadow-red:hover{
+    box-shadow: 0px 0px 8px rgba(242, 222, 222, .8);
+}
+
+.zoom-nine:hover{
+    transform: scale(0.98);
+}
+
+.box-shadow-blue:hover{
+    box-shadow: 0px 0px 8px rgba(153, 207, 255, .8);
+    padding: 3px;
+}
+
+.input-group-btn .btn{
+    margin-left: 5px;
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CodingHub</title>
+    <head th:insert="~{fragment/import :: head}"></head>
+</head>
+<body>
+<div th:replace="fragment/navigation :: navigation"></div>
+<div class="wrap" style="min-height: 0">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 white" style="text-align: center">
+                <h1>哎呀！页面出错了</h1>
+                <p class="text-danger">[[${message}]]</p>
+                <a class="btn btn-link btn-lg" th:href="@{/}" role="button">返回首页</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragment/navigation :: footer"></div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>发布 - CodingHub</title>
+    <head th:insert="fragment/import :: head"></head>
+</head>
+<body>
+<div th:replace="fragment/navigation :: navigation"></div>
+<div class="wrap">
+    <div class="container">
+        <div class="col-xs-12 side-left background-white">
+            <h2>
+                <i class="fa fa-pencil-square" aria-hidden="true"></i> 提问
+            </h2>
+            <hr/>
+            <form id="questionForm">
+                <input type="hidden" name="id" id="questionId" th:value="${id}">
+                <div class="form-group">
+                    <label for="questionTitle">问题描述(简单扼要):</label>
+                    <input type="text" class="form-control" name="questionTitle" id="questionTitle"
+                           placeholder="问题标题" th:value="${title}" maxlength="49">
+                </div>
+                <label for="description">问题详细信息(必填项):</label>
+                <div class="form-group" id="description-editor">
+                    <textarea class="form-control" name="description" id="description" cols="30"
+                              rows="10" style="display:none;">[[${description}]]</textarea>
+                    <script type="text/javascript">
+                        $(function () {
+                            editormd("description-editor", {
+                                width: "100%",
+                                height: "700px",
+                                delay: 0,
+                                placeholder: "提问指南\n" +
+                                    "问题标题:请用精简的语言描述您发布的问题，不超过40个字\n" +
+                                    "问题描述:详细补充你的问题内容，并确保问题描述的清晰直观，最好提供一些问题的资料。" +
+                                    "上传图片时单个大小不能超过5MB\n" +
+                                    "选择标签:至少选择一个或者多个合适的标签\n" +
+                                    "关于积分:......",
+                                imageUpload: true,
+                                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                                imageUploadURL: "/file/upload",
+                                path: "/js/lib/",
+                                watch: true,
+                                toolbarAutoFixed: false,
+                                toolbarIcons: function () {
+                                    return ["undo", "redo", "|",
+                                        "bold", "del", "italic", "ucwords", "uppercase", "lowercase", "|",
+                                        "link", "reference-link", "image", "code", "code-block",
+                                        "table", "datetime", "html-entities", "|", "goto-line",
+                                        "watch", "preview", "clear", "fullscreen", "|", "help", "info"];
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+                <div class="form-group">
+                    <label for="tags">添加标签:</label>
+                    <input type="text" class="form-control" name="tags" id="tags"
+                           th:attr="disabled = ${id != null ? '' : 'false'}"
+                           placeholder="创建或者搜索添加新话题..."
+                           th:value="${tags}" onclick="showSelectTag()" readonly>
+                    <div id="select-tag" class="publish-tag-tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" th:class="${type.type == '开发语言' ? 'active' : ''}"
+                                th:each="type : ${typeList}">
+                                <a th:href="${'#'+ type.getType()}" aria-controls="home" role="tab" data-toggle="tab"
+                                   aria-expanded="false">[[${type.type}]]</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" th:id="${type.type}" th:each="type : ${typeList}"
+                                 th:class="${type.type == '开发语言' ? 'active tab-pane' : 'tab-pane'}">
+                                <span th:each="tag : ${type.tags}" class="community-tag" onclick="selectTag(this)"
+                                      th:data-tag="${tag.tagName}">
+                                    [[${tag.tagName}]]
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg btn_float_right">发布</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div th:replace="fragment/alert :: original"></div>
+<script type="application/javascript">
+    $("#questionForm").submit(function (e) {
+        e.preventDefault();
+        var questionTitle = $("#questionTitle").val();
+        if ('' === questionTitle) {
+            $(".modal-body").text("请输入问题的标题");
+            $('#error_notice').modal("show");
+            return;
+        }
+        var description = $("#description").val();
+        if ('' === description) {
+            $(".modal-body").text("请输入更多的信息来描述你的问题，这样才能获得更好的解答");
+            $('#error_notice').modal("show");
+            return;
+        }
+        var tags = $("#tags").val();
+        if ('' === tags) {
+            $(".modal-body").text("请为问题选择标签，能更有效的获得解答");
+            $('#error_notice').modal("show");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/question/publish",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                "title": questionTitle,
+                "description": description,
+                "tags": tags,
+                "id": $("#questionId").val()
+            }),
+            success: function (result) {
+                if (result.code !== 200) {
+                    $(".modal-body").text(result.message);
+                    $('#error_notice').modal('show');
+                    return false;
+                } else {
+                    window.location.href = result.data;
+                }
+            }
+        });
+    });
+
+    function showSelectTag() {
+        var $questionId = $("#questionId");
+        var $selectTag = $("#select-tag");
+        if ("" !== $questionId.val())
+            return;
+        if ($selectTag.css("display") === "block") {
+            $selectTag.hide(500);
+            return;
+        }
+        $selectTag.show(500);
+    }
+
+    function selectTag(e) {
+        var value = e.getAttribute("data-tag");
+        var $tags = $("#tags");
+        var previous = $tags.val() ? "," + $tags.val() + "," : "";
+        if (previous.indexOf("," + value + ",") === -1) {
+            if (previous) {
+                var present = previous + value + ',';
+                $tags.val(present.substr(1, present.length - 2));
+            } else {
+                $tags.val(value);
+            }
+        } else {
+            present = previous.replace("," + value + ",", ",");
+            $tags.val(present.substr(1, present.length - 2));
+        }
+    }
+</script>
+<div th:replace="fragment/navigation :: footer"></div>
+</body>
+</html>
